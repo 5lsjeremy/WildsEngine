@@ -4,52 +4,108 @@ using WildsEngine.Core.Abstractions;
 
 namespace WildsEngine.Core.Processing
 {
-    public sealed class StateInstruction : IStateInstruction
+    public abstract class StateInstruction :
+        IStateInstruction
     {
-        private readonly IReadOnlyDictionary<string, object> _metadata;
+        private readonly Dictionary<string, object?> _arguments;
+        private readonly Dictionary<string, object?> _metadata;
 
-        public StateInstruction(
-            string operation,
-            string target,
-            object value)
-            : this(
-                operation,
-                target,
-                value,
-                new Dictionary<string, object>())
+        protected StateInstruction(
+            string intent,
+            object? payload = null,
+            IEnumerable<KeyValuePair<string, object?>>? arguments = null,
+            IEnumerable<KeyValuePair<string, object?>>? metadata = null)
         {
+            if (string.IsNullOrWhiteSpace(intent))
+            {
+                throw new ArgumentException(
+                    "Instruction intent cannot be empty.",
+                    nameof(intent));
+            }
+
+            Id = Guid.NewGuid();
+            Intent = intent;
+            Payload = payload;
+
+            _arguments = CreateDictionary(arguments);
+            _metadata = CreateDictionary(metadata);
         }
 
-        public StateInstruction(
-            string operation,
-            string target,
-            object value,
-            IReadOnlyDictionary<string, object> metadata)
-        {
-            if (string.IsNullOrWhiteSpace(operation))
-                throw new ArgumentException(
-                    "State instructions require an operation.",
-                    nameof(operation));
+        public Guid Id { get; }
 
-            if (string.IsNullOrWhiteSpace(target))
-                throw new ArgumentException(
-                    "State instructions require a target.",
-                    nameof(target));
+        public string Intent { get; }
 
-            Operation = operation.Trim();
-            Target = target.Trim();
-            Value = value;
-            _metadata = metadata ??
-                throw new ArgumentNullException(nameof(metadata));
-        }
+        public object? Payload { get; }
 
-        public string Operation { get; }
+        public IReadOnlyDictionary<string, object?> Arguments =>
+            _arguments;
 
-        public string Target { get; }
-
-        public object Value { get; }
-
-        public IReadOnlyDictionary<string, object> Metadata =>
+        public IReadOnlyDictionary<string, object?> Metadata =>
             _metadata;
+
+        protected void SetArgument(
+            string key,
+            object? value)
+        {
+            ValidateKey(key, nameof(key));
+
+            _arguments[key] = value;
+        }
+
+        protected void SetMetadata(
+            string key,
+            object? value)
+        {
+            ValidateKey(key, nameof(key));
+
+            _metadata[key] = value;
+        }
+
+        protected bool RemoveArgument(string key)
+        {
+            ValidateKey(key, nameof(key));
+
+            return _arguments.Remove(key);
+        }
+
+        protected bool RemoveMetadata(string key)
+        {
+            ValidateKey(key, nameof(key));
+
+            return _metadata.Remove(key);
+        }
+
+        private static Dictionary<string, object?> CreateDictionary(
+            IEnumerable<KeyValuePair<string, object?>>? source)
+        {
+            var result =
+                new Dictionary<string, object?>();
+
+            if (source == null)
+            {
+                return result;
+            }
+
+            foreach (var pair in source)
+            {
+                ValidateKey(pair.Key, nameof(source));
+
+                result[pair.Key] = pair.Value;
+            }
+
+            return result;
+        }
+
+        private static void ValidateKey(
+            string key,
+            string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Instruction keys cannot be empty.",
+                    parameterName);
+            }
+        }
     }
 }

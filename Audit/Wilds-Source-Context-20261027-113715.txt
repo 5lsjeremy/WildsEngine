@@ -1,0 +1,2205 @@
+============================================================
+ WILDS ENGINE SOURCE CONTEXT
+============================================================
+
+Generated: 2026-10-27 11:37:15
+Repository: C:\Users\jmatt\source\WildsEngine
+Files: 38
+
+============================================================
+ FILE INDEX
+============================================================
+
+WildsEngine.Console\Program.cs
+WildsEngine.Console\WildsEngine.Console.csproj
+WildsEngine.Core.Tests\ArbitraryObjectProcessingTests.cs
+WildsEngine.Core.Tests\ConsumerSetVariableInstruction.cs
+WildsEngine.Core.Tests\ConsumerThing.cs
+WildsEngine.Core.Tests\ConsumerVector.cs
+WildsEngine.Core.Tests\NullValueContractTests.cs
+WildsEngine.Core.Tests\TestComponent.cs
+WildsEngine.Core.Tests\TestContext.cs
+WildsEngine.Core.Tests\TestSignal.cs
+WildsEngine.Core.Tests\TestState.cs
+WildsEngine.Core.Tests\UnknownInstruction.cs
+WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj
+WildsEngine.Core\Abstractions\IBaseObject.cs
+WildsEngine.Core\Abstractions\IComponent.cs
+WildsEngine.Core\Abstractions\IContext.cs
+WildsEngine.Core\Abstractions\ISetContextVariableInstruction.cs
+WildsEngine.Core\Abstractions\ISignal.cs
+WildsEngine.Core\Abstractions\IState.cs
+WildsEngine.Core\Abstractions\IStateInstruction.cs
+WildsEngine.Core\Abstractions\Types\ComponentType.cs
+WildsEngine.Core\Components\BaseComponent.cs
+WildsEngine.Core\Contexts\WildsContext.cs
+WildsEngine.Core\Diagnostics\WildsLog.cs
+WildsEngine.Core\Objects\BaseObject.cs
+WildsEngine.Core\Processing\AddNeighborInstruction.cs
+WildsEngine.Core\Processing\ConsumerSetVariableInstruction.cs
+WildsEngine.Core\Processing\ContextVariableInstruction.cs
+WildsEngine.Core\Processing\RemoveNeighborInstruction.cs
+WildsEngine.Core\Processing\SetComponentMetadataInstruction.cs
+WildsEngine.Core\Processing\SetContextMetadataInstruction.cs
+WildsEngine.Core\Processing\SetContextVariableInstruction.cs
+WildsEngine.Core\Processing\StateInstruction.cs
+WildsEngine.Core\Signals\WildsSignal.cs
+WildsEngine.Core\States\WildsState.cs
+WildsEngine.Core\WildsEngine.Core.csproj
+WildsEngine.Qsl\WildsEngine.Qsl.csproj
+WildsEngine.sln
+
+============================================================
+ FILE: WildsEngine.Console\Program.cs
+============================================================
+
+Console.WriteLine("Hello, World!");
+
+
+
+============================================================
+ FILE: WildsEngine.Console\WildsEngine.Console.csproj
+============================================================
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
+
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\ArbitraryObjectProcessingTests.cs
+============================================================
+
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Diagnostics;
+using WildsEngine.Core.Objects;
+using WildsEngine.Core.Processing;
+using Xunit;
+using Xunit.Abstractions;
+
+namespace WildsEngine.Core.Tests
+{
+    public sealed class ArbitraryObjectProcessingTests :
+        IDisposable
+    {
+        private readonly ITestOutputHelper _output;
+        private readonly Action<string>? _previousWriter;
+        private readonly bool _previousEnabled;
+
+        public ArbitraryObjectProcessingTests(
+            ITestOutputHelper output)
+        {
+            _output = output
+                ?? throw new ArgumentNullException(
+                    nameof(output));
+
+            _previousWriter = WildsLog.Writer;
+            _previousEnabled = WildsLog.Enabled;
+
+            WildsLog.Enabled = true;
+            WildsLog.Writer = _output.WriteLine;
+        }
+
+        public void Dispose()
+        {
+            WildsLog.Writer = _previousWriter;
+            WildsLog.Enabled = _previousEnabled;
+        }
+
+        [Fact]
+        public void State_processes_external_reference_type_without_core_knowledge()
+        {
+            WildsLog.Info(
+                "Starting external reference-type processing test.");
+
+            var component = new TestComponent("test");
+
+            var payload = new ConsumerThing(
+                "External Consumer Object",
+                42);
+
+            WildsLog.Process(
+                $"Created consumer-owned payload. " +
+                $"Type={payload.GetType().FullName}, " +
+                $"Name={payload.Name}, " +
+                $"Value={payload.Value}.");
+
+            var instruction = new SetContextVariableInstruction(
+                "consumer",
+                payload);
+
+            WildsLog.Process(
+                $"Processing instruction. " +
+                $"Id={instruction.Id}, " +
+                $"Intent={instruction.Intent}, " +
+                $"Key={instruction.Key}.");
+
+            var processed =
+                component.State.Process(instruction);
+
+            WildsLog.State(
+                $"Instruction processed. " +
+                $"Result={processed}, " +
+                $"VariableExists=" +
+                $"{component.State.Context.Variables.ContainsKey("consumer")}.");
+
+            Assert.True(processed);
+            Assert.True(
+                component.State.Context.Variables.ContainsKey(
+                    "consumer"));
+
+            var stored =
+                component.State.Context.Variables["consumer"];
+
+            WildsLog.State(
+                $"Retrieved stored value. " +
+                $"Type={stored?.GetType().FullName ?? "<null>"}.");
+
+            Assert.Same(payload, stored);
+
+            var typed =
+                Assert.IsType<ConsumerThing>(stored);
+
+            Assert.Equal(
+                "External Consumer Object",
+                typed.Name);
+
+            Assert.Equal(42, typed.Value);
+
+            WildsLog.Info(
+                "External reference-type processing test passed.");
+        }
+
+        [Fact]
+        public void State_processes_external_value_type_without_core_knowledge()
+        {
+            WildsLog.Info(
+                "Starting external value-type processing test.");
+
+            var component = new TestComponent("test");
+
+            var payload = new ConsumerVector(
+                12.5f,
+                -4.25f,
+                81.75f);
+
+            WildsLog.Process(
+                $"Created consumer-owned value payload. " +
+                $"Type={payload.GetType().FullName}, " +
+                $"X={payload.X}, " +
+                $"Y={payload.Y}, " +
+                $"Z={payload.Z}.");
+
+            var instruction = new SetContextVariableInstruction(
+                "position",
+                payload);
+
+            WildsLog.Process(
+                $"Processing instruction. " +
+                $"Id={instruction.Id}, " +
+                $"Intent={instruction.Intent}, " +
+                $"Key={instruction.Key}.");
+
+            var processed =
+                component.State.Process(instruction);
+
+            WildsLog.State(
+                $"Instruction processed. " +
+                $"Result={processed}, " +
+                $"VariableExists=" +
+                $"{component.State.Context.Variables.ContainsKey("position")}.");
+
+            Assert.True(processed);
+            Assert.True(
+                component.State.Context.Variables.ContainsKey(
+                    "position"));
+
+            var stored =
+                component.State.Context.Variables["position"];
+
+            WildsLog.State(
+                $"Retrieved stored value. " +
+                $"Type={stored?.GetType().FullName ?? "<null>"}.");
+
+            var typed =
+                Assert.IsType<ConsumerVector>(stored);
+
+            Assert.Equal(payload, typed);
+            Assert.Equal(12.5f, typed.X);
+            Assert.Equal(-4.25f, typed.Y);
+            Assert.Equal(81.75f, typed.Z);
+
+            WildsLog.Info(
+                "External value-type processing test passed.");
+        }
+
+        [Fact]
+        public void State_can_replace_an_existing_arbitrary_runtime_value()
+        {
+            WildsLog.Info(
+                "Starting arbitrary runtime-value replacement test.");
+
+            var component = new TestComponent("test");
+
+            var original = new ConsumerThing(
+                "Original",
+                1);
+
+            var replacement = new ConsumerThing(
+                "Replacement",
+                2);
+
+            var originalInstruction =
+                new SetContextVariableInstruction(
+                    "subject",
+                    original);
+
+            WildsLog.Process(
+                $"Processing original value. " +
+                $"InstructionId={originalInstruction.Id}, " +
+                $"Name={original.Name}, " +
+                $"Value={original.Value}.");
+
+            Assert.True(
+                component.State.Process(
+                    originalInstruction));
+
+            var replacementInstruction =
+                new SetContextVariableInstruction(
+                    "subject",
+                    replacement);
+
+            WildsLog.Process(
+                $"Processing replacement value. " +
+                $"InstructionId={replacementInstruction.Id}, " +
+                $"Name={replacement.Name}, " +
+                $"Value={replacement.Value}.");
+
+            Assert.True(
+                component.State.Process(
+                    replacementInstruction));
+
+            var stored =
+                component.State.Context.Variables["subject"];
+
+            WildsLog.State(
+                $"Replacement completed. " +
+                $"StoredType=" +
+                $"{stored?.GetType().FullName ?? "<null>"}.");
+
+            Assert.Same(replacement, stored);
+            Assert.NotSame(original, stored);
+
+            var typed =
+                Assert.IsType<ConsumerThing>(stored);
+
+            Assert.Equal("Replacement", typed.Name);
+            Assert.Equal(2, typed.Value);
+
+            WildsLog.Info(
+                "Arbitrary runtime-value replacement test passed.");
+        }
+
+        [Fact]
+        public void State_processing_can_transition_existing_value_to_null()
+        {
+            WildsLog.Info(
+                "Starting value-to-null transition test.");
+
+            var component = new TestComponent("test");
+
+            var original = new ConsumerThing(
+                "Original",
+                1);
+
+            var originalInstruction =
+                new SetContextVariableInstruction(
+                    "subject",
+                    original);
+
+            WildsLog.Process(
+                $"Setting initial non-null value. " +
+                $"InstructionId={originalInstruction.Id}.");
+
+            Assert.True(
+                component.State.Process(
+                    originalInstruction));
+
+            Assert.Same(
+                original,
+                component.State.Context.Variables["subject"]);
+
+            var nullInstruction =
+                new SetContextVariableInstruction(
+                    "subject",
+                    null);
+
+            WildsLog.Process(
+                $"Transitioning existing value to null. " +
+                $"InstructionId={nullInstruction.Id}.");
+
+            Assert.True(
+                component.State.Process(
+                    nullInstruction));
+
+            var keyExists =
+                component.State.Context.Variables.ContainsKey(
+                    "subject");
+
+            var stored =
+                component.State.Context.Variables["subject"];
+
+            WildsLog.State(
+                $"Value-to-null transition completed. " +
+                $"KeyExists={keyExists}, " +
+                $"StoredIsNull={stored == null}.");
+
+            Assert.True(keyExists);
+            Assert.Null(stored);
+
+            WildsLog.Info(
+                "Value-to-null transition test passed.");
+        }
+
+        [Fact]
+        public void State_processing_can_transition_null_to_consumer_object()
+        {
+            WildsLog.Info(
+                "Starting null-to-consumer-object transition test.");
+
+            var component = new TestComponent("test");
+
+            var replacement = new ConsumerThing(
+                "Replacement",
+                2);
+
+            var nullInstruction =
+                new SetContextVariableInstruction(
+                    "subject",
+                    null);
+
+            WildsLog.Process(
+                $"Creating present-null variable. " +
+                $"InstructionId={nullInstruction.Id}.");
+
+            Assert.True(
+                component.State.Process(
+                    nullInstruction));
+
+            Assert.True(
+                component.State.Context.Variables.ContainsKey(
+                    "subject"));
+
+            Assert.Null(
+                component.State.Context.Variables["subject"]);
+
+            var replacementInstruction =
+                new SetContextVariableInstruction(
+                    "subject",
+                    replacement);
+
+            WildsLog.Process(
+                $"Transitioning null value to consumer object. " +
+                $"InstructionId={replacementInstruction.Id}, " +
+                $"Name={replacement.Name}, " +
+                $"Value={replacement.Value}.");
+
+            Assert.True(
+                component.State.Process(
+                    replacementInstruction));
+
+            var stored =
+                component.State.Context.Variables["subject"];
+
+            WildsLog.State(
+                $"Null-to-object transition completed. " +
+                $"StoredType=" +
+                $"{stored?.GetType().FullName ?? "<null>"}.");
+
+            Assert.Same(replacement, stored);
+
+            var typed =
+                Assert.IsType<ConsumerThing>(stored);
+
+            Assert.Equal("Replacement", typed.Name);
+            Assert.Equal(2, typed.Value);
+
+            WildsLog.Info(
+                "Null-to-consumer-object transition test passed.");
+        }
+
+        [Fact]
+        public void Context_metadata_remains_separate_from_component_metadata()
+        {
+            WildsLog.Info(
+                "Starting metadata ownership-separation test.");
+
+            var component = new TestComponent("test");
+
+            component.Metadata["category"] =
+                "component";
+
+            WildsLog.State(
+                "Set component-owned metadata: " +
+                "category=component.");
+
+            component.State.Context.SetMetadata(
+                "category",
+                "processing-context");
+
+            WildsLog.State(
+                "Set context-owned metadata: " +
+                "category=processing-context.");
+
+            var componentCategory =
+                component.Metadata["category"];
+
+            var contextCategory =
+                component.State.Context.Metadata["category"];
+
+            WildsLog.State(
+                $"Resolved metadata values. " +
+                $"Component={componentCategory}, " +
+                $"Context={contextCategory}.");
+
+            Assert.Equal(
+                "component",
+                componentCategory);
+
+            Assert.Equal(
+                "processing-context",
+                contextCategory);
+
+            WildsLog.Info(
+                "Metadata ownership-separation test passed.");
+        }
+
+        [Fact]
+        public void Base_object_shortcuts_resolve_to_component_owned_properties()
+        {
+            WildsLog.Info(
+                "Starting BaseObject shortcut-resolution test.");
+
+            var component = new TestComponent("test");
+
+            BaseObject baseObject = component;
+
+            WildsLog.State(
+                $"Resolving shortcuts through component. " +
+                $"ComponentId={component.Id}, " +
+                $"ComponentSlug={component.Slug}.");
+
+            Assert.Same(
+                component,
+                baseObject.Component);
+
+            Assert.Same(
+                component.State,
+                baseObject.State);
+
+            Assert.Same(
+                component.Signal,
+                baseObject.Signal);
+
+            Assert.Same(
+                component.Metadata,
+                baseObject.Metadata);
+
+            WildsLog.Info(
+                "BaseObject shortcut-resolution test passed.");
+        }
+
+        [Fact]
+        public void Context_rejects_invalid_variable_keys()
+        {
+            WildsLog.Info(
+                "Starting invalid context-key rejection test.");
+
+            var component = new TestComponent("test");
+
+            WildsLog.Process(
+                "Attempting to set a context variable " +
+                "using a whitespace-only key.");
+
+            var exception =
+                Assert.Throws<ArgumentException>(
+                    () =>
+                        component.State.Context.SetVariable(
+                            " ",
+                            new ConsumerThing(
+                                "Invalid",
+                                0)));
+
+            WildsLog.Warning(
+                $"Invalid key was rejected. " +
+                $"ExceptionType={exception.GetType().FullName}, " +
+                $"Parameter={exception.ParamName}.");
+
+            Assert.Empty(
+                component.State.Context.Variables);
+
+            WildsLog.Info(
+                "Invalid context-key rejection test passed.");
+        }
+
+        [Fact]
+        public void State_rejects_unknown_instruction_types()
+        {
+            WildsLog.Info(
+                "Starting unknown-instruction rejection test.");
+
+            var component = new TestComponent("test");
+
+            IStateInstruction instruction =
+                new UnknownInstruction();
+
+            WildsLog.Process(
+                $"Processing unknown instruction. " +
+                $"Type={instruction.GetType().FullName}, " +
+                $"Id={instruction.Id}, " +
+                $"Intent={instruction.Intent}.");
+
+            var processed =
+                component.State.Process(instruction);
+
+            WildsLog.Warning(
+                $"Unknown instruction processing completed. " +
+                $"Accepted={processed}.");
+
+            Assert.False(processed);
+            Assert.Empty(
+                component.State.Context.Variables);
+
+            WildsLog.Info(
+                "Unknown-instruction rejection test passed.");
+        }
+
+        [Fact]
+        public void State_processes_external_instruction_and_payload_without_core_knowledge()
+        {
+            WildsLog.Info(
+                "Starting external instruction and payload test.");
+
+            var component = new TestComponent("test");
+
+            var payload = new ConsumerVector(
+                7.5f,
+                -2.25f,
+                19.0f);
+
+            WildsLog.Process(
+                $"Created external payload. " +
+                $"Type={payload.GetType().FullName}, " +
+                $"X={payload.X}, " +
+                $"Y={payload.Y}, " +
+                $"Z={payload.Z}.");
+
+            IStateInstruction instruction =
+                new ConsumerSetVariableInstruction(
+                    "velocity",
+                    payload);
+
+            WildsLog.Process(
+                $"Created external instruction. " +
+                $"Type={instruction.GetType().FullName}, " +
+                $"Id={instruction.Id}, " +
+                $"Intent={instruction.Intent}, " +
+                $"PayloadType=" +
+                $"{instruction.Payload?.GetType().FullName ?? "<null>"}.");
+
+            var processed =
+                component.State.Process(instruction);
+
+            WildsLog.State(
+                $"External instruction processed. " +
+                $"Result={processed}, " +
+                $"VariableExists=" +
+                $"{component.State.Context.Variables.ContainsKey("velocity")}.");
+
+            Assert.True(processed);
+
+            Assert.True(
+                component.State.Context.Variables.ContainsKey(
+                    "velocity"));
+
+            var stored =
+                component.State.Context.Variables["velocity"];
+
+            WildsLog.State(
+                $"Retrieved external payload from context. " +
+                $"StoredType=" +
+                $"{stored?.GetType().FullName ?? "<null>"}.");
+
+            var typed =
+                Assert.IsType<ConsumerVector>(stored);
+
+            Assert.Equal(payload, typed);
+            Assert.Equal(7.5f, typed.X);
+            Assert.Equal(-2.25f, typed.Y);
+            Assert.Equal(19.0f, typed.Z);
+
+            Assert.NotEqual(
+                Guid.Empty,
+                instruction.Id);
+
+            Assert.Equal(
+                "consumer.context.variable.set",
+                instruction.Intent);
+
+            Assert.Equal(
+                payload,
+                instruction.Payload);
+
+            WildsLog.Info(
+                "External instruction and payload test passed.");
+        }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\ConsumerSetVariableInstruction.cs
+============================================================
+
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Processing;
+
+namespace WildsEngine.Core.Tests
+{
+    public sealed class ConsumerSetVariableInstruction :
+        StateInstruction,
+        ISetContextVariableInstruction
+    {
+        public ConsumerSetVariableInstruction(
+            string key,
+            object? value)
+            : base(
+                "consumer.context.variable.set",
+                value)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Variable key cannot be empty.",
+                    nameof(key));
+            }
+
+            Key = key;
+            Value = value;
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\ConsumerThing.cs
+============================================================
+
+namespace WildsEngine.Core.Tests;
+
+public sealed class ConsumerThing
+{
+    public ConsumerThing(
+        string name,
+        int value)
+    {
+        Name = name;
+        Value = value;
+    }
+
+    public string Name { get; }
+
+    public int Value { get; }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\ConsumerVector.cs
+============================================================
+
+namespace WildsEngine.Core.Tests;
+
+public readonly struct ConsumerVector :
+    IEquatable<ConsumerVector>
+{
+    public ConsumerVector(
+        float x,
+        float y,
+        float z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+
+    public float X { get; }
+
+    public float Y { get; }
+
+    public float Z { get; }
+
+    public bool Equals(ConsumerVector other)
+    {
+        return X.Equals(other.X)
+               && Y.Equals(other.Y)
+               && Z.Equals(other.Z);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ConsumerVector other
+               && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hash = 17;
+
+            hash = (hash * 31) + X.GetHashCode();
+            hash = (hash * 31) + Y.GetHashCode();
+            hash = (hash * 31) + Z.GetHashCode();
+
+            return hash;
+        }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\NullValueContractTests.cs
+============================================================
+
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+using Xunit;
+
+namespace WildsEngine.Core.Tests
+{
+    public sealed class NullValueContractTests
+    {
+        [Fact]
+        public void ContextVariableDictionary_CanRepresentNull()
+        {
+            var values = new Dictionary<string, object?>
+            {
+                ["target"] = null
+            };
+
+            IReadOnlyDictionary<string, object?> readOnly = values;
+
+            Assert.True(readOnly.ContainsKey("target"));
+            Assert.Null(readOnly["target"]);
+        }
+
+        [Fact]
+        public void NullValue_IsDistinctFromMissingKey()
+        {
+            var values = new Dictionary<string, object?>
+            {
+                ["target"] = null
+            };
+
+            IReadOnlyDictionary<string, object?> readOnly = values;
+
+            Assert.True(readOnly.ContainsKey("target"));
+            Assert.False(readOnly.ContainsKey("missing"));
+        }
+
+        [Fact]
+        public void ValueCanTransitionToNull()
+        {
+            var expected = new ConsumerThing("external");
+
+            var values = new Dictionary<string, object?>
+            {
+                ["target"] = expected
+            };
+
+            values["target"] = null;
+
+            Assert.True(values.ContainsKey("target"));
+            Assert.Null(values["target"]);
+        }
+
+        [Fact]
+        public void NullCanTransitionToConsumerObject()
+        {
+            var expected = new ConsumerThing("external");
+
+            var values = new Dictionary<string, object?>
+            {
+                ["target"] = null
+            };
+
+            values["target"] = expected;
+
+            Assert.Same(expected, values["target"]);
+        }
+
+        [Fact]
+        public void ArbitraryConsumerObjectRetainsConcreteType()
+        {
+            var expected = new ConsumerThing("external");
+
+            var values = new Dictionary<string, object?>
+            {
+                ["target"] = expected
+            };
+
+            var actual = values["target"];
+
+            Assert.Same(expected, actual);
+            Assert.IsType<ConsumerThing>(actual);
+        }
+
+        private sealed class ConsumerThing
+        {
+            public ConsumerThing(string name)
+            {
+                Name = name;
+            }
+
+            public string Name { get; }
+        }
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\TestComponent.cs
+============================================================
+
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Components;
+
+namespace WildsEngine.Core.Tests;
+
+public sealed class TestComponent :
+    BaseComponent
+{
+    private readonly IState _state;
+    private readonly ISignal _signal;
+
+    public TestComponent(string layer)
+        : base(layer)
+    {
+        var context = new TestContext(
+            this,
+            $"{layer}.context");
+
+        _state = new TestState(
+            this,
+            context,
+            $"{layer}.state");
+
+        _signal = new TestSignal(
+            this,
+            $"{layer}.signal");
+    }
+
+    public override IState State => _state;
+
+    public override ISignal Signal => _signal;
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\TestContext.cs
+============================================================
+
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Tests;
+
+public sealed class TestContext :
+    BaseObject,
+    IContext
+{
+    private readonly IComponent _component;
+
+    private readonly Dictionary<string, object?> _variables =
+        new Dictionary<string, object?>();
+
+    private readonly Dictionary<string, object?>
+        _contextMetadata =
+            new Dictionary<string, object?>();
+
+    public TestContext(
+        IComponent component,
+        string layer)
+        : base(layer)
+    {
+        _component = component
+                     ?? throw new ArgumentNullException(
+                         nameof(component));
+    }
+
+    public override IComponent Component =>
+        _component;
+
+    public IReadOnlyDictionary<string, object?> Variables =>
+        _variables;
+
+    IReadOnlyDictionary<string, object?> IContext.Metadata =>
+        _contextMetadata;
+
+    public void SetVariable(
+        string key,
+        object? value)
+    {
+        ValidateKey(key);
+
+        _variables[key] = value;
+    }
+
+    public void SetMetadata(
+        string key,
+        object? value)
+    {
+        ValidateKey(key);
+
+        _contextMetadata[key] = value;
+    }
+
+    private static void ValidateKey(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            throw new ArgumentException(
+                "Context keys cannot be empty.",
+                nameof(key));
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\TestSignal.cs
+============================================================
+
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Tests;
+
+public sealed class TestSignal :
+    BaseObject,
+    ISignal
+{
+    private readonly IComponent _component;
+
+    public TestSignal(
+        IComponent component,
+        string layer)
+        : base(layer)
+    {
+        _component = component
+                     ?? throw new ArgumentNullException(
+                         nameof(component));
+    }
+
+    public override IComponent Component =>
+        _component;
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\TestState.cs
+============================================================
+
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+using WildsEngine.Core.Processing;
+
+namespace WildsEngine.Core.Tests;
+
+public sealed class TestState :
+    BaseObject,
+    IState
+{
+    private readonly IComponent _component;
+
+    public TestState(
+        IComponent component,
+        IContext context,
+        string layer)
+        : base(layer)
+    {
+        _component = component
+                     ?? throw new ArgumentNullException(
+                         nameof(component));
+
+        Context = context
+                  ?? throw new ArgumentNullException(
+                      nameof(context));
+    }
+
+    public override IComponent Component =>
+        _component;
+
+    public IContext Context { get; }
+
+    public bool Process(
+        IStateInstruction instruction)
+    {
+        if (instruction == null)
+        {
+            throw new ArgumentNullException(
+                nameof(instruction));
+        }
+
+        if (instruction is not ISetContextVariableInstruction setVariable)
+        {
+            return false;
+        }
+
+        Context.SetVariable(
+            setVariable.Key,
+            setVariable.Value);
+
+        return true;
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\UnknownInstruction.cs
+============================================================
+
+using WildsEngine.Core.Processing;
+
+namespace WildsEngine.Core.Tests;
+
+public sealed class UnknownInstruction :
+    StateInstruction
+{
+    public UnknownInstruction()
+        : base(
+            intent: "test.unknown",
+            payload: null)
+    {
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj
+============================================================
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+  </ItemGroup>
+</Project>
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\IBaseObject.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IBaseObject
+    {
+        Guid Id { get; }
+
+        string Slug { get; }
+
+        IReadOnlyList<IBaseObject> Neighbors { get; }
+
+        IComponent Component { get; }
+
+        string AppendSlug(string value);
+
+        bool AddNeighbor(IBaseObject neighbor);
+
+        bool RemoveNeighbor(Guid id);
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\IComponent.cs
+============================================================
+
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IComponent : IBaseObject
+    {
+        IState State { get; }
+
+        ISignal Signal { get; }
+
+        IDictionary<string, object?> Metadata { get; }
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\IContext.cs
+============================================================
+
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IContext : IBaseObject
+    {
+        IReadOnlyDictionary<string, object?> Variables { get; }
+
+        IReadOnlyDictionary<string, object?> Metadata { get; }
+
+        void SetVariable(string key, object? value);
+
+        void SetMetadata(string key, object? value);
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\ISetContextVariableInstruction.cs
+============================================================
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface ISetContextVariableInstruction :
+        IStateInstruction
+    {
+        string Key { get; }
+
+        object? Value { get; }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\ISignal.cs
+============================================================
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface ISignal : IBaseObject
+    {
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\IState.cs
+============================================================
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IState : IBaseObject
+    {
+        IContext Context { get; }
+
+        bool Process(IStateInstruction instruction);
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\IStateInstruction.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IStateInstruction
+    {
+        Guid Id { get; }
+
+        string Intent { get; }
+
+        object? Payload { get; }
+
+        IReadOnlyDictionary<string, object?> Arguments { get; }
+
+        IReadOnlyDictionary<string, object?> Metadata { get; }
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Abstractions\Types\ComponentType.cs
+============================================================
+
+namespace WildsEngine.Core.Abstractions.Types
+{
+    public enum ComponentType
+    {
+        Unknown = 0,
+        Node,
+        Facet,
+        Layer
+    }
+    
+    public enum LayerType
+    {
+        Unknown = 0
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core\Components\BaseComponent.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Components
+{
+    public abstract class BaseComponent : BaseObject, IComponent
+    {
+        private readonly Dictionary<string, object?> _metadata =
+            new Dictionary<string, object?>();
+
+        protected BaseComponent(string layer)
+            : base(layer)
+        {
+        }
+
+        protected BaseComponent(Guid id, string layer)
+            : base(id, layer)
+        {
+        }
+
+        public sealed override IComponent Component =>
+            this;
+
+        public abstract override IState State { get; }
+
+        public abstract override ISignal Signal { get; }
+
+        public sealed override IDictionary<string, object?> Metadata =>
+            _metadata;
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Contexts\WildsContext.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Contexts
+{
+    public abstract class WildsContext :
+        BaseObject,
+        IContext
+    {
+        private readonly Dictionary<string, object?> _variables =
+            new Dictionary<string, object?>();
+
+        private readonly Dictionary<string, object?> _contextMetadata =
+            new Dictionary<string, object?>();
+
+        private readonly IComponent _component;
+
+        protected WildsContext(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component
+                ?? throw new ArgumentNullException(
+                    nameof(component));
+        }
+
+        protected WildsContext(
+            Guid id,
+            IComponent component,
+            string layer)
+            : base(id, layer)
+        {
+            _component = component
+                ?? throw new ArgumentNullException(
+                    nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+
+        public IReadOnlyDictionary<string, object?> Variables =>
+            _variables;
+
+        IReadOnlyDictionary<string, object?> IContext.Metadata =>
+            _contextMetadata;
+
+        public virtual void SetVariable(
+            string key,
+            object? value)
+        {
+            ValidateKey(key);
+
+            _variables[key] = value;
+        }
+
+        public virtual void SetMetadata(
+            string key,
+            object? value)
+        {
+            ValidateKey(key);
+
+            _contextMetadata[key] = value;
+        }
+
+        protected bool RemoveVariable(string key)
+        {
+            ValidateKey(key);
+
+            return _variables.Remove(key);
+        }
+
+        protected bool RemoveMetadata(string key)
+        {
+            ValidateKey(key);
+
+            return _contextMetadata.Remove(key);
+        }
+
+        protected bool TryGetVariable(
+            string key,
+            out object? value)
+        {
+            ValidateKey(key);
+
+            return _variables.TryGetValue(
+                key,
+                out value);
+        }
+
+        protected bool TryGetMetadata(
+            string key,
+            out object? value)
+        {
+            ValidateKey(key);
+
+            return _contextMetadata.TryGetValue(
+                key,
+                out value);
+        }
+
+        protected static void ValidateKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException(
+                    "Context keys cannot be empty.",
+                    nameof(key));
+        }
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Diagnostics\WildsLog.cs
+============================================================
+
+using System;
+
+namespace WildsEngine.Core.Diagnostics
+{
+    public static class WildsLog
+    {
+        public static Action<string>? Writer { get; set; }
+
+        public static bool Enabled { get; set; } = true;
+
+        public static void Info(string message)
+        {
+            Write("INFO", message);
+        }
+
+        public static void Process(string message)
+        {
+            Write("PROCESS", message);
+        }
+
+        public static void State(string message)
+        {
+            Write("STATE", message);
+        }
+
+        public static void Warning(string message)
+        {
+            Write("WARN", message);
+        }
+
+        public static void Error(string message)
+        {
+            Write("ERROR", message);
+        }
+
+        private static void Write(
+            string category,
+            string message)
+        {
+            if (!Enabled)
+                return;
+
+            var formatted =
+                $"[Wilds:{category}] {message}";
+
+            if (Writer != null)
+            {
+                Writer(formatted);
+                return;
+            }
+
+            Console.WriteLine(formatted);
+        }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core\Objects\BaseObject.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Objects
+{
+    public abstract class BaseObject : IBaseObject
+    {
+        private readonly List<IBaseObject> _neighbors =
+            new List<IBaseObject>();
+
+        protected BaseObject(string layer)
+            : this(Guid.NewGuid(), layer)
+        {
+        }
+
+        protected BaseObject(Guid id, string layer)
+        {
+            if (id == Guid.Empty)
+                throw new ArgumentException(
+                    "Wilds objects require a non-empty GUID.",
+                    nameof(id));
+
+            if (string.IsNullOrWhiteSpace(layer))
+                throw new ArgumentException(
+                    "Wilds objects require a layer.",
+                    nameof(layer));
+
+            Id = id;
+            Slug = BuildSlug(id, layer);
+        }
+
+        public Guid Id { get; }
+
+        public string Slug { get; private set; }
+
+        public IReadOnlyList<IBaseObject> Neighbors =>
+            _neighbors.AsReadOnly();
+
+        public abstract IComponent Component { get; }
+
+        // Component shortcuts.
+        // These intentionally do NOT belong to IBaseObject.
+
+        public virtual IState State =>
+            Component.State;
+
+        public virtual ISignal Signal =>
+            Component.Signal;
+
+        public virtual IDictionary<string, object?> Metadata =>
+            Component.Metadata;
+
+        public string AppendSlug(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return Slug;
+
+            var segment = value.Trim().Trim('.');
+
+            if (segment.Length == 0)
+                return Slug;
+
+            Slug = $"{Slug}.{segment}";
+
+            return Slug;
+        }
+
+        public bool AddNeighbor(IBaseObject neighbor)
+        {
+            if (neighbor == null)
+                throw new ArgumentNullException(nameof(neighbor));
+
+            if (neighbor.Id == Id)
+                return false;
+
+            for (var i = 0; i < _neighbors.Count; i++)
+            {
+                if (_neighbors[i].Id == neighbor.Id)
+                    return false;
+            }
+
+            _neighbors.Add(neighbor);
+
+            return true;
+        }
+
+        public bool RemoveNeighbor(Guid id)
+        {
+            for (var i = 0; i < _neighbors.Count; i++)
+            {
+                if (_neighbors[i].Id != id)
+                    continue;
+
+                _neighbors.RemoveAt(i);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private static string BuildSlug(Guid id, string layer)
+        {
+            var raw = id.ToString("N");
+
+            var first = raw.Substring(0, 3);
+            var last = raw.Substring(raw.Length - 3, 3);
+
+            return $"{first}{last}-{layer.Trim()}";
+        }
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\AddNeighborInstruction.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class AddNeighborInstruction :
+        StateInstruction
+    {
+        public const string IntentName =
+            "topology.neighbor.add";
+
+        public AddNeighborInstruction(
+            IBaseObject neighbor,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                ValidateNeighbor(neighbor),
+                metadata: metadata)
+        {
+            Neighbor = neighbor;
+        }
+
+        public IBaseObject Neighbor { get; }
+
+        private static IBaseObject ValidateNeighbor(
+            IBaseObject neighbor)
+        {
+            return neighbor
+                ?? throw new ArgumentNullException(
+                    nameof(neighbor));
+        }
+    }
+}
+
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\ConsumerSetVariableInstruction.cs
+============================================================
+
+using WildsEngine.Core.Processing;
+
+public sealed class ConsumerSetVariableInstruction :
+    ContextVariableInstruction
+{
+    public ConsumerSetVariableInstruction(
+        string key,
+        object? value)
+        : base(
+            "consumer.context.variable.set",
+            key,
+            value)
+    {
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\ContextVariableInstruction.cs
+============================================================
+
+using System;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class ContextVariableInstruction :
+        StateInstruction
+    {
+        protected ContextVariableInstruction(
+            string intent,
+            string key,
+            object? value)
+            : base(
+                intent,
+                value)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Context variable key cannot be empty.",
+                    nameof(key));
+            }
+
+            Key = key;
+            Value = value;
+
+            SetArgument("key", key);
+            SetArgument("value", value);
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\RemoveNeighborInstruction.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class RemoveNeighborInstruction :
+        StateInstruction
+    {
+        public const string IntentName =
+            "topology.neighbor.remove";
+
+        public RemoveNeighborInstruction(
+            Guid neighborId,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                ValidateId(neighborId),
+                metadata: metadata)
+        {
+            NeighborId = neighborId;
+        }
+
+        public Guid NeighborId { get; }
+
+        private static Guid ValidateId(Guid neighborId)
+        {
+            if (neighborId == Guid.Empty)
+            {
+                throw new ArgumentException(
+                    "Neighbor removal requires a non-empty GUID.",
+                    nameof(neighborId));
+            }
+
+            return neighborId;
+        }
+    }
+}
+
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\SetComponentMetadataInstruction.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetComponentMetadataInstruction :
+        StateInstruction
+    {
+        public const string IntentName =
+            "component.metadata.set";
+
+        public SetComponentMetadataInstruction(
+            string key,
+            object? value,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                value,
+                CreateArguments(key),
+                metadata)
+        {
+            Key = ValidateKey(key);
+            Value = value;
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+
+        private static IDictionary<string, object?> CreateArguments(
+            string key)
+        {
+            return new Dictionary<string, object?>
+            {
+                ["key"] = ValidateKey(key)
+            };
+        }
+
+        private static string ValidateKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Component metadata instructions require a key.",
+                    nameof(key));
+            }
+
+            return key.Trim();
+        }
+    }
+}
+
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\SetContextMetadataInstruction.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetContextMetadataInstruction :
+        StateInstruction
+    {
+        public const string IntentName =
+            "context.metadata.set";
+
+        public SetContextMetadataInstruction(
+            string key,
+            object? value,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                value,
+                CreateArguments(key),
+                metadata)
+        {
+            Key = ValidateKey(key);
+            Value = value;
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+
+        private static IDictionary<string, object?> CreateArguments(
+            string key)
+        {
+            return new Dictionary<string, object?>
+            {
+                ["key"] = ValidateKey(key)
+            };
+        }
+
+        private static string ValidateKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Context metadata instructions require a key.",
+                    nameof(key));
+            }
+
+            return key.Trim();
+        }
+    }
+}
+
+
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\SetContextVariableInstruction.cs
+============================================================
+
+using System;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetContextVariableInstruction :
+        StateInstruction,
+        ISetContextVariableInstruction
+    {
+        public SetContextVariableInstruction(
+            string key,
+            object? value)
+            : base(
+                "context.variable.set",
+                value)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Variable key cannot be empty.",
+                    nameof(key));
+            }
+
+            Key = key;
+            Value = value;
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core\Processing\StateInstruction.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class StateInstruction :
+        IStateInstruction
+    {
+        protected StateInstruction(
+            string intent,
+            object? payload = null,
+            IReadOnlyDictionary<string, object?>? arguments = null,
+            IReadOnlyDictionary<string, object?>? metadata = null)
+        {
+            if (string.IsNullOrWhiteSpace(intent))
+            {
+                throw new ArgumentException(
+                    "Instruction intent cannot be empty.",
+                    nameof(intent));
+            }
+
+            Id = Guid.NewGuid();
+            Intent = intent;
+            Payload = payload;
+
+            Arguments =
+                arguments ??
+                new Dictionary<string, object?>();
+
+            Metadata =
+                metadata ??
+                new Dictionary<string, object?>();
+        }
+
+        public Guid Id { get; }
+
+        public string Intent { get; }
+
+        public object? Payload { get; }
+
+        public IReadOnlyDictionary<string, object?> Arguments { get; }
+
+        public IReadOnlyDictionary<string, object?> Metadata { get; }
+    }
+}
+
+
+============================================================
+ FILE: WildsEngine.Core\Signals\WildsSignal.cs
+============================================================
+
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Signals
+{
+    public abstract class WildsSignal :
+        BaseObject,
+        ISignal
+    {
+        private readonly IComponent _component;
+
+        protected WildsSignal(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component
+                ?? throw new ArgumentNullException(
+                    nameof(component));
+        }
+
+        protected WildsSignal(
+            Guid id,
+            IComponent component,
+            string layer)
+            : base(id, layer)
+        {
+            _component = component
+                ?? throw new ArgumentNullException(
+                    nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\States\WildsState.cs
+============================================================
+
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.States
+{
+    public abstract class WildsState :
+        BaseObject,
+        IState
+    {
+        private readonly IComponent _component;
+
+        protected WildsState(
+            IComponent component,
+            IContext context,
+            string layer)
+            : base(layer)
+        {
+            _component = component
+                ?? throw new ArgumentNullException(
+                    nameof(component));
+
+            Context = context
+                ?? throw new ArgumentNullException(
+                    nameof(context));
+        }
+
+        protected WildsState(
+            Guid id,
+            IComponent component,
+            IContext context,
+            string layer)
+            : base(id, layer)
+        {
+            _component = component
+                ?? throw new ArgumentNullException(
+                    nameof(component));
+
+            Context = context
+                ?? throw new ArgumentNullException(
+                    nameof(context));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+
+        public IContext Context { get; }
+
+        public abstract bool Process(
+            IStateInstruction instruction);
+    }
+}
+
+
+
+============================================================
+ FILE: WildsEngine.Core\WildsEngine.Core.csproj
+============================================================
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Abstractions\Base\" />
+  </ItemGroup>
+</Project>
+
+
+============================================================
+ FILE: WildsEngine.Qsl\WildsEngine.Qsl.csproj
+============================================================
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
+
+
+
+============================================================
+ FILE: WildsEngine.sln
+============================================================
+
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Core", "WildsEngine.Core\WildsEngine.Core.csproj", "{9A2F378C-3645-474E-909E-D9D8409803C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Qsl", "WildsEngine.Qsl\WildsEngine.Qsl.csproj", "{CA88C6EF-89C5-47EB-9705-D44DA919F638}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Core.Tests", "WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj", "{BCAE7461-F721-4762-A8D7-016A859538EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Console", "WildsEngine.Console\WildsEngine.Console.csproj", "{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Debug|x64.Build.0 = Debug|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Debug|x86.Build.0 = Debug|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Release|x64.ActiveCfg = Release|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Release|x64.Build.0 = Release|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Release|x86.ActiveCfg = Release|Any CPU
+		{9A2F378C-3645-474E-909E-D9D8409803C4}.Release|x86.Build.0 = Release|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Debug|x64.Build.0 = Debug|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Debug|x86.Build.0 = Debug|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Release|x64.ActiveCfg = Release|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Release|x64.Build.0 = Release|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Release|x86.ActiveCfg = Release|Any CPU
+		{CA88C6EF-89C5-47EB-9705-D44DA919F638}.Release|x86.Build.0 = Release|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Debug|x64.Build.0 = Debug|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Debug|x86.Build.0 = Debug|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Release|x64.ActiveCfg = Release|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Release|x64.Build.0 = Release|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Release|x86.ActiveCfg = Release|Any CPU
+		{BCAE7461-F721-4762-A8D7-016A859538EF}.Release|x86.Build.0 = Release|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Debug|x64.Build.0 = Debug|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Debug|x86.Build.0 = Debug|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Release|x64.ActiveCfg = Release|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Release|x64.Build.0 = Release|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Release|x86.ActiveCfg = Release|Any CPU
+		{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
+
+
+

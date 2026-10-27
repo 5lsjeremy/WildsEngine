@@ -35,24 +35,41 @@ $Script:Findings = New-Object System.Collections.Generic.List[object]
 
 function Get-Text {
     param([Parameter(Mandatory = $true)][string] $Path)
-    if (-not (Test-Path $Path -PathType Leaf)) { return "" }
+
+    if (-not (Test-Path $Path -PathType Leaf)) {
+        return ""
+    }
+
     return Get-Content -Path $Path -Raw
 }
 
 function Get-RelativePath {
     param([Parameter(Mandatory = $true)][string] $Path)
+
     $FullPath = [System.IO.Path]::GetFullPath($Path)
-    if ($FullPath.StartsWith($Root, [System.StringComparison]::OrdinalIgnoreCase)) {
+
+    if ($FullPath.StartsWith(
+            $Root,
+            [System.StringComparison]::OrdinalIgnoreCase)) {
+
         return $FullPath.Substring($Root.Length).TrimStart("\")
     }
+
     return $FullPath
 }
 
 function Add-Finding {
     param(
-        [Parameter(Mandatory = $true)][ValidateSet("PASS", "WARN", "FAIL")][string] $Status,
-        [Parameter(Mandatory = $true)][string] $Area,
-        [Parameter(Mandatory = $true)][string] $Message,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("PASS", "WARN", "FAIL")]
+        [string] $Status,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Area,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Message,
+
         [string] $Evidence = ""
     )
 
@@ -98,8 +115,10 @@ function Invoke-CapturedCommand {
 
     $PreviousPreference = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
+
     try {
         $Output = @(& $Command 2>&1)
+
         return [PSCustomObject]@{
             Name = $Name
             ExitCode = $LASTEXITCODE
@@ -120,6 +139,7 @@ function Add-CommandFinding {
     )
 
     $Evidence = ($Result.Output | Out-String).Trim()
+
     if ($Evidence.Length -gt 4000) {
         $Evidence = $Evidence.Substring($Evidence.Length - 4000)
     }
@@ -134,7 +154,11 @@ function Add-CommandFinding {
 
 function Escape-MarkdownTableValue {
     param([AllowEmptyString()][string] $Value)
-    if ($null -eq $Value) { return "" }
+
+    if ($null -eq $Value) {
+        return ""
+    }
+
     return ($Value -replace "\|", "\|" -replace "`r?`n", "<br>")
 }
 
@@ -143,6 +167,7 @@ $IBaseObjectPath = Join-Path $AbstractionsPath "IBaseObject.cs"
 $IComponentPath = Join-Path $AbstractionsPath "IComponent.cs"
 $IStatePath = Join-Path $AbstractionsPath "IState.cs"
 $IStateInstructionPath = Join-Path $AbstractionsPath "IStateInstruction.cs"
+$StateInstructionPath = Join-Path $CorePath "Processing\StateInstruction.cs"
 $IContextPath = Join-Path $AbstractionsPath "IContext.cs"
 $ISignalPath = Join-Path $AbstractionsPath "ISignal.cs"
 $BaseObjectPath = Join-Path $CorePath "Objects\BaseObject.cs"
@@ -156,10 +181,17 @@ Write-Host "[Wilds] Root: $Root" -ForegroundColor DarkGray
 Write-Host "[Wilds] Report: $ReportPath" -ForegroundColor DarkGray
 
 $RequiredFiles = @(
-    $IBaseObjectPath, $IComponentPath, $IStatePath,
-    $IStateInstructionPath, $IContextPath, $ISignalPath,
-    $BaseObjectPath, $BaseComponentPath,
-    $ArbitraryTestsPath, $NullTestsPath
+    $IBaseObjectPath
+    $IComponentPath
+    $IStatePath
+    $IStateInstructionPath
+    $StateInstructionPath
+    $IContextPath
+    $ISignalPath
+    $BaseObjectPath
+    $BaseComponentPath
+    $ArbitraryTestsPath
+    $NullTestsPath
 )
 
 foreach ($File in $RequiredFiles) {
@@ -175,13 +207,24 @@ $IBaseObjectText = Get-Text $IBaseObjectPath
 $IComponentText = Get-Text $IComponentPath
 $IStateText = Get-Text $IStatePath
 $IStateInstructionText = Get-Text $IStateInstructionPath
+$StateInstructionText = Get-Text $StateInstructionPath
 $IContextText = Get-Text $IContextPath
 $BaseObjectText = Get-Text $BaseObjectPath
 $BaseComponentText = Get-Text $BaseComponentPath
 $CoreProjectText = Get-Text $CoreProjectPath
 $ArbitraryTestsText = Get-Text $ArbitraryTestsPath
 $NullTestsText = Get-Text $NullTestsPath
-$TestCorpus = $ArbitraryTestsText + "`n" + $NullTestsText
+
+$TestCorpus =
+$ArbitraryTestsText +
+        "`n" +
+        $NullTestsText +
+        "`n" +
+        $IStateInstructionText +
+        "`n" +
+        $StateInstructionText +
+        "`n" +
+        $IContextText
 
 Test-Pattern $CoreProjectText "<TargetFramework>\s*netstandard2\.1\s*</TargetFramework>" "Target framework" "WildsEngine.Core targets netstandard2.1." "WildsEngine.Core does not target netstandard2.1." "WildsEngine.Core.csproj" | Out-Null
 
@@ -193,7 +236,11 @@ Test-Pattern $IBaseObjectText "\bstring\s+AppendSlug\s*\(\s*string\s+value\s*\)"
 Test-Pattern $IBaseObjectText "\bbool\s+AddNeighbor\s*\(\s*IBaseObject\s+neighbor\s*\)" "IBaseObject" "Neighbor addition reports topology change." "AddNeighbor contract is missing." "IBaseObject.cs" | Out-Null
 Test-Pattern $IBaseObjectText "\bbool\s+RemoveNeighbor\s*\(\s*Guid\s+id\s*\)" "IBaseObject" "Neighbor removal uses GUID identity." "RemoveNeighbor contract is missing." "IBaseObject.cs" | Out-Null
 
-foreach ($Forbidden in @("\bIState\s+State\s*\{", "\bISignal\s+Signal\s*\{", "IDictionary\s*<[^>]+>\s+Metadata\s*\{")) {
+foreach ($Forbidden in @(
+    "\bIState\s+State\s*\{",
+    "\bISignal\s+Signal\s*\{",
+    "IDictionary\s*<[^>]+>\s+Metadata\s*\{"
+)) {
     if ($IBaseObjectText -match $Forbidden) {
         Add-Finding -Status "FAIL" -Area "IBaseObject ownership" -Message "IBaseObject redeclares a component-owned shortcut." -Evidence $Forbidden
     }
@@ -219,26 +266,60 @@ Test-Pattern $BaseComponentText "abstract\s+override\s+ISignal\s+Signal" "BaseCo
 Test-Pattern $IStateText "interface\s+IState\s*:\s*IBaseObject" "IState" "IState extends IBaseObject." "IState does not extend IBaseObject." "IState.cs" | Out-Null
 Test-Pattern $IStateText "\bIContext\s+Context\s*\{\s*get;\s*\}" "IState" "IState owns Context." "IState does not expose Context." "IState.cs" | Out-Null
 Test-Pattern $IStateText "\bbool\s+Process\s*\(\s*IStateInstruction\s+instruction\s*\)" "IState" "IState processes a Wilds-native instruction." "IState.Process has drifted." "IState.cs" | Out-Null
+
 if ($IStateText -match "Process\s*\([^)]*IContext") {
     Add-Finding -Status "FAIL" -Area "IState" -Message "Context is incorrectly passed into Process()." -Evidence "IState.cs"
 }
 else {
     Add-Finding -Status "PASS" -Area "IState" -Message "Process does not receive duplicate Context." -Evidence "IState.cs"
 }
+
 Test-Pattern $IStateInstructionText "interface\s+IStateInstruction" "IStateInstruction" "Wilds-native instruction boundary exists." "IStateInstruction is missing." "IStateInstruction.cs" | Out-Null
+Test-Pattern $IStateInstructionText "\bGuid\s+Id\s*\{\s*get;\s*\}" "IStateInstruction" "Instruction identity contract is present." "Instruction identity contract is missing." "IStateInstruction.cs" | Out-Null
+Test-Pattern $IStateInstructionText "\bstring\s+Intent\s*\{\s*get;\s*\}" "IStateInstruction" "Instruction intent contract is present." "Instruction intent contract is missing." "IStateInstruction.cs" | Out-Null
+Test-Pattern $IStateInstructionText "object\?\s+Payload\s*\{\s*get;\s*\}" "IStateInstruction" "Instruction payload is nullable and arbitrary." "Instruction payload contract is missing or not nullable." "IStateInstruction.cs" | Out-Null
+Test-Pattern $IStateInstructionText "IReadOnlyDictionary\s*<\s*string\s*,\s*object\?\s*>\s+Arguments" "IStateInstruction" "Instruction arguments are read-only and nullable." "Instruction arguments contract is missing or not nullable." "IStateInstruction.cs" | Out-Null
+Test-Pattern $IStateInstructionText "IReadOnlyDictionary\s*<\s*string\s*,\s*object\?\s*>\s+Metadata" "IStateInstruction" "Instruction metadata is read-only and nullable." "Instruction metadata contract is missing or not nullable." "IStateInstruction.cs" | Out-Null
+
+Test-Pattern $StateInstructionText "public\s+abstract\s+class\s+StateInstruction\s*:\s*IStateInstruction" "StateInstruction" "StateInstruction is a public abstract IStateInstruction base." "StateInstruction is missing or does not implement IStateInstruction." "Processing\StateInstruction.cs" | Out-Null
+Test-Pattern $StateInstructionText "protected\s+StateInstruction\s*\(" "StateInstruction" "External instruction sets can derive through a protected constructor." "StateInstruction does not expose a protected constructor." "Processing\StateInstruction.cs" | Out-Null
+Test-Pattern $StateInstructionText "Id\s*=\s*Guid\.NewGuid\s*\(\s*\)" "StateInstruction" "StateInstruction creates canonical instruction identity." "StateInstruction does not create instruction identity." "Processing\StateInstruction.cs" | Out-Null
+Test-Pattern $StateInstructionText "public\s+object\?\s+Payload\s*\{\s*get;\s*\}" "StateInstruction" "StateInstruction exposes nullable arbitrary payloads." "StateInstruction payload is missing or not nullable." "Processing\StateInstruction.cs" | Out-Null
+Test-Pattern $StateInstructionText "protected\s+void\s+SetArgument\s*\(" "StateInstruction" "Derived instruction sets can populate arguments." "StateInstruction does not provide protected argument mutation." "Processing\StateInstruction.cs" | Out-Null
+Test-Pattern $StateInstructionText "protected\s+void\s+SetMetadata\s*\(" "StateInstruction" "Derived instruction sets can populate metadata." "StateInstruction does not provide protected metadata mutation." "Processing\StateInstruction.cs" | Out-Null
 
 Test-Pattern $IContextText "IReadOnlyDictionary\s*<\s*string\s*,\s*object\?\s*>\s+Variables" "IContext" "Variables explicitly support nullable arbitrary values." "Variables are not explicitly nullable." "IContext.cs" | Out-Null
 Test-Pattern $IContextText "IReadOnlyDictionary\s*<\s*string\s*,\s*object\?\s*>\s+Metadata" "IContext" "Context Metadata explicitly supports nullable arbitrary values." "Context Metadata is not explicitly nullable." "IContext.cs" | Out-Null
 Test-Pattern $IContextText "SetVariable\s*\(\s*string\s+key\s*,\s*object\?\s+value\s*\)" "IContext" "SetVariable accepts null." "SetVariable is not explicitly nullable." "IContext.cs" | Out-Null
 Test-Pattern $IContextText "SetMetadata\s*\(\s*string\s+key\s*,\s*object\?\s+value\s*\)" "IContext" "SetMetadata accepts null." "SetMetadata is not explicitly nullable." "IContext.cs" | Out-Null
 
-$CoreSourceFiles = @(Get-ChildItem $CorePath -Filter "*.cs" -File -Recurse | Where-Object { $_.FullName -notmatch "[\\/](bin|obj|Audit)[\\/]" })
-$QslReferences = @($CoreSourceFiles | Select-String -Pattern "\bQSL\b|\bQsl[A-Za-z0-9_]*\b" -CaseSensitive:$false)
+$CoreSourceFiles = @(
+Get-ChildItem $CorePath -Filter "*.cs" -File -Recurse |
+        Where-Object {
+            $_.FullName -notmatch "[\\/](bin|obj|Audit)[\\/]"
+        }
+)
+
+$QslReferences = @(
+$CoreSourceFiles |
+        Select-String `
+            -Pattern "\bQSL\b|\bQsl[A-Za-z0-9_]*\b" `
+            -CaseSensitive:$false
+)
+
 if ($QslReferences.Count -eq 0) {
     Add-Finding -Status "PASS" -Area "QSL isolation" -Message "WildsEngine.Core contains no direct QSL references." -Evidence "WildsEngine.Core"
 }
 else {
-    Add-Finding -Status "FAIL" -Area "QSL isolation" -Message "WildsEngine.Core directly references QSL." -Evidence (($QslReferences | Select-Object -First 10 | ForEach-Object { "$(Get-RelativePath $_.Path):$($_.LineNumber)" }) -join "`n")
+    $QslEvidence = (
+    $QslReferences |
+            Select-Object -First 10 |
+            ForEach-Object {
+                "$(Get-RelativePath $_.Path):$($_.LineNumber)"
+            }
+    ) -join "`n"
+
+    Add-Finding -Status "FAIL" -Area "QSL isolation" -Message "WildsEngine.Core directly references QSL." -Evidence $QslEvidence
 }
 
 $TestRequirements = @(
@@ -248,9 +329,11 @@ $TestRequirements = @(
     @{ Name = "Null present versus missing"; Pattern = "NullValue_IsDistinctFromMissingKey" },
     @{ Name = "State value-to-null transition"; Pattern = "State_processing_can_transition_existing_value_to_null" },
     @{ Name = "State null-to-value transition"; Pattern = "State_processing_can_transition_null_to_consumer_object" },
-    @{ Name = "Nullable instruction payload"; Pattern = "public\s+object\?\s+Value" },
-    @{ Name = "Nullable TestContext variables"; Pattern = "Dictionary\s*<\s*string\s*,\s*object\?\s*>\s+_variables" },
-    @{ Name = "Nullable TestContext setters"; Pattern = "SetVariable\s*\(\s*string\s+key\s*,\s*object\?\s+value\s*\)" }
+    @{ Name = "Nullable instruction payload"; Pattern = "object\?\s+Payload\s*\{\s*get;" },
+    @{ Name = "Abstract instruction implementation"; Pattern = "abstract\s+class\s+StateInstruction" },
+    @{ Name = "Externally derivable instruction base"; Pattern = "protected\s+StateInstruction\s*\(" },
+    @{ Name = "Nullable context variables contract"; Pattern = "IReadOnlyDictionary\s*<\s*string\s*,\s*object\?\s*>\s+Variables" },
+    @{ Name = "Nullable context variable setter contract"; Pattern = "SetVariable\s*\(\s*string\s+key\s*,\s*object\?\s+value\s*\)" }
 )
 
 foreach ($Requirement in $TestRequirements) {
@@ -263,16 +346,41 @@ foreach ($Requirement in $TestRequirements) {
 }
 
 Write-Host "[Wilds] Building solution..." -ForegroundColor Yellow
-$BuildResult = Invoke-CapturedCommand -Name "dotnet build" -Command { dotnet build $SolutionPath --nologo }
-Add-CommandFinding $BuildResult "Build" "WildsEngine.sln builds successfully." "WildsEngine.sln failed to build."
+
+$BuildResult = Invoke-CapturedCommand `
+    -Name "dotnet build" `
+    -Command {
+    dotnet build $SolutionPath --nologo
+}
+
+Add-CommandFinding `
+    $BuildResult `
+    "Build" `
+    "WildsEngine.sln builds successfully." `
+    "WildsEngine.sln failed to build."
 
 Write-Host "[Wilds] Testing WildsEngine.Core.Tests..." -ForegroundColor Yellow
-$TestResult = Invoke-CapturedCommand -Name "dotnet test" -Command { dotnet test $TestProjectPath --no-build --nologo }
-Add-CommandFinding $TestResult "Tests" "WildsEngine.Core.Tests passed." "WildsEngine.Core.Tests failed."
+
+$TestResult = Invoke-CapturedCommand `
+    -Name "dotnet test" `
+    -Command {
+    dotnet test $TestProjectPath --no-build --nologo
+}
+
+Add-CommandFinding `
+    $TestResult `
+    "Tests" `
+    "WildsEngine.Core.Tests passed." `
+    "WildsEngine.Core.Tests failed."
 
 $BuildEvidence = ($BuildResult.Output | Out-String)
 $TestEvidence = ($TestResult.Output | Out-String)
-$WarningsFound = [regex]::Matches($BuildEvidence, "(?im)^.*warning\s+[A-Z]+\d+.*$")
+
+$WarningsFound = [regex]::Matches(
+        $BuildEvidence,
+        "(?im)^.*warning\s+[A-Z]+\d+.*$"
+)
+
 if ($WarningsFound.Count -eq 0) {
     Add-Finding -Status "PASS" -Area "Compiler warnings" -Message "Solution build contains no compiler warnings." -Evidence "dotnet build"
 }
@@ -280,27 +388,69 @@ else {
     Add-Finding -Status "FAIL" -Area "Compiler warnings" -Message "Compiler warnings were found." -Evidence (($WarningsFound.Value) -join "`n")
 }
 
-if ($TestEvidence -match "total:\s*14,\s*failed:\s*0,\s*succeeded:\s*14") {
-    Add-Finding -Status "PASS" -Area "Test count" -Message "All 14 processing tests passed." -Evidence "14 passed, 0 failed"
+$TestSummaryPattern =
+"Failed:\s*0,\s*Passed:\s*(\d+),\s*Skipped:\s*(\d+),\s*Total:\s*(\d+)"
+
+$TestSummaryMatch = [regex]::Match(
+        $TestEvidence,
+        $TestSummaryPattern
+)
+
+if ($TestSummaryMatch.Success) {
+    $PassedTests =
+    [int] $TestSummaryMatch.Groups[1].Value
+
+    $SkippedTests =
+    [int] $TestSummaryMatch.Groups[2].Value
+
+    $TotalTests =
+    [int] $TestSummaryMatch.Groups[3].Value
+
+    if (
+    $PassedTests -eq $TotalTests -and
+            $SkippedTests -eq 0
+    ) {
+        Add-Finding `
+            -Status "PASS" `
+            -Area "Test count" `
+            -Message "All $TotalTests processing tests passed." `
+            -Evidence "$PassedTests passed, 0 failed, 0 skipped"
+    }
+    else {
+        Add-Finding `
+            -Status "WARN" `
+            -Area "Test count" `
+            -Message "The processing test suite did not complete with every test passing." `
+            -Evidence ($TestEvidence.Trim())
+    }
 }
 else {
-    Add-Finding -Status "WARN" -Area "Test count" -Message "The expected 14-test summary was not detected; inspect test output." -Evidence ($TestEvidence.Trim())
+    Add-Finding `
+        -Status "WARN" `
+        -Area "Test count" `
+        -Message "The test summary was not detected; inspect test output." `
+        -Evidence ($TestEvidence.Trim())
 }
 
 if ($Script:Failed -gt 0) {
     $Certification = "FAILED"
-    $CertificationReason = "One or more required architecture, build, warning, or test checks failed."
+    $CertificationReason =
+    "One or more required architecture, build, warning, or test checks failed."
 }
 elseif ($Script:Warnings -gt 0) {
     $Certification = "P0 READY WITH WARNINGS"
-    $CertificationReason = "All required checks passed, but non-blocking audit warnings remain."
+    $CertificationReason =
+    "All required checks passed, but non-blocking audit warnings remain."
 }
 else {
     $Certification = "P0 READY"
-    $CertificationReason = "Contracts, nullability, build, and processing tests support arbitrary consumer-owned object processing."
+    $CertificationReason =
+    "Contracts, instruction extensibility, nullability, build, and processing tests support arbitrary consumer-owned object and instruction processing."
 }
 
-$ReportLines = New-Object System.Collections.Generic.List[string]
+$ReportLines =
+New-Object System.Collections.Generic.List[string]
+
 $ReportLines.Add("# Wilds P0 Processing Audit")
 $ReportLines.Add("")
 $ReportLines.Add("Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')")
@@ -323,9 +473,16 @@ $ReportLines.Add("## Findings")
 $ReportLines.Add("")
 $ReportLines.Add("| Status | Area | Finding | Evidence |")
 $ReportLines.Add("|---|---|---|---|")
+
 foreach ($Finding in $Script:Findings) {
-    $ReportLines.Add("| $(Escape-MarkdownTableValue $Finding.Status) | $(Escape-MarkdownTableValue $Finding.Area) | $(Escape-MarkdownTableValue $Finding.Message) | $(Escape-MarkdownTableValue $Finding.Evidence) |")
+    $ReportLines.Add(
+            "| $(Escape-MarkdownTableValue $Finding.Status) | " +
+                    "$(Escape-MarkdownTableValue $Finding.Area) | " +
+                    "$(Escape-MarkdownTableValue $Finding.Message) | " +
+                    "$(Escape-MarkdownTableValue $Finding.Evidence) |"
+    )
 }
+
 $ReportLines.Add("")
 $ReportLines.Add("## Ownership Checkpoint")
 $ReportLines.Add("")
@@ -333,23 +490,37 @@ $ReportLines.Add("- ``IBaseObject`` owns identity, slug, neighbors, and the Comp
 $ReportLines.Add("- ``IComponent`` owns State, Signal, and component Metadata.")
 $ReportLines.Add("- ``BaseObject`` supplies State, Signal, and Metadata shortcuts through Component.")
 $ReportLines.Add("- ``IState`` owns Context and processes ``IStateInstruction``.")
+$ReportLines.Add("- ``IStateInstruction`` defines the external instruction contract.")
+$ReportLines.Add("- ``StateInstruction`` provides the public abstract base for internal and consumer-owned instruction sets.")
+$ReportLines.Add("- ``IStateInstruction`` and ``StateInstruction`` preserve nullable arbitrary Payload, Arguments, and Metadata values.")
 $ReportLines.Add("- ``IContext`` owns nullable Variables and contextual Metadata.")
 $ReportLines.Add("- Context is not passed into ``IState.Process()``.")
 $ReportLines.Add("- WildsEngine.Core does not depend directly on QSL.")
 $ReportLines.Add("")
 $ReportLines.Add("## Build Output")
-$ReportLines.Add("")
-$ReportLines.Add("````text")
-foreach ($Line in $BuildResult.Output) { $ReportLines.Add([string] $Line) }
-$ReportLines.Add("````")
+$ReportLines.Add('```text')
+
+foreach ($Line in $BuildResult.Output) {
+    $ReportLines.Add([string] $Line)
+}
+
+$ReportLines.Add('```')
 $ReportLines.Add("")
 $ReportLines.Add("## Test Output")
 $ReportLines.Add("")
-$ReportLines.Add("````text")
-foreach ($Line in $TestResult.Output) { $ReportLines.Add([string] $Line) }
-$ReportLines.Add("````")
+$ReportLines.Add('```text')
 
-[System.IO.File]::WriteAllLines($ReportPath, $ReportLines, [System.Text.UTF8Encoding]::new($false))
+foreach ($Line in $TestResult.Output) {
+    $ReportLines.Add([string] $Line)
+}
+
+$ReportLines.Add('```')
+
+[System.IO.File]::WriteAllLines(
+        $ReportPath,
+        $ReportLines,
+        [System.Text.UTF8Encoding]::new($false)
+)
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor DarkGray
@@ -360,13 +531,24 @@ Write-Host "Warnings : $Script:Warnings" -ForegroundColor Yellow
 Write-Host "Failed   : $Script:Failed" -ForegroundColor Red
 
 switch ($Certification) {
-    "P0 READY" { Write-Host "Status   : $Certification" -ForegroundColor Green }
-    "P0 READY WITH WARNINGS" { Write-Host "Status   : $Certification" -ForegroundColor Yellow }
-    default { Write-Host "Status   : $Certification" -ForegroundColor Red }
+    "P0 READY" {
+        Write-Host "Status   : $Certification" -ForegroundColor Green
+    }
+
+    "P0 READY WITH WARNINGS" {
+        Write-Host "Status   : $Certification" -ForegroundColor Yellow
+    }
+
+    default {
+        Write-Host "Status   : $Certification" -ForegroundColor Red
+    }
 }
 
 Write-Host "Report   : $ReportPath" -ForegroundColor Cyan
 Write-Host ""
 
-if ($Script:Failed -gt 0) { exit 1 }
+if ($Script:Failed -gt 0) {
+    exit 1
+}
+
 exit 0
