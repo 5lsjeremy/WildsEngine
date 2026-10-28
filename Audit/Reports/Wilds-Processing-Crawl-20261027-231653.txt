@@ -1,0 +1,843 @@
+============================================================
+ WildsEngine.Core Processing Crawl
+============================================================
+Root: C:\Users\jmatt\source\WildsEngine
+Core: C:\Users\jmatt\source\WildsEngine\WildsEngine.Core
+Processing: C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\Processing
+Generated: 2026-10-27 23:16:53
+Processing files: 14
+Relevant abstraction files: 9
+Signal files: 0
+============================================================
+
+PROCESSING TREE
+============================================================
+Folder PATH listing
+Volume serial number is 1264-B3C4
+C:\USERS\JMATT\SOURCE\WILDSENGINE\WILDSENGINE.CORE\PROCESSING
++---Base
+|       ContextVariableInstructionBase.cs
+|       RegistryBase.cs
+|       StateInstructionBase.cs
+|       TaskBase.cs
+|       TaskBusBase.cs
+|       TaskRegistryBase.cs
+|       
++---Bus
+|       TaskBus.cs
+|       
++---Instructions
+|       AddNeighborInstruction.cs
+|       RemoveNeighborInstruction.cs
+|       SetComponentMetadataInstruction.cs
+|       SetContextVariableInstruction.cs
+|       
++---Registry
+|       DefaultTaskRegistry.cs
+|       
++---Signals
+|       WildsSignal.cs
+|       
+\---Tasks
+        SetContextVariable.cs
+        
+
+PROCESSING FILE INVENTORY
+============================================================
+Base\ContextVariableInstructionBase.cs
+Base\RegistryBase.cs
+Base\StateInstructionBase.cs
+Base\TaskBase.cs
+Base\TaskBusBase.cs
+Base\TaskRegistryBase.cs
+Bus\TaskBus.cs
+Instructions\AddNeighborInstruction.cs
+Instructions\RemoveNeighborInstruction.cs
+Instructions\SetComponentMetadataInstruction.cs
+Instructions\SetContextVariableInstruction.cs
+Registry\DefaultTaskRegistry.cs
+Signals\WildsSignal.cs
+Tasks\SetContextVariable.cs
+
+PROCESSING SOURCE
+============================================================
+
+############################################################
+# FILE: Base\ContextVariableInstructionBase.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class ContextVariableInstructionBase :
+        StateInstructionBase,
+        ISetContextVariableInstruction
+    {
+        protected ContextVariableInstructionBase(
+            string intent,
+            string key,
+            object? value)
+            : base(
+                intent,
+                value)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Context variable key cannot be empty.",
+                    nameof(key));
+            }
+
+            Key = key.Trim();
+            Value = value;
+
+            SetArgument(
+                "key",
+                Key);
+
+            SetArgument(
+                "value",
+                Value);
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+    }
+}
+
+############################################################
+# FILE: Base\RegistryBase.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class RegistryBase :
+        BaseObject,
+        IRegistry
+    {
+        protected RegistryBase(string layer)
+            : base(layer)
+        {
+        }
+
+        public bool IsInitialized { get; private set; }
+
+        public bool Initialize()
+        {
+            if (IsInitialized)
+            {
+                return false;
+            }
+
+            OnInitialize();
+
+            IsInitialized = true;
+
+            return true;
+        }
+
+        public bool Shutdown()
+        {
+            if (!IsInitialized)
+            {
+                return false;
+            }
+
+            OnShutdown();
+
+            IsInitialized = false;
+
+            return true;
+        }
+
+        protected abstract void OnInitialize();
+
+        protected abstract void OnShutdown();
+    }
+}
+
+############################################################
+# FILE: Base\StateInstructionBase.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class StateInstructionBase :
+        IStateInstruction
+    {
+        private readonly Dictionary<string, object?> _arguments;
+        private readonly Dictionary<string, object?> _metadata;
+
+        protected StateInstructionBase(
+            string intent,
+            object? payload = null,
+            IEnumerable<KeyValuePair<string, object?>>? arguments = null,
+            IEnumerable<KeyValuePair<string, object?>>? metadata = null)
+        {
+            if (string.IsNullOrWhiteSpace(intent))
+            {
+                throw new ArgumentException(
+                    "Instruction intent cannot be empty.",
+                    nameof(intent));
+            }
+
+            Id = Guid.NewGuid();
+            Intent = intent;
+            Payload = payload;
+
+            _arguments = CreateDictionary(arguments);
+            _metadata = CreateDictionary(metadata);
+        }
+
+        public Guid Id { get; }
+
+        public string Intent { get; }
+
+        public object? Payload { get; }
+
+        public IReadOnlyDictionary<string, object?> Arguments =>
+            _arguments;
+
+        public IReadOnlyDictionary<string, object?> Metadata =>
+            _metadata;
+
+        protected void SetArgument(
+            string key,
+            object? value)
+        {
+            ValidateKey(key, nameof(key));
+
+            _arguments[key] = value;
+        }
+
+        protected void SetMetadata(
+            string key,
+            object? value)
+        {
+            ValidateKey(key, nameof(key));
+
+            _metadata[key] = value;
+        }
+
+        protected bool RemoveArgument(string key)
+        {
+            ValidateKey(key, nameof(key));
+
+            return _arguments.Remove(key);
+        }
+
+        protected bool RemoveMetadata(string key)
+        {
+            ValidateKey(key, nameof(key));
+
+            return _metadata.Remove(key);
+        }
+
+        private static Dictionary<string, object?> CreateDictionary(
+            IEnumerable<KeyValuePair<string, object?>>? source)
+        {
+            var result =
+                new Dictionary<string, object?>();
+
+            if (source == null)
+            {
+                return result;
+            }
+
+            foreach (var pair in source)
+            {
+                ValidateKey(pair.Key, nameof(source));
+
+                result[pair.Key] = pair.Value;
+            }
+
+            return result;
+        }
+
+        private static void ValidateKey(
+            string key,
+            string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Instruction keys cannot be empty.",
+                    parameterName);
+            }
+        }
+    }
+}
+
+############################################################
+# FILE: Base\TaskBase.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class TaskBase :
+        BaseObject,
+        ITask
+    {
+        protected TaskBase(string layer)
+            : base(layer)
+        {
+        }
+    }
+}
+
+############################################################
+# FILE: Base\TaskBusBase.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class TaskBusBase :
+        BaseObject,
+        ITaskBus
+    {
+        private readonly IComponent _component;
+
+        protected TaskBusBase(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        protected TaskBusBase(
+            Guid id,
+            IComponent component,
+            string layer)
+            : base(
+                id,
+                layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+
+        public bool Dispatch(ITask task)
+        {
+            if (task == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(task));
+            }
+
+            return DispatchTaskCore(task);
+        }
+
+        public bool Dispatch(ISignal signal)
+        {
+            if (signal == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(signal));
+            }
+
+            return DispatchSignalCore(signal);
+        }
+
+        protected abstract bool DispatchTaskCore(
+            ITask task);
+
+        protected abstract bool DispatchSignalCore(
+            ISignal signal);
+    }
+}
+
+############################################################
+# FILE: Base\TaskRegistryBase.cs
+############################################################
+using WildsEngine.Core.Processing;
+
+public abstract class TaskRegistryBase :
+    RegistryBase
+{
+    protected TaskRegistryBase(string layer) : base(layer)
+    {
+    }
+}
+
+############################################################
+# FILE: Bus\TaskBus.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing.Bus
+{
+    public sealed class TaskBus :
+        TaskBusBase
+    {
+        public TaskBus(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer)
+        {
+        }
+
+        protected override bool DispatchTaskCore(
+            ITask task)
+        {
+            return false;
+        }
+
+        protected override bool DispatchSignalCore(
+            ISignal signal)
+        {
+            return false;
+        }
+    }
+}
+
+############################################################
+# FILE: Instructions\AddNeighborInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class AddNeighborInstruction :
+        StateInstructionBase
+    {
+        public const string IntentName =
+            "topology.neighbor.add";
+
+        public AddNeighborInstruction(
+            IBaseObject neighbor,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                ValidateNeighbor(neighbor),
+                metadata: metadata)
+        {
+            Neighbor = neighbor;
+        }
+
+        public IBaseObject Neighbor { get; }
+
+        private static IBaseObject ValidateNeighbor(
+            IBaseObject neighbor)
+        {
+            return neighbor
+                ?? throw new ArgumentNullException(
+                    nameof(neighbor));
+        }
+    }
+}
+
+
+
+############################################################
+# FILE: Instructions\RemoveNeighborInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class RemoveNeighborInstruction :
+        StateInstructionBase
+    {
+        public const string IntentName =
+            "topology.neighbor.remove";
+
+        public RemoveNeighborInstruction(
+            Guid neighborId,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                ValidateId(neighborId),
+                metadata: metadata)
+        {
+            NeighborId = neighborId;
+        }
+
+        public Guid NeighborId { get; }
+
+        private static Guid ValidateId(Guid neighborId)
+        {
+            if (neighborId == Guid.Empty)
+            {
+                throw new ArgumentException(
+                    "Neighbor removal requires a non-empty GUID.",
+                    nameof(neighborId));
+            }
+
+            return neighborId;
+        }
+    }
+}
+
+
+
+############################################################
+# FILE: Instructions\SetComponentMetadataInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetComponentMetadataInstruction :
+        StateInstructionBase
+    {
+        public const string IntentName =
+            "component.metadata.set";
+
+        public SetComponentMetadataInstruction(
+            string key,
+            object? value,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                value,
+                CreateArguments(key),
+                metadata)
+        {
+            Key = ValidateKey(key);
+            Value = value;
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+
+        private static IDictionary<string, object?> CreateArguments(
+            string key)
+        {
+            return new Dictionary<string, object?>
+            {
+                ["key"] = ValidateKey(key)
+            };
+        }
+
+        private static string ValidateKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Component metadata instructions require a key.",
+                    nameof(key));
+            }
+
+            return key.Trim();
+        }
+    }
+}
+
+
+
+############################################################
+# FILE: Instructions\SetContextVariableInstruction.cs
+############################################################
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetContextVariableInstruction :
+        ContextVariableInstructionBase
+    {
+        public const string IntentName =
+            "context.variable.set";
+
+        public SetContextVariableInstruction(
+            string key,
+            object? value)
+            : base(
+                IntentName,
+                key,
+                value)
+        {
+        }
+    }
+}
+
+############################################################
+# FILE: Registry\DefaultTaskRegistry.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Processing;
+
+public sealed class DefaultTaskRegistry :
+    TaskRegistryBase
+{
+    public DefaultTaskRegistry(string layer)
+        : base(layer)
+    {
+    }
+
+    protected override void OnInitialize()
+    {
+    }
+
+    protected override void OnShutdown()
+    {
+    }
+
+    public override IComponent Component { get; }
+}
+
+############################################################
+# FILE: Signals\WildsSignal.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Signals
+{
+    public abstract class WildsSignal :
+        BaseObject,
+        ISignal
+    {
+        private readonly IComponent _component;
+
+        protected WildsSignal(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        protected WildsSignal(
+            Guid id,
+            IComponent component,
+            string layer)
+            : base(id, layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+    }
+}
+
+############################################################
+# FILE: Tasks\SetContextVariable.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetContextVariable :
+        TaskBase
+    {
+        public SetContextVariable(
+            IComponent component,
+            IContext context,
+            string key,
+            object? value)
+            : base(
+                "task.context.variable.set")
+        {
+            Context = context
+                      ?? throw new ArgumentNullException(
+                          nameof(context));
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Context variable key cannot be empty.",
+                    nameof(key));
+            }
+
+            Key = key;
+            Value = value;
+        }
+
+        public IContext Context { get; }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+        public override IComponent Component { get; }
+    }
+}
+
+RELATED ABSTRACTIONS
+============================================================
+
+############################################################
+# FILE: IBaseObject.cs
+############################################################
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IBaseObject
+    {
+        Guid Id { get; }
+
+        string Slug { get; }
+
+        IReadOnlyList<IBaseObject> Neighbors { get; }
+
+        IComponent Component { get; }
+
+        string AppendSlug(string value);
+
+        bool AddNeighbor(IBaseObject neighbor);
+
+        bool RemoveNeighbor(Guid id);
+    }
+}
+
+
+############################################################
+# FILE: IBus.cs
+############################################################
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IBus :
+        IBaseObject
+    {
+        bool Dispatch(ISignal signal);
+    }
+}
+
+############################################################
+# FILE: IComponent.cs
+############################################################
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IComponent : IBaseObject
+    {
+        IState State { get; }
+
+        ISignal Signal { get; }
+
+        IDictionary<string, object?> Metadata { get; }
+    }
+}
+
+
+############################################################
+# FILE: IContext.cs
+############################################################
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IContext : IBaseObject
+    {
+        IReadOnlyDictionary<string, object?> Variables { get; }
+
+        IReadOnlyDictionary<string, object?> Metadata { get; }
+
+        void SetVariable(string key, object? value);
+
+        void SetMetadata(string key, object? value);
+    }
+}
+
+
+############################################################
+# FILE: ISignal.cs
+############################################################
+namespace WildsEngine.Core.Abstractions
+{
+    public interface ISignal : IBaseObject
+    {
+    }
+}
+
+
+############################################################
+# FILE: IState.cs
+############################################################
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IState : IBaseObject
+    {
+        IContext Context { get; }
+
+        bool Process(IStateInstruction instruction);
+    }
+}
+
+
+############################################################
+# FILE: IStateInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
+{
+    public interface IStateInstruction
+    {
+        Guid Id { get; }
+
+        string Intent { get; }
+
+        object? Payload { get; }
+
+        IReadOnlyDictionary<string, object?> Arguments { get; }
+
+        IReadOnlyDictionary<string, object?> Metadata { get; }
+    }
+}
+
+
+############################################################
+# FILE: ITask.cs
+############################################################
+namespace WildsEngine.Core.Abstractions
+{
+    public interface ITask :
+        IBaseObject
+    {
+    }
+}
+
+############################################################
+# FILE: ITaskBus.cs
+############################################################
+namespace WildsEngine.Core.Abstractions
+{
+    public interface ITaskBus :
+        IBus
+    {
+        bool Dispatch(ITask task);
+    }
+}
+
+SIGNAL SOURCE
+============================================================
+<no Signals C# files found>
+
+============================================================
+ Crawl complete
+============================================================

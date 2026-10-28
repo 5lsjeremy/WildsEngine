@@ -5,7 +5,7 @@ using WildsEngine.Core.Abstractions;
 namespace WildsEngine.Core.Processing
 {
     public sealed class AddNeighborInstruction :
-        StateInstruction
+        StateInstructionBase
     {
         public const string IntentName =
             "topology.neighbor.add";

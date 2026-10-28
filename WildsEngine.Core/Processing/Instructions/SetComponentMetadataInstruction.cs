@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace WildsEngine.Core.Processing
 {
-    public sealed class SetContextMetadataInstruction :
-        StateInstruction
+    public sealed class SetComponentMetadataInstruction :
+        StateInstructionBase
     {
         public const string IntentName =
-            "context.metadata.set";
+            "component.metadata.set";
 
-        public SetContextMetadataInstruction(
+        public SetComponentMetadataInstruction(
             string key,
             object? value,
             IDictionary<string, object?>? metadata = null)
@@ -41,7 +41,7 @@ namespace WildsEngine.Core.Processing
             if (string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentException(
-                    "Context metadata instructions require a key.",
+                    "Component metadata instructions require a key.",
                     nameof(key));
             }
 

@@ -4,13 +4,13 @@ using WildsEngine.Core.Abstractions;
 
 namespace WildsEngine.Core.Processing
 {
-    public abstract class StateInstruction :
+    public abstract class StateInstructionBase :
         IStateInstruction
     {
         private readonly Dictionary<string, object?> _arguments;
         private readonly Dictionary<string, object?> _metadata;
 
-        protected StateInstruction(
+        protected StateInstructionBase(
             string intent,
             object? payload = null,
             IEnumerable<KeyValuePair<string, object?>>? arguments = null,

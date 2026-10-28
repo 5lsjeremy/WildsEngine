@@ -16,8 +16,8 @@ namespace WildsEngine.Core.Signals
             : base(layer)
         {
             _component = component
-                ?? throw new ArgumentNullException(
-                    nameof(component));
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
         }
 
         protected WildsSignal(
@@ -27,8 +27,8 @@ namespace WildsEngine.Core.Signals
             : base(id, layer)
         {
             _component = component
-                ?? throw new ArgumentNullException(
-                    nameof(component));
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
         }
 
         public sealed override IComponent Component =>

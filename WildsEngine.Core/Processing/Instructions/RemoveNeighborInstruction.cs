@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace WildsEngine.Core.Processing
 {
     public sealed class RemoveNeighborInstruction :
-        StateInstruction
+        StateInstructionBase
     {
         public const string IntentName =
             "topology.neighbor.remove";

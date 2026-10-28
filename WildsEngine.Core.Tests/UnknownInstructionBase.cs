@@ -2,10 +2,10 @@
 
 namespace WildsEngine.Core.Tests;
 
-public sealed class UnknownInstruction :
-    StateInstruction
+public sealed class UnknownInstructionBase :
+    StateInstructionBase
 {
-    public UnknownInstruction()
+    public UnknownInstructionBase()
         : base(
             intent: "test.unknown",
             payload: null)

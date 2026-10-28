@@ -480,7 +480,7 @@ namespace WildsEngine.Core.Tests
             var component = new TestComponent("test");
 
             IStateInstruction instruction =
-                new UnknownInstruction();
+                new UnknownInstructionBase();
 
             WildsLog.Process(
                 $"Processing unknown instruction. " +
@@ -524,7 +524,7 @@ namespace WildsEngine.Core.Tests
                 $"Z={payload.Z}.");
 
             IStateInstruction instruction =
-                new ConsumerSetVariableInstruction(
+                new ConsumerSetVariableInstructionBase(
                     "velocity",
                     payload);
 

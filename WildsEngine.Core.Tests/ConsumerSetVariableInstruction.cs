@@ -1,33 +1,21 @@
-﻿using System;
-using WildsEngine.Core.Abstractions;
-using WildsEngine.Core.Processing;
+﻿using WildsEngine.Core.Processing;
 
 namespace WildsEngine.Core.Tests
 {
     public sealed class ConsumerSetVariableInstruction :
-        StateInstruction,
-        ISetContextVariableInstruction
+        ContextVariableInstructionBase
     {
+        public const string IntentName =
+            "consumer.context.variable.set";
+
         public ConsumerSetVariableInstruction(
             string key,
             object? value)
             : base(
-                "consumer.context.variable.set",
+                IntentName,
+                key,
                 value)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentException(
-                    "Variable key cannot be empty.",
-                    nameof(key));
-            }
-
-            Key = key;
-            Value = value;
         }
-
-        public string Key { get; }
-
-        public object? Value { get; }
     }
 }
