@@ -1,12 +1,28 @@
-﻿namespace WildsEngine.Core.Abstractions
+﻿using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Abstractions
 {
-    public interface IRegistry :
+    public interface IRegistry<T> :
         IBaseObject
+        where T : class
     {
-        bool IsInitialized { get; }
+        int Count { get; }
 
-        bool Initialize();
+        IReadOnlyCollection<T> Items { get; }
 
-        bool Shutdown();
+        bool Register(T item);
+
+        bool Contains(Guid id);
+
+        T? Get(Guid id);
+
+        bool TryGet(
+            Guid id,
+            out T? item);
+
+        bool Remove(Guid id);
+
+        void Clear();
     }
 }

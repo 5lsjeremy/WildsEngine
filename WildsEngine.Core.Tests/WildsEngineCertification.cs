@@ -1,40 +1,70 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using WildsEngine.Core;
 using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Tests;
+using WildsEngine.Tests.Logging;
+using WildsEngine.Tests.Registry;
 
 namespace WildsEngine.Tests
 {
-    /// <summary>
-    /// Dependency-free certification suite for the current WildsEngine composition root.
-    /// Run with: await WildsEngineCertification.RunAllAsync();
-    /// Throws immediately on failure and prints a compact PASS summary on success.
-    /// </summary>
     public static class WildsEngineCertification
     {
-        private static readonly List<string> Passed = new List<string>();
+        private static readonly List<string> Passed =
+            new List<string>();
 
         public static async Task RunAllAsync()
         {
             Passed.Clear();
 
-            Run("Constructs isolated engine", ConstructsIsolatedEngine);
-            Run("Initialize is idempotent", InitializeIsIdempotent);
-            Run("Shutdown is idempotent", ShutdownIsIdempotent);
-            await RunAsync("Rejects processing before initialization", RejectsProcessingBeforeInitialization);
-            await RunAsync("Executes instruction lease", ExecutesInstructionLease);
-            await RunAsync("Reuses instruction processor", ReusesInstructionProcessor);
-            await RunAsync("Returns processor after operation failure", ReturnsProcessorAfterOperationFailure);
-            await RunAsync("Honors cancellation while waiting", HonorsCancellationWhileWaiting);
-            Run("Rejects use after disposal", RejectsUseAfterDisposal);
-            await RunAsync("Concurrent load respects limit", ConcurrentLoadRespectsLimit);
+            TestLog.Write(
+                "=== WildsEngine Composition Tests ===");
 
-            Console.WriteLine();
-            Console.WriteLine($"WildsEngine certification passed: {Passed.Count}/{Passed.Count}");
-            foreach (var name in Passed)
-                Console.WriteLine($"[PASS] {name}");
+            Run(
+                "Constructs isolated engine",
+                ConstructsIsolatedEngine);
+
+            Run(
+                "Initialize is idempotent",
+                InitializeIsIdempotent);
+
+            Run(
+                "Shutdown is idempotent",
+                ShutdownIsIdempotent);
+
+            await RunAsync(
+                "Rejects processing before initialization",
+                RejectsProcessingBeforeInitialization);
+
+            await RunAsync(
+                "Executes instruction lease",
+                ExecutesInstructionLease);
+
+            await RunAsync(
+                "Reuses instruction processor",
+                ReusesInstructionProcessor);
+
+            await RunAsync(
+                "Returns processor after operation failure",
+                ReturnsProcessorAfterOperationFailure);
+
+            await RunAsync(
+                "Honors cancellation while waiting",
+                HonorsCancellationWhileWaiting);
+
+            Run(
+                "Rejects use after disposal",
+                RejectsUseAfterDisposal);
+
+            await RunAsync(
+                "Concurrent load respects limit",
+                ConcurrentLoadRespectsLimit);
+
+            TestLog.Write(
+                $"WildsEngine certification passed: " +
+                $"{Passed.Count}/{Passed.Count}");
         }
 
         private static WildsEngineOptions Options(
@@ -45,222 +75,514 @@ namespace WildsEngine.Tests
         {
             return new WildsEngineOptions
             {
-                Layer = "certification",
-                RetainedInstructionsProcessors = retainedInstructions,
-                ConcurrentInstructionsProcessors = concurrentInstructions,
-                RetainedTaskProcessors = retainedTasks,
-                ConcurrentTaskProcessors = concurrentTasks
+                Layer =
+                    "certification",
+
+                RetainedInstructionsProcessors =
+                    retainedInstructions,
+
+                ConcurrentInstructionsProcessors =
+                    concurrentInstructions,
+
+                RetainedTaskProcessors =
+                    retainedTasks,
+
+                ConcurrentTaskProcessors =
+                    concurrentTasks
             };
+        }
+
+        private static IComponent CreateComponent(
+            string layer)
+        {
+            return new TestComponent(
+                layer);
+        }
+
+        private static Core.WildsEngine CreateEngine(
+            string layer,
+            int retainedInstructions = 4,
+            int concurrentInstructions = 4,
+            int retainedTasks = 8,
+            int concurrentTasks = 8)
+        {
+            var component =
+                CreateComponent(
+                    layer);
+
+            var options =
+                Options(
+                    retainedInstructions,
+                    concurrentInstructions,
+                    retainedTasks,
+                    concurrentTasks);
+
+            return new Core.WildsEngine(
+                component,
+                options);
         }
 
         private static void ConstructsIsolatedEngine()
         {
-            using var a = new Core.WildsEngine(Options());
-            using var b = new Core.WildsEngine(Options());
+            using var a =
+                CreateEngine(
+                    "certification.engine.a");
 
-            Assert(!ReferenceEquals(a, b), "Engine instances must be independent.");
-            Assert(!ReferenceEquals(a.Instructions, b.Instructions), "Instruction pools must be instance-owned.");
+            using var b =
+                CreateEngine(
+                    "certification.engine.b");
+
+            Assert(
+                !ReferenceEquals(a, b),
+                "Engine instances must be independent.");
+
+            Assert(
+                !ReferenceEquals(
+                    a.Instructions,
+                    b.Instructions),
+                "Instruction pools must be instance-owned.");
         }
 
         private static void InitializeIsIdempotent()
         {
-            using var engine = new Core.WildsEngine(Options());
-            Assert(engine.Initialize(), "First Initialize() should succeed.");
-            Assert(engine.IsInitialized, "Engine should report initialized.");
-            Assert(!engine.Initialize(), "Second Initialize() should return false.");
+            using var engine =
+                CreateEngine(
+                    "certification.initialize");
+
+            Assert(
+                engine.Initialize(),
+                "First Initialize() should succeed.");
+
+            Assert(
+                engine.IsInitialized,
+                "Engine should report initialized.");
+
+            Assert(
+                !engine.Initialize(),
+                "Second Initialize() should return false.");
         }
 
         private static void ShutdownIsIdempotent()
         {
-            using var engine = new Core.WildsEngine(Options());
-            Assert(engine.Initialize(), "Initialize() should succeed.");
-            Assert(engine.Shutdown(), "First Shutdown() should succeed.");
-            Assert(!engine.IsInitialized, "Engine should report stopped.");
-            Assert(!engine.Shutdown(), "Second Shutdown() should return false.");
+            using var engine =
+                CreateEngine(
+                    "certification.shutdown");
+
+            Assert(
+                engine.Initialize(),
+                "Initialize() should succeed.");
+
+            Assert(
+                engine.Shutdown(),
+                "First Shutdown() should succeed.");
+
+            Assert(
+                !engine.IsInitialized,
+                "Engine should report stopped.");
+
+            Assert(
+                !engine.Shutdown(),
+                "Second Shutdown() should return false.");
         }
 
-        private static async Task RejectsProcessingBeforeInitialization()
+        private static async Task
+            RejectsProcessingBeforeInitialization()
         {
-            using var engine = new Core.WildsEngine(Options());
-            await AssertThrowsAsync<InvalidOperationException>(async () =>
-            {
-                await engine.ExecuteInstructionAsync<int>((_, __) => new ValueTask<int>(1));
-            });
+            using var engine =
+                CreateEngine(
+                    "certification.uninitialized");
+
+            await AssertThrowsAsync<InvalidOperationException>(
+                async () =>
+                {
+                    await engine.ExecuteInstructionAsync<int>(
+                        (_, __) =>
+                            new ValueTask<int>(1));
+                });
         }
 
-        private static async Task ExecutesInstructionLease()
+        private static async Task
+            ExecutesInstructionLease()
         {
-            using var engine = new Core.WildsEngine(Options());
-            engine.Initialize();
+            using var engine =
+                CreateEngine(
+                    "certification.execute");
 
-            var result = await engine.ExecuteInstructionAsync<int>((processor, _) =>
-            {
-                Assert(processor != null, "Processor must be supplied.");
-                return new ValueTask<int>(42);
-            });
+            Assert(
+                engine.Initialize(),
+                "Initialize() should succeed.");
 
-            Assert(result == 42, "Instruction result should flow through the engine.");
-            Assert(engine.Instructions.ActiveCount == 0, "Lease should be returned after execution.");
-            Assert(engine.Instructions.AvailableCount == 1, "Returned processor should be retained.");
+            var result =
+                await engine.ExecuteInstructionAsync<int>(
+                    (processor, _) =>
+                    {
+                        Assert(
+                            processor != null,
+                            "Processor must be supplied.");
+
+                        return new ValueTask<int>(
+                            42);
+                    });
+
+            LogPool(
+                engine,
+                "After instruction execution");
+
+            Assert(
+                result == 42,
+                "Instruction result should flow through the engine.");
+
+            Assert(
+                engine.Instructions.ActiveCount == 0,
+                "Lease should be returned after execution.");
+
+            Assert(
+                engine.Instructions.AvailableCount == 1,
+                "Returned processor should be retained.");
         }
 
-        private static async Task ReusesInstructionProcessor()
+        private static async Task
+            ReusesInstructionProcessor()
         {
-            using var engine = new Core.WildsEngine(Options(retainedInstructions: 1, concurrentInstructions: 1));
-            engine.Initialize();
+            using var engine =
+                CreateEngine(
+                    "certification.reuse",
+                    retainedInstructions: 1,
+                    concurrentInstructions: 1);
 
-            IInstructionsProcessor first = null!;
-            IInstructionsProcessor second = null!;
+            Assert(
+                engine.Initialize(),
+                "Initialize() should succeed.");
 
-            await engine.ExecuteInstructionAsync<int>((processor, _) =>
-            {
-                first = processor;
-                return new ValueTask<int>(1);
-            });
+            IInstructionsProcessor? first =
+                null;
 
-            await engine.ExecuteInstructionAsync<int>((processor, _) =>
-            {
-                second = processor;
-                return new ValueTask<int>(2);
-            });
+            IInstructionsProcessor? second =
+                null;
 
-            Assert(ReferenceEquals(first, second), "Sequential leases should reuse the retained processor.");
-            Assert(engine.Instructions.CreatedCount == 1, "Only one instruction processor should have been created.");
+            await engine.ExecuteInstructionAsync<int>(
+                (processor, _) =>
+                {
+                    first =
+                        processor;
+
+                    return new ValueTask<int>(
+                        1);
+                });
+
+            await engine.ExecuteInstructionAsync<int>(
+                (processor, _) =>
+                {
+                    second =
+                        processor;
+
+                    return new ValueTask<int>(
+                        2);
+                });
+
+            Assert(
+                first != null,
+                "First instruction processor should be captured.");
+
+            Assert(
+                second != null,
+                "Second instruction processor should be captured.");
+
+            Assert(
+                ReferenceEquals(
+                    first,
+                    second),
+                "Sequential leases should reuse the retained processor.");
+
+            Assert(
+                engine.Instructions.CreatedCount == 1,
+                "Only one instruction processor should have been created.");
         }
 
-        private static async Task ReturnsProcessorAfterOperationFailure()
+        private static async Task
+            ReturnsProcessorAfterOperationFailure()
         {
-            using var engine = new Core.WildsEngine(Options(retainedInstructions: 1, concurrentInstructions: 1));
-            engine.Initialize();
+            using var engine =
+                CreateEngine(
+                    "certification.failure",
+                    retainedInstructions: 1,
+                    concurrentInstructions: 1);
 
-            await AssertThrowsAsync<ExpectedTestException>(async () =>
-            {
-                await engine.ExecuteInstructionAsync<int>((_, __) =>
-                    throw new ExpectedTestException());
-            });
+            Assert(
+                engine.Initialize(),
+                "Initialize() should succeed.");
 
-            Assert(engine.Instructions.ActiveCount == 0, "Failed operation must not leak an active lease.");
-            Assert(engine.Instructions.AvailableCount == 1, "Processor should return after operation failure.");
+            await AssertThrowsAsync<ExpectedTestException>(
+                async () =>
+                {
+                    await engine.ExecuteInstructionAsync<int>(
+                        (_, __) =>
+                            throw new ExpectedTestException());
+                });
+
+            Assert(
+                engine.Instructions.ActiveCount == 0,
+                "Failed operation must not leak an active lease.");
+
+            Assert(
+                engine.Instructions.AvailableCount == 1,
+                "Processor should return after operation failure.");
         }
 
-        private static async Task HonorsCancellationWhileWaiting()
+        private static async Task
+            HonorsCancellationWhileWaiting()
         {
-            using var engine = new Core.WildsEngine(Options(retainedInstructions: 1, concurrentInstructions: 1));
-            engine.Initialize();
+            using var engine =
+                CreateEngine(
+                    "certification.cancellation",
+                    retainedInstructions: 1,
+                    concurrentInstructions: 1);
 
-            using var held = engine.Instructions.Rent();
-            using var cts = new CancellationTokenSource();
-            cts.Cancel();
+            Assert(
+                engine.Initialize(),
+                "Initialize() should succeed.");
 
-            await AssertThrowsAsync<OperationCanceledException>(async () =>
-            {
-                await engine.ExecuteInstructionAsync<int>((_, __) => new ValueTask<int>(1), cts.Token);
-            });
+            using var held =
+                engine.Instructions.Rent();
 
-            Assert(engine.Instructions.ActiveCount == 1, "Canceled waiter must not acquire a second lease.");
+            using var cancellation =
+                new CancellationTokenSource();
+
+            cancellation.Cancel();
+
+            await AssertThrowsAsync<OperationCanceledException>(
+                async () =>
+                {
+                    await engine.ExecuteInstructionAsync<int>(
+                        (_, __) =>
+                            new ValueTask<int>(1),
+                        cancellation.Token);
+                });
+
+            Assert(
+                engine.Instructions.ActiveCount == 1,
+                "Canceled waiter must not acquire a second lease.");
         }
 
         private static void RejectsUseAfterDisposal()
         {
-            var engine = new Core.WildsEngine(Options());
+            var engine =
+                CreateEngine(
+                    "certification.disposal");
+
             engine.Dispose();
 
-            AssertThrows<ObjectDisposedException>(() => engine.Initialize());
+            AssertThrows<ObjectDisposedException>(
+                () =>
+                    engine.Initialize());
         }
 
-        private static async Task ConcurrentLoadRespectsLimit()
+        private static async Task
+            ConcurrentLoadRespectsLimit()
         {
-            const int concurrentLimit = 3;
-            const int operationCount = 24;
+            const int limit = 3;
+            const int count = 24;
 
-            using var engine = new Core.WildsEngine(
-                Options(retainedInstructions: concurrentLimit, concurrentInstructions: concurrentLimit));
-            engine.Initialize();
+            using var engine =
+                CreateEngine(
+                    "certification.concurrent",
+                    retainedInstructions: limit,
+                    concurrentInstructions: limit);
+
+            Assert(
+                engine.Initialize(),
+                "Initialize() should succeed.");
 
             var current = 0;
-            var observedMaximum = 0;
-            var release = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            var entered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var maximum = 0;
 
-            var tasks = new List<Task<int>>(operationCount);
+            var release =
+                new TaskCompletionSource<bool>(
+                    TaskCreationOptions
+                        .RunContinuationsAsynchronously);
 
-            for (var i = 0; i < operationCount; i++)
+            var entered =
+                new TaskCompletionSource<bool>(
+                    TaskCreationOptions
+                        .RunContinuationsAsynchronously);
+
+            var tasks =
+                new List<Task<int>>(
+                    count);
+
+            for (var i = 0; i < count; i++)
             {
-                tasks.Add(engine.ExecuteInstructionAsync<int>(async (_, token) =>
-                {
-                    var now = Interlocked.Increment(ref current);
-                    UpdateMaximum(ref observedMaximum, now);
-                    if (now >= concurrentLimit)
-                        entered.TrySetResult(true);
+                tasks.Add(
+                    engine.ExecuteInstructionAsync<int>(
+                            async (_, token) =>
+                            {
+                                var now =
+                                    Interlocked.Increment(
+                                        ref current);
 
-                    try
-                    {
-                        await release.Task.ConfigureAwait(false);
-                        token.ThrowIfCancellationRequested();
-                        return 1;
-                    }
-                    finally
-                    {
-                        Interlocked.Decrement(ref current);
-                    }
-                }).AsTask());
+                                UpdateMaximum(
+                                    ref maximum,
+                                    now);
+
+                                if (now >= limit)
+                                {
+                                    entered.TrySetResult(
+                                        true);
+                                }
+
+                                try
+                                {
+                                    await release.Task
+                                        .ConfigureAwait(false);
+
+                                    token.ThrowIfCancellationRequested();
+
+                                    return 1;
+                                }
+                                finally
+                                {
+                                    Interlocked.Decrement(
+                                        ref current);
+                                }
+                            })
+                        .AsTask());
             }
 
-            await entered.Task.ConfigureAwait(false);
-            Assert(engine.Instructions.ActiveCount <= concurrentLimit, "Active leases exceeded MaximumConcurrent.");
-            release.TrySetResult(true);
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            await entered.Task
+                .ConfigureAwait(false);
 
-            Assert(observedMaximum == concurrentLimit, "Concurrent load did not exercise the configured limit.");
-            Assert(engine.Instructions.ActiveCount == 0, "All concurrent leases should be returned.");
-            Assert(engine.Instructions.CreatedCount <= concurrentLimit, "Pool created more processors than concurrent leasing permits.");
+            LogPool(
+                engine,
+                "At concurrency limit");
+
+            Assert(
+                engine.Instructions.ActiveCount <= limit,
+                "Active leases exceeded MaximumConcurrent.");
+
+            release.TrySetResult(
+                true);
+
+            await Task.WhenAll(
+                    tasks)
+                .ConfigureAwait(false);
+
+            Assert(
+                maximum == limit,
+                "Concurrent load did not exercise the configured limit.");
+
+            Assert(
+                engine.Instructions.ActiveCount == 0,
+                "All concurrent leases should be returned.");
+
+            Assert(
+                engine.Instructions.CreatedCount <= limit,
+                "Pool created more processors than " +
+                "concurrent leasing permits.");
         }
 
-        private static void UpdateMaximum(ref int target, int value)
+        private static void UpdateMaximum(
+            ref int target,
+            int value)
         {
             while (true)
             {
-                var current = Volatile.Read(ref target);
+                var current =
+                    Volatile.Read(
+                        ref target);
+
                 if (value <= current)
                     return;
-                if (Interlocked.CompareExchange(ref target, value, current) == current)
+
+                if (Interlocked.CompareExchange(
+                        ref target,
+                        value,
+                        current) == current)
+                {
                     return;
+                }
             }
         }
 
-        private static void Run(string name, Action test)
+        private static void Run(
+            string name,
+            Action test)
         {
+            TestLog.Test(
+                name);
+
             try
             {
                 test();
-                Passed.Add(name);
+
+                Passed.Add(
+                    name);
+
+                TestLog.Pass(
+                    name);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                throw new Exception($"[FAIL] {name}: {ex.Message}", ex);
+                TestLog.Fail(
+                    name,
+                    exception);
+
+                throw;
             }
         }
 
-        private static async Task RunAsync(string name, Func<Task> test)
+        private static async Task RunAsync(
+            string name,
+            Func<Task> test)
         {
+            TestLog.Test(
+                name);
+
             try
             {
-                await test().ConfigureAwait(false);
-                Passed.Add(name);
+                await test()
+                    .ConfigureAwait(false);
+
+                Passed.Add(
+                    name);
+
+                TestLog.Pass(
+                    name);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                throw new Exception($"[FAIL] {name}: {ex.Message}", ex);
+                TestLog.Fail(
+                    name,
+                    exception);
+
+                throw;
             }
         }
 
-        private static void Assert(bool condition, string message)
+        private static void LogPool(
+            Core.WildsEngine engine,
+            string label)
+        {
+            TestLog.State(
+                $"{label} | " +
+                $"Active={engine.Instructions.ActiveCount}, " +
+                $"Available={engine.Instructions.AvailableCount}, " +
+                $"Created={engine.Instructions.CreatedCount}, " +
+                $"Maximum={engine.Instructions.MaximumConcurrent}");
+        }
+
+        private static void Assert(
+            bool condition,
+            string message)
         {
             if (!condition)
-                throw new InvalidOperationException(message);
+            {
+                throw new InvalidOperationException(
+                    message);
+            }
         }
 
-        private static void AssertThrows<TException>(Action action)
+        private static void AssertThrows<TException>(
+            Action action)
             where TException : Exception
         {
             try
@@ -269,28 +591,39 @@ namespace WildsEngine.Tests
             }
             catch (TException)
             {
+                TestLog.Expected(
+                    typeof(TException).Name);
+
                 return;
             }
 
-            throw new InvalidOperationException($"Expected {typeof(TException).Name}.");
+            throw new InvalidOperationException(
+                $"Expected {typeof(TException).Name}.");
         }
 
-        private static async Task AssertThrowsAsync<TException>(Func<Task> action)
+        private static async Task AssertThrowsAsync<TException>(
+            Func<Task> action)
             where TException : Exception
         {
             try
             {
-                await action().ConfigureAwait(false);
+                await action()
+                    .ConfigureAwait(false);
             }
             catch (TException)
             {
+                TestLog.Expected(
+                    typeof(TException).Name);
+
                 return;
             }
 
-            throw new InvalidOperationException($"Expected {typeof(TException).Name}.");
+            throw new InvalidOperationException(
+                $"Expected {typeof(TException).Name}.");
         }
 
-        private sealed class ExpectedTestException : Exception
+        private sealed class ExpectedTestException :
+            Exception
         {
         }
     }

@@ -1,21 +1,26 @@
 ﻿using WildsEngine.Core.Abstractions;
-using WildsEngine.Core.Processing;
 
-public sealed class DefaultInstructionsRegistry :
-    InstructionsRegistryBase
+namespace WildsEngine.Core.Processing.Registry
 {
-    public DefaultInstructionsRegistry(string layer)
-        : base(layer)
+    public sealed class DefaultInstructionsRegistry :
+        InstructionsRegistryBase
     {
-    }
+        public DefaultInstructionsRegistry(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer)
+        {
+        }
 
-    protected override void OnInitialize()
-    {
-    }
+        protected override void OnInitialize()
+        {
+        }
 
-    protected override void OnShutdown()
-    {
+        protected override void OnShutdown()
+        {
+            Clear();
+        }
     }
-
-    public override IComponent Component { get; }
 }

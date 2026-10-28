@@ -10,7 +10,7 @@ namespace WildsEngine.Core.Pooling
     /// Thread-safe object pool with bounded retention
     /// and bounded concurrent leasing.
     /// </summary>
-    public sealed class ObjectPool<T> :
+    public class ObjectPool<T> :
         IObjectPool<T>,
         IDisposable
         where T : class

@@ -5,60 +5,54 @@ using WildsEngine.Core.Abstractions;
 
 namespace WildsEngine.Core.Processing.Processor
 {
+    /// <summary>
+    /// Processes instructions using the instruction registry
+    /// and delegates task work through the task processor pool.
+    /// </summary>
     public class InstructionsProcessor :
         ProcessorBase,
         IInstructionsProcessor
     {
-        private readonly IObjectPool<ITaskProcessor>
-            _taskProcessors;
+        private readonly IObjectPool<ITaskProcessor> _taskProcessors;
 
         public InstructionsProcessor(
+            IComponent component,
             string layer,
-            Abstractions.IInstructionsRegistry registry,
+            IInstructionsRegistry registry,
             IObjectPool<ITaskProcessor> taskProcessors)
-            : base(layer)
+            : base(
+                component,
+                layer)
         {
             Registry = registry ??
-                       throw new ArgumentNullException(nameof(registry));
+                       throw new ArgumentNullException(
+                           nameof(registry));
 
             _taskProcessors = taskProcessors ??
                               throw new ArgumentNullException(
                                   nameof(taskProcessors));
         }
 
-        public Abstractions.IInstructionsRegistry Registry { get; }
-
-        public override IComponent Component { get; }
+        public IInstructionsRegistry Registry { get; }
 
         /// <summary>
-        /// Rents a task processor, performs delegated work,
-        /// and guarantees that the processor is returned.
+        /// Rents a task processor for delegated task processing.
+        /// The caller owns the returned lease and must dispose it.
         /// </summary>
-        protected async ValueTask<TResult> ExecuteTaskAsync<TResult>(
-            Func<
-                ITaskProcessor,
-                CancellationToken,
-                ValueTask<TResult>> operation,
-            CancellationToken cancellationToken = default)
+        public ValueTask<ObjectLease<ITaskProcessor>>
+            RentTaskProcessorAsync(
+                CancellationToken cancellationToken = default)
         {
-            if (operation == null)
-                throw new ArgumentNullException(nameof(operation));
-
-            using (var lease =
-                   await _taskProcessors
-                       .RentAsync(cancellationToken)
-                       .ConfigureAwait(false))
-            {
-                return await operation(
-                        lease.Instance,
-                        cancellationToken)
-                    .ConfigureAwait(false);
-            }
+            return _taskProcessors.RentAsync(
+                cancellationToken);
         }
 
+        /// <summary>
+        /// Clears transient processor state before this processor
+        /// is returned to its pool.
+        /// </summary>
         protected override bool OnReset()
         {
-            // Clear future per-instruction state here.
             return true;
         }
     }

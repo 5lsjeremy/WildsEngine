@@ -12,10 +12,11 @@ namespace WildsEngine.Core.Processing
             string key,
             object? value)
             : base(
+                component,
                 "task.context.variable.set")
         {
-            Context = context
-                      ?? throw new ArgumentNullException(
+            Context = context ??
+                      throw new ArgumentNullException(
                           nameof(context));
 
             if (string.IsNullOrWhiteSpace(key))
@@ -25,7 +26,7 @@ namespace WildsEngine.Core.Processing
                     nameof(key));
             }
 
-            Key = key;
+            Key = key.Trim();
             Value = value;
         }
 
@@ -34,6 +35,5 @@ namespace WildsEngine.Core.Processing
         public string Key { get; }
 
         public object? Value { get; }
-        public override IComponent Component { get; }
     }
 }

@@ -1,11 +1,8 @@
 ﻿namespace WildsEngine.Core.Abstractions
 {
-    public interface ITaskProcessor
+    public interface ITaskProcessor :
+        IBaseObject
     {
         ITaskRegistry Registry { get; }
-    }
-
-    public interface ITaskRegistry
-    {
     }
 }

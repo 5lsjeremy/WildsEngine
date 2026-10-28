@@ -12,13 +12,20 @@ namespace WildsEngine.Benchmarks
     /// </summary>
     public sealed class ProcessorPoolingBenchmark
     {
+        private readonly IComponent _component;
         private readonly ITaskRegistry _registry;
 
         public ProcessorPoolingBenchmark(
+            IComponent component,
             ITaskRegistry registry)
         {
+            _component = component ??
+                throw new ArgumentNullException(
+                    nameof(component));
+
             _registry = registry ??
-                throw new ArgumentNullException(nameof(registry));
+                throw new ArgumentNullException(
+                    nameof(registry));
         }
 
         public ProcessorPoolingBenchmarkResult Run(
@@ -59,10 +66,12 @@ namespace WildsEngine.Benchmarks
             {
                 var processor =
                     new TaskProcessor(
+                        _component,
                         "benchmark.direct",
                         _registry);
 
-                Consume(processor);
+                Consume(
+                    processor);
             }
 
             directWatch.Stop();
@@ -77,6 +86,7 @@ namespace WildsEngine.Benchmarks
                 new ObjectPool<ITaskProcessor>(
                     factory: () =>
                         new TaskProcessor(
+                            _component,
                             "benchmark.pooled",
                             _registry),
                     maximumRetained:
@@ -94,7 +104,8 @@ namespace WildsEngine.Benchmarks
                 {
                     using (var lease = pool.Rent())
                     {
-                        Consume(lease.Instance);
+                        Consume(
+                            lease.Instance);
                     }
                 }
 
@@ -123,10 +134,12 @@ namespace WildsEngine.Benchmarks
             {
                 var processor =
                     new TaskProcessor(
+                        _component,
                         "benchmark.warmup",
                         _registry);
 
-                Consume(processor);
+                Consume(
+                    processor);
             }
         }
 
@@ -152,7 +165,9 @@ namespace WildsEngine.Benchmarks
             ITaskProcessor processor)
         {
             if (processor == null)
+            {
                 throw new InvalidOperationException();
+            }
         }
     }
 }

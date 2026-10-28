@@ -1,33 +1,33 @@
-﻿using WildsEngine.Core.Abstractions;
+﻿using System;
+using WildsEngine.Core.Abstractions;
 using WildsEngine.Core.Objects;
 
 namespace WildsEngine.Core.Processing
 {
-    /// <summary>
-    /// Base abstraction for Wilds processing infrastructure.
-    /// Provides the common object surface used by task and
-    /// instruction processors.
-    /// </summary>
     public abstract class ProcessorBase :
         BaseObject,
         IResettablePoolObject
     {
-        protected ProcessorBase(string layer)
+        private readonly IComponent _component;
+
+        protected ProcessorBase(
+            IComponent component,
+            string layer)
             : base(layer)
         {
+            _component = component ??
+                         throw new ArgumentNullException(
+                             nameof(component));
         }
 
-        public abstract override IComponent Component { get; }
+        public sealed override IComponent Component =>
+            _component;
 
         public bool TryReset()
         {
             return OnReset();
         }
 
-        /// <summary>
-        /// Clears transient processing state before this processor
-        /// is retained by its pool.
-        /// </summary>
         protected virtual bool OnReset()
         {
             return true;

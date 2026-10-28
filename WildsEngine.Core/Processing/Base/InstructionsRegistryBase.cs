@@ -3,11 +3,16 @@
 namespace WildsEngine.Core.Processing
 {
     public abstract class InstructionsRegistryBase :
-        RegistryBase,
-        Abstractions.IInstructionsRegistry
+        RegistryBase<IStateInstruction>,
+        IInstructionsRegistry
     {
-        protected InstructionsRegistryBase(string layer)
-            : base(layer)
+        protected InstructionsRegistryBase(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer,
+                instruction => instruction.Id)
         {
         }
     }

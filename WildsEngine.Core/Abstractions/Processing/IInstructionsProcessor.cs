@@ -1,11 +1,15 @@
-﻿namespace WildsEngine.Core.Abstractions
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace WildsEngine.Core.Abstractions
 {
-    public interface IInstructionsProcessor
+    public interface IInstructionsProcessor :
+        IBaseObject
     {
         IInstructionsRegistry Registry { get; }
-    }
 
-    public interface IInstructionsRegistry
-    {
+        ValueTask<ObjectLease<ITaskProcessor>>
+            RentTaskProcessorAsync(
+                CancellationToken cancellationToken = default);
     }
 }

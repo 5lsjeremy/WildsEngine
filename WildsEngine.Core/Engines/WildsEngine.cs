@@ -1,24 +1,26 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using global::WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Abstractions;
 using WildsEngine.Core.Pooling;
 using WildsEngine.Core.Processing.Processor;
+using WildsEngine.Core.Processing.Registry;
 
 namespace WildsEngine.Core
 {
     /// <summary>
     /// Composition root for one isolated Wilds runtime instance.
-    /// Owns registries and processor pools and coordinates
-    /// their runtime lifecycle.
     /// </summary>
-    public sealed class WildsEngine : IDisposable
+    public sealed class WildsEngine :
+        IDisposable
     {
-        private readonly DefaultInstructionsRegistry
-            _instructionsRegistry;
+        private readonly IComponent _component;
 
-        private readonly DefaultTaskRegistry
-            _taskRegistry;
+        private readonly DefaultInstructionsRegistry
+            _instructionRegistry;
+
+        private readonly DefaultTasksRegistry
+            _tasksRegistry;
 
         private readonly ObjectPool<ITaskProcessor>
             _taskProcessors;
@@ -29,10 +31,18 @@ namespace WildsEngine.Core
         private int _disposed;
 
         public WildsEngine(
+            IComponent component,
             WildsEngineOptions options)
         {
+            _component = component ??
+                throw new ArgumentNullException(
+                    nameof(component));
+
             if (options == null)
-                throw new ArgumentNullException(nameof(options));
+            {
+                throw new ArgumentNullException(
+                    nameof(options));
+            }
 
             if (string.IsNullOrWhiteSpace(options.Layer))
             {
@@ -41,22 +51,26 @@ namespace WildsEngine.Core
                     nameof(options));
             }
 
-            Layer = options.Layer.Trim();
+            Layer =
+                options.Layer.Trim();
 
-            _instructionsRegistry =
+            _instructionRegistry =
                 new DefaultInstructionsRegistry(
-                    $"{Layer}.instructions-registry");
+                    _component,
+                    $"{Layer}.instruction-registry");
 
-            _taskRegistry =
-                new DefaultTaskRegistry(
+            _tasksRegistry =
+                new DefaultTasksRegistry(
+                    _component,
                     $"{Layer}.task-registry");
 
             _taskProcessors =
                 new ObjectPool<ITaskProcessor>(
                     factory: () =>
                         new TaskProcessor(
+                            _component,
                             $"{Layer}.task-processor",
-                            _taskRegistry),
+                            _tasksRegistry),
                     maximumRetained:
                         options.RetainedTaskProcessors,
                     maximumConcurrent:
@@ -66,8 +80,9 @@ namespace WildsEngine.Core
                 new ObjectPool<IInstructionsProcessor>(
                     factory: () =>
                         new InstructionsProcessor(
+                            _component,
                             $"{Layer}.instructions-processor",
-                            _instructionsRegistry,
+                            _instructionRegistry,
                             _taskProcessors),
                     maximumRetained:
                         options.RetainedInstructionsProcessors,
@@ -76,6 +91,9 @@ namespace WildsEngine.Core
         }
 
         public string Layer { get; }
+
+        public IComponent Component =>
+            _component;
 
         public bool IsInitialized { get; private set; }
 
@@ -89,8 +107,8 @@ namespace WildsEngine.Core
             if (IsInitialized)
                 return false;
 
-            _instructionsRegistry.Initialize();
-            _taskRegistry.Initialize();
+            _instructionRegistry.Initialize();
+            _tasksRegistry.Initialize();
 
             IsInitialized = true;
 
@@ -110,11 +128,15 @@ namespace WildsEngine.Core
             if (!IsInitialized)
             {
                 throw new InvalidOperationException(
-                    "The Wilds engine must be initialized before processing.");
+                    "The WildsEngine must be initialized " +
+                    "before processing instructions.");
             }
 
             if (operation == null)
-                throw new ArgumentNullException(nameof(operation));
+            {
+                throw new ArgumentNullException(
+                    nameof(operation));
+            }
 
             using (var lease =
                 await _instructionsProcessors
@@ -135,8 +157,8 @@ namespace WildsEngine.Core
             if (!IsInitialized)
                 return false;
 
-            _taskRegistry.Shutdown();
-            _instructionsRegistry.Shutdown();
+            _tasksRegistry.Shutdown();
+            _instructionRegistry.Shutdown();
 
             IsInitialized = false;
 
@@ -154,8 +176,8 @@ namespace WildsEngine.Core
 
             if (IsInitialized)
             {
-                _taskRegistry.Shutdown();
-                _instructionsRegistry.Shutdown();
+                _tasksRegistry.Shutdown();
+                _instructionRegistry.Shutdown();
 
                 IsInitialized = false;
             }
