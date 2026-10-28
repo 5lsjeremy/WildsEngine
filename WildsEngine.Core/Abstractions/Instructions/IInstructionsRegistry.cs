@@ -1,7 +1,7 @@
 ﻿using System;
 using WildsEngine.Core.Abstractions;
 
-public interface IInstructionRegistry :
+public interface IInstructionsRegistry :
     IBaseObject
 {
     bool Register(IStateInstruction instruction);

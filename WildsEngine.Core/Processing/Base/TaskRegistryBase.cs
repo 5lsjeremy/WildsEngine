@@ -1,9 +1,14 @@
-﻿using WildsEngine.Core.Processing;
+﻿using WildsEngine.Core.Abstractions;
 
-public abstract class TaskRegistryBase :
-    RegistryBase
+namespace WildsEngine.Core.Processing
 {
-    protected TaskRegistryBase(string layer) : base(layer)
+    public abstract class TaskRegistryBase :
+        RegistryBase,
+        ITaskRegistry
     {
+        protected TaskRegistryBase(string layer)
+            : base(layer)
+        {
+        }
     }
 }
