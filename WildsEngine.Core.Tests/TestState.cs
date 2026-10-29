@@ -27,6 +27,17 @@ internal sealed class TestState :
                 nameof(instruction));
         }
 
+        if (instruction is
+            ISetContextVariableInstruction
+            setContextVariable)
+        {
+            Context.SetVariable(
+                setContextVariable.Key,
+                setContextVariable.Value);
+
+            return true;
+        }
+
         return false;
     }
 }

@@ -6,5 +6,6 @@
   <ItemGroup>
     <Folder Include="Abstractions\Base\" />
     <Folder Include="Pools\" />
+    <Folder Include="Work\" />
   </ItemGroup>
 </Project>

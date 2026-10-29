@@ -39,7 +39,8 @@ namespace WildsEngine.Core.Processing.Processor
                     nameof(task));
             }
 
-            return Registry.Register(task);
+            return Registry.Register(
+                task);
         }
 
         /// <summary>
@@ -48,7 +49,8 @@ namespace WildsEngine.Core.Processing.Processor
         public bool ContainsTask(
             Guid id)
         {
-            return Registry.Contains(id);
+            return Registry.Contains(
+                id);
         }
 
         /// <summary>
@@ -57,7 +59,8 @@ namespace WildsEngine.Core.Processing.Processor
         public ITask? GetTask(
             Guid id)
         {
-            return Registry.Get(id);
+            return Registry.Get(
+                id);
         }
 
         /// <summary>
@@ -78,7 +81,8 @@ namespace WildsEngine.Core.Processing.Processor
         public bool RemoveTask(
             Guid id)
         {
-            return Registry.Remove(id);
+            return Registry.Remove(
+                id);
         }
 
         /// <summary>

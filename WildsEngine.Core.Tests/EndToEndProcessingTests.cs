@@ -56,148 +56,241 @@ namespace WildsEngine.Core.Tests
                 $"{Passed.Count}/{Passed.Count}");
         }
 
-        private static async Task
-            InstructionFlowsThroughCompleteProcessingRoute()
-        {
-            var component =
-                CreateComponent(
-                    "certification.end-to-end.success");
+private static async Task
+    InstructionFlowsThroughCompleteProcessingRoute()
+{
+    var component =
+        CreateComponent(
+            "certification.end-to-end.success");
 
-            using var engine =
-                CreateEngine(
-                    component);
+    using var engine =
+        CreateEngine(
+            component);
 
-            Assert.True(
-                engine.Initialize());
+    Assert.True(
+        engine.Initialize());
 
-            var instruction =
-                new SetContextVariableInstruction(
-                    "PlayerHealth",
-                    10);
+    var instruction =
+        new SetContextVariableInstruction(
+            "PlayerHealth",
+            10);
 
-            IInstructionsRegistry? observedInstructionRegistry =
-                null;
+    IInstructionsRegistry? observedInstructionRegistry =
+        null;
 
-            ITaskRegistry? observedTaskRegistry =
-                null;
+    ITaskRegistry? observedTaskRegistry =
+        null;
 
-            ITaskProcessor? observedTaskProcessor =
-                null;
+    ITaskProcessor? observedTaskProcessor =
+        null;
 
-            TestLog.Write(
-                $"[PARK] Instruction {instruction.Id}");
+    SetContextVariable? observedTask =
+        null;
 
-            var result =
-                await engine.ExecuteInstructionAsync<int>(
-                        async (
-                            instructionProcessor,
-                            cancellationToken) =>
+    TestLog.Write(
+        $"[PARK] Instruction {instruction.Id}");
+
+    var result =
+        await engine.ExecuteInstructionAsync<int>(
+                async (
+                    instructionProcessor,
+                    cancellationToken) =>
+                {
+                    cancellationToken
+                        .ThrowIfCancellationRequested();
+
+                    Assert.Same(
+                        component,
+                        instructionProcessor.Component);
+
+                    observedInstructionRegistry =
+                        instructionProcessor.Registry;
+
+                    Assert.Same(
+                        component,
+                        observedInstructionRegistry.Component);
+
+                    Assert.True(
+                        observedInstructionRegistry.Register(
+                            instruction));
+
+                    Assert.True(
+                        observedInstructionRegistry.TryGet(
+                            instruction.Id,
+                            out var parkedInstruction));
+
+                    Assert.Same(
+                        instruction,
+                        parkedInstruction);
+
+                    TestLog.Write(
+                        $"[READ] Instruction {instruction.Id}");
+
+                    try
+                    {
+                        using var taskLease =
+                            await instructionProcessor
+                                .RentTaskProcessorAsync(
+                                    cancellationToken)
+                                .ConfigureAwait(false);
+
+                        cancellationToken
+                            .ThrowIfCancellationRequested();
+
+                        observedTaskProcessor =
+                            taskLease.Instance;
+
+                        observedTaskRegistry =
+                            observedTaskProcessor.Registry;
+
+                        Assert.NotNull(
+                            observedTaskProcessor);
+
+                        Assert.NotNull(
+                            observedTaskRegistry);
+
+                        Assert.Same(
+                            component,
+                            observedTaskProcessor.Component);
+
+                        Assert.Same(
+                            component,
+                            observedTaskRegistry.Component);
+
+                        observedTask =
+                            new SetContextVariable(
+                                component,
+                                component.State.Context,
+                                instruction.Key,
+                                instruction.Value);
+
+                        Assert.Same(
+                            component,
+                            observedTask.Component);
+
+                        Assert.Same(
+                            component.State.Context,
+                            observedTask.Context);
+
+                        Assert.True(
+                            observedTaskProcessor.RegisterTask(
+                                observedTask));
+
+                        Assert.True(
+                            observedTaskProcessor.ContainsTask(
+                                observedTask.Id));
+
+                        Assert.True(
+                            observedTaskProcessor.TryGetTask(
+                                observedTask.Id,
+                                out var parkedTask));
+
+                        Assert.Same(
+                            observedTask,
+                            parkedTask);
+
+                        TestLog.Write(
+                            $"[TASK] Parked task {observedTask.Id}");
+
+                        try
                         {
-                            Assert.Same(
-                                component,
-                                instructionProcessor.Component);
-
-                            observedInstructionRegistry =
-                                instructionProcessor.Registry;
-
-                            Assert.Same(
-                                component,
-                                observedInstructionRegistry.Component);
+                            cancellationToken
+                                .ThrowIfCancellationRequested();
 
                             Assert.True(
-                                observedInstructionRegistry.Register(
+                                component.State.Process(
                                     instruction));
 
                             Assert.True(
-                                observedInstructionRegistry.TryGet(
-                                    instruction.Id,
-                                    out var parkedInstruction));
+                                component.State.Context.Variables
+                                    .TryGetValue(
+                                        instruction.Key,
+                                        out var processedValue));
 
-                            Assert.Same(
-                                instruction,
-                                parkedInstruction);
+                            Assert.Equal(
+                                instruction.Value,
+                                processedValue);
+
+                            TestLog.State(
+                                $"{instruction.Key}={processedValue}");
+
+                            return Assert.IsType<int>(
+                                processedValue);
+                        }
+                        finally
+                        {
+                            Assert.True(
+                                observedTaskProcessor.RemoveTask(
+                                    observedTask.Id));
 
                             TestLog.Write(
-                                $"[READ] Instruction {instruction.Id}");
+                                $"[TASK] Removed task {observedTask.Id}");
+                        }
+                    }
+                    finally
+                    {
+                        Assert.True(
+                            observedInstructionRegistry.Remove(
+                                instruction.Id));
 
-                            try
-                            {
-                                using var taskLease =
-                                    await instructionProcessor
-                                        .RentTaskProcessorAsync(
-                                            cancellationToken)
-                                        .ConfigureAwait(false);
+                        TestLog.Write(
+                            $"[REMOVE] Instruction {instruction.Id}");
+                    }
+                })
+            .ConfigureAwait(false);
 
-                                observedTaskProcessor =
-                                    taskLease.Instance;
+    Assert.Equal(
+        10,
+        result);
 
-                                observedTaskRegistry =
-                                    observedTaskProcessor.Registry;
+    Assert.NotNull(
+        observedInstructionRegistry);
 
-                                Assert.NotNull(
-                                    observedTaskProcessor);
+    Assert.NotNull(
+        observedTaskProcessor);
 
-                                Assert.NotNull(
-                                    observedTaskRegistry);
+    Assert.NotNull(
+        observedTaskRegistry);
 
-                                Assert.Same(
-                                    component,
-                                    observedTaskProcessor.Component);
+    Assert.NotNull(
+        observedTask);
 
-                                Assert.Same(
-                                    component,
-                                    observedTaskRegistry.Component);
+    Assert.False(
+        observedInstructionRegistry.TryGet(
+            instruction.Id,
+            out _));
 
-                                TestLog.State(
-                                    "Instruction processor delegated " +
-                                    "to task processor");
+    Assert.False(
+        observedTaskProcessor.TryGetTask(
+            observedTask.Id,
+            out _));
 
-                                return 10;
-                            }
-                            finally
-                            {
-                                Assert.True(
-                                    observedInstructionRegistry.Remove(
-                                        instruction.Id));
+    Assert.True(
+        component.State.Context.Variables
+            .TryGetValue(
+                "PlayerHealth",
+                out var finalPlayerHealth));
 
-                                TestLog.Write(
-                                    $"[REMOVE] Instruction {instruction.Id}");
-                            }
-                        })
-                    .ConfigureAwait(false);
+    Assert.Equal(
+        10,
+        Assert.IsType<int>(
+            finalPlayerHealth));
 
-            Assert.Equal(
-                10,
-                result);
+    Assert.Equal(
+        0,
+        engine.Instructions.ActiveCount);
 
-            Assert.NotNull(
-                observedInstructionRegistry);
+    Assert.Equal(
+        1,
+        engine.Instructions.AvailableCount);
 
-            Assert.NotNull(
-                observedTaskProcessor);
-
-            Assert.NotNull(
-                observedTaskRegistry);
-
-            Assert.False(
-                observedInstructionRegistry.TryGet(
-                    instruction.Id,
-                    out _));
-
-            Assert.Equal(
-                0,
-                engine.Instructions.ActiveCount);
-
-            Assert.Equal(
-                1,
-                engine.Instructions.AvailableCount);
-
-            TestLog.State(
-                "Successful route complete | " +
-                $"Active={engine.Instructions.ActiveCount}, " +
-                $"Available={engine.Instructions.AvailableCount}, " +
-                $"Created={engine.Instructions.CreatedCount}");
-        }
+    TestLog.State(
+        "Successful stateful route complete | " +
+        $"PlayerHealth={finalPlayerHealth}, " +
+        $"Active={engine.Instructions.ActiveCount}, " +
+        $"Available={engine.Instructions.AvailableCount}, " +
+        $"Created={engine.Instructions.CreatedCount}");
+}
 
         private static async Task
             ProcessingFailureReturnsProcessorsAndRemovesInstruction()

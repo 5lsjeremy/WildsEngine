@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+    <ProjectReference Include="..\..\QSL\QSL.csproj" />
+  </ItemGroup>
 
 </Project>
