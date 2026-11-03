@@ -27,6 +27,12 @@ internal sealed class TestState :
                 nameof(instruction));
         }
 
+        if (TryProcessNeighborInstruction(
+                instruction))
+        {
+            return true;
+        }
+
         if (instruction is
             ISetContextVariableInstruction
             setContextVariable)

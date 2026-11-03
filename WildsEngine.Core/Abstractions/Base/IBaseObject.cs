@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace WildsEngine.Core.Abstractions
 {
@@ -9,14 +8,14 @@ namespace WildsEngine.Core.Abstractions
 
         string Slug { get; }
 
-        IReadOnlyList<IBaseObject> Neighbors { get; }
+        INeighborCollection Neighbors { get; }
 
         IComponent Component { get; }
 
-        string AppendSlug(string value);
+        string AppendSlug(
+            string value);
 
-        bool AddNeighbor(IBaseObject neighbor);
-
-        bool RemoveNeighbor(Guid id);
+        TResult ApplyNeighborOperator<TResult>(
+            INeighborOperator<TResult> neighborOperator);
     }
 }

@@ -4,38 +4,55 @@ using WildsEngine.Core.Abstractions;
 
 namespace WildsEngine.Core.Objects
 {
-    public abstract class BaseObject : IBaseObject
+    public abstract class BaseObject :
+        IBaseObject
     {
-        private readonly List<IBaseObject> _neighbors =
-            new List<IBaseObject>();
+        private readonly NeighborCollection _neighbors;
 
-        protected BaseObject(string layer)
-            : this(Guid.NewGuid(), layer)
+        protected BaseObject(
+            string layer)
+            : this(
+                Guid.NewGuid(),
+                layer)
         {
         }
 
-        protected BaseObject(Guid id, string layer)
+        protected BaseObject(
+            Guid id,
+            string layer)
         {
             if (id == Guid.Empty)
+            {
                 throw new ArgumentException(
                     "Wilds objects require a non-empty GUID.",
                     nameof(id));
+            }
 
             if (string.IsNullOrWhiteSpace(layer))
+            {
                 throw new ArgumentException(
                     "Wilds objects require a layer.",
                     nameof(layer));
+            }
 
             Id = id;
-            Slug = BuildSlug(id, layer);
+
+            Slug =
+                BuildSlug(
+                    id,
+                    layer);
+
+            _neighbors =
+                new NeighborCollection(
+                    this);
         }
 
         public Guid Id { get; }
 
         public string Slug { get; private set; }
 
-        public IReadOnlyList<IBaseObject> Neighbors =>
-            _neighbors.AsReadOnly();
+        public INeighborCollection Neighbors =>
+            _neighbors;
 
         public abstract IComponent Component { get; }
 
@@ -51,63 +68,64 @@ namespace WildsEngine.Core.Objects
         public virtual IDictionary<string, object?> Metadata =>
             Component.Metadata;
 
-        public string AppendSlug(string value)
+        public string AppendSlug(
+            string value)
         {
             if (string.IsNullOrWhiteSpace(value))
+            {
                 return Slug;
+            }
 
-            var segment = value.Trim().Trim('.');
+            var segment =
+                value
+                    .Trim()
+                    .Trim('.');
 
             if (segment.Length == 0)
+            {
                 return Slug;
+            }
 
-            Slug = $"{Slug}.{segment}";
+            Slug =
+                $"{Slug}.{segment}";
 
             return Slug;
         }
 
-        public bool AddNeighbor(IBaseObject neighbor)
+        public TResult ApplyNeighborOperator<TResult>(
+            INeighborOperator<TResult> neighborOperator)
         {
-            if (neighbor == null)
-                throw new ArgumentNullException(nameof(neighbor));
-
-            if (neighbor.Id == Id)
-                return false;
-
-            for (var i = 0; i < _neighbors.Count; i++)
+            if (neighborOperator == null)
             {
-                if (_neighbors[i].Id == neighbor.Id)
-                    return false;
+                throw new ArgumentNullException(
+                    nameof(neighborOperator));
             }
 
-            _neighbors.Add(neighbor);
-
-            return true;
+            return neighborOperator.Apply(
+                this,
+                _neighbors.Relationships);
         }
 
-        public bool RemoveNeighbor(Guid id)
+        private static string BuildSlug(
+            Guid id,
+            string layer)
         {
-            for (var i = 0; i < _neighbors.Count; i++)
-            {
-                if (_neighbors[i].Id != id)
-                    continue;
+            var raw =
+                id.ToString(
+                    "N");
 
-                _neighbors.RemoveAt(i);
+            var first =
+                raw.Substring(
+                    0,
+                    3);
 
-                return true;
-            }
+            var last =
+                raw.Substring(
+                    raw.Length - 3,
+                    3);
 
-            return false;
-        }
-
-        private static string BuildSlug(Guid id, string layer)
-        {
-            var raw = id.ToString("N");
-
-            var first = raw.Substring(0, 3);
-            var last = raw.Substring(raw.Length - 3, 3);
-
-            return $"{first}{last}-{layer.Trim()}";
+            return
+                $"{first}{last}-{layer.Trim()}";
         }
     }
 }
