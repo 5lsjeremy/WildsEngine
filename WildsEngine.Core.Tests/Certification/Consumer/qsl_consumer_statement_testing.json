@@ -1,0 +1,274 @@
+﻿{
+    "suite":  "WildsQslConsumer",
+    "dependencies":  [
+                         "ApplyForce",
+                         "heal",
+                         "Player"
+                     ],
+    "tests":  [
+                  {
+                      "category":  "Block",
+                      "statement":  "{ health = 100; heal(10); }",
+                      "expected":  "110",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "Block",
+                      "statement":  "{ health = 50; heal(10); health; }",
+                      "expected":  "60",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 100; heal(10); }",
+                      "expected":  "110",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 0; heal(5); }",
+                      "expected":  "5",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 0; heal(5 + 5); }",
+                      "expected":  "10",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 0; heal(1 + 2 + 3); }",
+                      "expected":  "6",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 50; heal(10); }",
+                      "expected":  "60",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 100; heal(10); heal(10); }",
+                      "expected":  "120",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 1; heal(1); }",
+                      "expected":  "2",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 10; heal(-5); }",
+                      "expected":  "5",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 5; heal(0); }",
+                      "expected":  "5",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 10; heal(2 * 5); }",
+                      "expected":  "20",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "heal()",
+                      "expected":  "",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "heal(1, 2)",
+                      "expected":  "",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "heal(\"bad\")",
+                      "expected":  "",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "FunctionCall",
+                      "statement":  "{ health = 10; heal(5); health; }",
+                      "expected":  "15",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.health; }",
+                      "expected":  "100",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.mana = 50; Player.mana; }",
+                      "expected":  "50",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "Player.unknownField",
+                      "expected":  "",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.health + 10; }",
+                      "expected":  "110",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.health == 100; }",
+                      "expected":  "true",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.health \u003e 50; }",
+                      "expected":  "true",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.mana = 50; true ? Player.health : Player.mana; }",
+                      "expected":  "100",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.mana = 50; false ? Player.health : Player.mana; }",
+                      "expected":  "50",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.mana = 50; Player.health + Player.mana; }",
+                      "expected":  "150",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.mana = 50; Player.health \u003e= Player.mana; }",
+                      "expected":  "true",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.mana = 50; Player.mana \u003c Player.health; }",
+                      "expected":  "true",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.mana = 50; (Player.health + Player.mana) / 2; }",
+                      "expected":  "75",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.mana = 50; Player.health != Player.mana; }",
+                      "expected":  "true",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 100; Player.health = 75; }",
+                      "expected":  "75",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "MemberAccess",
+                      "statement":  "{ Player.health = 75; Player.health; }",
+                      "expected":  "75",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "Embedded",
+                      "statement":  "\"Player: $({ Player.health = 75; Player.health; })\"",
+                      "expected":  "Player: 75",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "Arrow",
+                      "statement":  "{ health = 50; health =\u003e heal(10); }",
+                      "expected":  "60",
+                      "dependency":  "heal"
+                  },
+                  {
+                      "category":  "Physics",
+                      "statement":  "ApplyForce(\"Player\", Vector(10, 0))",
+                      "expected":  "Velocity(X=1, Y=0)",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Physics",
+                      "statement":  "ApplyForce(\"Player\", Vector(0, 10))",
+                      "expected":  "Velocity(X=0, Y=1)",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Physics",
+                      "statement":  "ApplyForce(\"Player\", Vector(10, 10))",
+                      "expected":  "Velocity(X=1, Y=1)",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Physics",
+                      "statement":  "ApplyForce(\"Player\", Vector(-10, 0))",
+                      "expected":  "Velocity(X=-1, Y=0)",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Physics",
+                      "statement":  "ApplyForce(\"Player\", Vector(0, 0))",
+                      "expected":  "Velocity(X=0, Y=0)",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "ApplyForce(\"Player\", 10)",
+                      "expected":  "",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "ApplyForce(10, Vector(1, 1))",
+                      "expected":  "",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "ApplyForce(\"Player\")",
+                      "expected":  "",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "ApplyForce(\"Player\", Vector(1, 1), 3)",
+                      "expected":  "",
+                      "dependency":  "ApplyForce"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "Player.unknownField",
+                      "expected":  "",
+                      "dependency":  "Player"
+                  },
+                  {
+                      "category":  "Error",
+                      "statement":  "heal(\"bad\")",
+                      "expected":  "",
+                      "dependency":  "heal"
+                  }
+              ]
+}

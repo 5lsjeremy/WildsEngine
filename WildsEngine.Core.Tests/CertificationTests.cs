@@ -93,21 +93,57 @@ namespace WildsEngine.Core.Tests
             TestLog.Pass(
                 "End-to-end processing certification");
         }
-        
+
         [Fact]
-        public async Task WildsQslDiagnosticRun()
+        public async Task WildsQslCoreCertification()
         {
             TestLog.Initialize();
-            TestLog.Section("Wilds / QSL Diagnostic Run");
-            TestLog.Write("[START] Wilds / QSL diagnostic run");
-            var report = await Certification.WildsQslCertification.RunAllAsync();
-            Assert.Equal(200, report.Total);
+
+            TestLog.Section(
+                "Wilds / QSL Core Certification");
+
+            TestLog.Write(
+                "[START] Wilds / QSL core certification");
+
+            var report =
+                await Certification
+                    .WildsQslCertification
+                    .RunAllAsync();
+
+            Assert.True(
+                report.Total > 0);
+
             Assert.Equal(
                 report.Total,
-                report.Passed + report.Failed + report.MissingDependencies);
-            Assert.Equal(report.Total, report.TimelineMoments);
-            Assert.Equal(1, report.EpochTimelines);
-            TestLog.Pass("Wilds / QSL diagnostic run");
+                report.Passed);
+
+            Assert.Equal(
+                0,
+                report.Failed);
+
+            Assert.Equal(
+                0,
+                report.MissingDependencies);
+
+            Assert.Equal(
+                report.Total,
+                report.Passed +
+                report.Failed +
+                report.MissingDependencies);
+
+            Assert.Equal(
+                report.Total,
+                report.TimelineMoments);
+
+            Assert.Equal(
+                1,
+                report.EpochTimelines);
+
+            Assert.True(
+                report.IsCertified);
+
+            TestLog.Pass(
+                "Wilds / QSL core certification");
         }
     }
 }

@@ -22,7 +22,11 @@
     <ProjectReference Include="..\WildsEngine.Qsl\WildsEngine.Qsl.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="Certification\qsl_statement_testing.json">
+    <None Update="Certification\qsl_core_statement_testing.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Update="Certification\Consumer\qsl_consumer_statement_testing.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

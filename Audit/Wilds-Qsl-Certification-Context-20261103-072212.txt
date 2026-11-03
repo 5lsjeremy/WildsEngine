@@ -1,0 +1,61 @@
+WILDS QSL CERTIFICATION CONTEXT
+Generated: 2026-11-03T07:22:12.3144141-05:00
+Root: C:\Users\jmatt\source\WildsEngine
+
+================================================================================
+SOLUTION PROJECTS
+================================================================================
+
+================================================================================
+EXACT KNOWN FILES
+================================================================================
+
+================================================================================
+CURRENT TEMPORAL AND QSL FILES
+================================================================================
+
+================================================================================
+EXECUTION AND INTEGRATION MATCHES
+================================================================================
+
+PATTERN: ExecuteAsync
+--------------------------------------------------------------------------------
+
+================================================================================
+QSL CERTIFICATION ASSETS
+================================================================================
+
+================================================================================
+GIT STATUS
+================================================================================
+AD WildsEngine.Core/Abstractions/IInstructionsProcessor.cs
+AD WildsEngine.Core/Abstractions/IObjectPool.cs
+AD WildsEngine.Core/Abstractions/IResettablePoolObject.cs
+AD WildsEngine.Core/Abstractions/ITaskProcessor.cs
+A  WildsEngine.Core/Docs/README.md
+AD WildsEngine.Core/Units/IBaseUnit.cs
+AD WildsEngine.Core/Units/IMoment.cs
+AD WildsEngine.Core/Units/IPulse.cs
+AD WildsEngine.Core/Units/IWorkUnit.cs
+?? Audit/Wilds-Qsl-Certification-Context-20261103-072212.txt
+
+================================================================================
+BUILD
+================================================================================
+  Determining projects to restore...
+  Restored C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\WildsEngine.Core.csproj (in 84 ms).
+  Restored C:\Users\jmatt\source\WildsEngine\WildsEngine.Console\WildsEngine.Console.csproj (in 89 ms).
+  Restored C:\Users\jmatt\source\QSL\QSL.csproj (in 185 ms).
+  Restored C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\WildsEngine.Qsl.csproj (in 185 ms).
+  Restored C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj (in 186 ms).
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Debug\netstandard2.1\WildsEngine.Core.dll
+C:\Users\jmatt\source\QSL\Core\Surface\QslEngine.cs(28,17): error CS1002: ; expected [C:\Users\jmatt\source\QSL\QSL.csproj]
+  WildsEngine.Console -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Console\bin\Debug\net10.0\WildsEngine.Console.dll
+
+Build FAILED.
+
+C:\Users\jmatt\source\QSL\Core\Surface\QslEngine.cs(28,17): error CS1002: ; expected [C:\Users\jmatt\source\QSL\QSL.csproj]
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:03.23

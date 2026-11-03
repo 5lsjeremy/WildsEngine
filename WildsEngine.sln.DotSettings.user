@@ -4,5 +4,6 @@
     &lt;TestId&gt;xUnit::BCAE7461-F721-4762-A8D7-016A859538EF::net10.0::WildsEngine.Core.Tests.CertificationTests.WildsQslCertification&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::BCAE7461-F721-4762-A8D7-016A859538EF::net10.0::WildsEngine.Core.Tests.CertificationTests.EndToEndProcessingCertification&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::BCAE7461-F721-4762-A8D7-016A859538EF::net10.0::WildsEngine.Core.Tests.CertificationTests.WildsQslDiagnosticRun&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::BCAE7461-F721-4762-A8D7-016A859538EF::net10.0::WildsEngine.Core.Tests.CertificationTests.WildsQslCoreCertification&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

@@ -145,10 +145,10 @@ namespace WildsEngine.Core.Tests.Certification
     public static class WildsQslCertification
     {
         private const string SuiteFileName =
-            "qsl_statement_testing.json";
+            "qsl_core_statement_testing.json";
 
         private const string ReportFileName =
-            "wilds_qsl_statement_testing_output.json";
+            "wilds_qsl_core_statement_testing_output.json";
 
         private static readonly List<string> Passed =
             new List<string>();
@@ -172,7 +172,7 @@ namespace WildsEngine.Core.Tests.Certification
 
             var component =
                 CreateComponent(
-                    "certification.qsl.200");
+                    "certification.qsl.core");
 
             using var wildsEngine =
                 CreateWildsEngine(
@@ -191,7 +191,7 @@ namespace WildsEngine.Core.Tests.Certification
                 new WildsQslCertificationReport();
 
             TestLog.Write(
-                "=== Wilds / QSL 200-Case Tests ===");
+                "=== Wilds / QSL Core Certification ===");
 
             TestLog.State(
                 "Route: QSL source -> WildsQslExecutor -> " +
@@ -326,13 +326,18 @@ namespace WildsEngine.Core.Tests.Certification
                 report.MissingDependencies,
                 "Every certification result must be accounted for " +
                 "as passed, failed, or missing a dependency.");
+            
+            Assert(
+                report.IsCertified,
+                "Wilds / QSL core certification requires every " +
+                "core case to pass with no missing dependencies.");
 
             TestLog.Write(
-                "Wilds / QSL diagnostic run completed: " +
+                "Wilds / QSL core certification completed: " +
                 report.Passed +
                 "/" +
                 report.Total +
-                " behavioral cases passed.");
+                " cases passed.");
 
             TestLog.State(
                 "Certification status: " +
@@ -931,7 +936,7 @@ namespace WildsEngine.Core.Tests.Certification
                     new WildsEngineOptions
                     {
                         Layer =
-                            "certification.qsl.200",
+                            "certification.qsl.core",
 
                         RetainedInstructionsProcessors =
                             1,

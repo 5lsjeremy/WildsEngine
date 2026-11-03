@@ -1,0 +1,1048 @@
+{
+  "tests": [
+    {
+      "category": "Arithmetic",
+      "statement": "1 + 2",
+      "expected": "3"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 - 3",
+      "expected": "7"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 * 4",
+      "expected": "20"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "20 / 5",
+      "expected": "4"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 % 3",
+      "expected": "1"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "1 + 2 + 4 + 1",
+      "expected": "8"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "1 + 2 / 2 + 1",
+      "expected": "3"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 - 2 + 5",
+      "expected": "13"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 - (2 + 5)",
+      "expected": "3"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "100 / 5 / 2",
+      "expected": "10"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 * 2 * 3",
+      "expected": "30"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 * 2 + 3",
+      "expected": "13"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 + 2 * 3",
+      "expected": "11"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "(1 + 2) * (3 + 4)",
+      "expected": "21"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "0 * 100",
+      "expected": "0"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "2.5 + 1.5",
+      "expected": "4"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 / 4",
+      "expected": "2.5"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "9 % 4",
+      "expected": "1"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "1 - 5",
+      "expected": "-4"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "((8 + 2) * 3) / 5",
+      "expected": "6"
+    },
+    {
+      "category": "Unary",
+      "statement": "-10",
+      "expected": "-10"
+    },
+    {
+      "category": "Unary",
+      "statement": "--10",
+      "expected": "10"
+    },
+    {
+      "category": "Unary",
+      "statement": "---10",
+      "expected": "-10"
+    },
+    {
+      "category": "Unary",
+      "statement": "!false",
+      "expected": "true"
+    },
+    {
+      "category": "Unary",
+      "statement": "!true",
+      "expected": "false"
+    },
+    {
+      "category": "Unary",
+      "statement": "!!true",
+      "expected": "true"
+    },
+    {
+      "category": "Unary",
+      "statement": "!(1 == 2)",
+      "expected": "true"
+    },
+    {
+      "category": "Unary",
+      "statement": "-(1 + 2)",
+      "expected": "-3"
+    },
+    {
+      "category": "Unary",
+      "statement": "-5 * 2",
+      "expected": "-10"
+    },
+    {
+      "category": "Unary",
+      "statement": "+10",
+      "expected": "10"
+    },
+    {
+      "category": "Comparison",
+      "statement": "5 < 10",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "10 > 20",
+      "expected": "false"
+    },
+    {
+      "category": "Comparison",
+      "statement": "10 == 10",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "10 != 5",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "5 <= 5",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "5 >= 10",
+      "expected": "false"
+    },
+    {
+      "category": "Comparison",
+      "statement": "(1 + 2) == 3",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "1 + 2 == 2 + 1",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "true == true",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "true != false",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "3 < 3",
+      "expected": "false"
+    },
+    {
+      "category": "Comparison",
+      "statement": "3 <= 3",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "4 > 3",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "4 >= 4",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "(10 / 2) >= (2 + 3)",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "true || false",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false && false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "false || false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && true || false",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && (false || true)",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "!false && true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false || true && false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "(false || true) && true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && !false",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false && unknownFunction()",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "true || unknownFunction()",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false || true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "!(true && false)",
+      "expected": "true"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? 1 : 0",
+      "expected": "1"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? 1 : 0",
+      "expected": "0"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(5 > 3) ? 10 : 20",
+      "expected": "10"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? (1 + 2) : (3 + 4)",
+      "expected": "3"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? (1 + 2) : (3 + 4)",
+      "expected": "7"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? (false ? 1 : 2) : 3",
+      "expected": "2"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(1 + 2 == 3) ? (10 * 2) : (5 * 2)",
+      "expected": "20"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? 10 : unknownFunction()",
+      "expected": "10"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? unknownFunction() : 20",
+      "expected": "20"
+    },
+    {
+      "category": "Ternary",
+      "statement": "1 < 2 ? 3 < 4 ? 5 : 6 : 7",
+      "expected": "5"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? true : false",
+      "expected": "true"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? true : false",
+      "expected": "false"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(10 > 5) ? 10 / 2 : 0",
+      "expected": "5"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(2 * 3 == 6) ? 9 % 4 : 0",
+      "expected": "1"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? 1 : true ? 2 : 3",
+      "expected": "2"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(1 + 2) * 3",
+      "expected": "9"
+    },
+    {
+      "category": "Grouping",
+      "statement": "1 + (2 * 3)",
+      "expected": "7"
+    },
+    {
+      "category": "Grouping",
+      "statement": "((1 + 2) * (3 + 4)) / 7",
+      "expected": "3"
+    },
+    {
+      "category": "Grouping",
+      "statement": "1 + 2 * 3 == 7",
+      "expected": "true"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(1 + 2) * 3 == 9",
+      "expected": "true"
+    },
+    {
+      "category": "Grouping",
+      "statement": "true || false && false",
+      "expected": "true"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(true || false) && false",
+      "expected": "false"
+    },
+    {
+      "category": "Grouping",
+      "statement": "((10 - 2) / 2) + 1",
+      "expected": "5"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(((5)))",
+      "expected": "5"
+    },
+    {
+      "category": "Grouping",
+      "statement": "-(2 + 3) * 2",
+      "expected": "-10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "health = 50",
+      "expected": "50"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = 10",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 10; x; }",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 10; x + 5; }",
+      "expected": "15"
+    },
+    {
+      "category": "Assignment",
+      "statement": "a = b = 10",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ a = b = 10; a + b; }",
+      "expected": "20"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = 1 + 2 * 3",
+      "expected": "7"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = true",
+      "expected": "true"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = false ? 1 : 2",
+      "expected": "2"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 1; x = x + 1; x; }",
+      "expected": "2"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ health = 50; health; }",
+      "expected": "50"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ mana = 25; mana; }",
+      "expected": "25"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ a = 1; b = 2; b = a + b; b; }",
+      "expected": "3"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 5; y = x * 2; y; }",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 10; x = -x; x; }",
+      "expected": "-10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ 1 + 2; 3 + 4; }",
+      "expected": "7"
+    },
+    {
+      "category": "Block",
+      "statement": "{ 1 + 2; 3 * 4; }",
+      "expected": "12"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; x; }",
+      "expected": "10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; x = x + 5; x; }",
+      "expected": "15"
+    },
+    {
+      "category": "Block",
+      "statement": "{ health = 100; heal(10); }",
+      "expected": "110",
+      "dependency": "heal"
+    },
+    {
+      "category": "Block",
+      "statement": "{ a = 1; b = 2; a + b; }",
+      "expected": "3"
+    },
+    {
+      "category": "Block",
+      "statement": "{ a = 2; b = 3; a * b; }",
+      "expected": "6"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 1; x = x + 1; x = x + 1; x; }",
+      "expected": "3"
+    },
+    {
+      "category": "Block",
+      "statement": "{ true; false; }",
+      "expected": "false"
+    },
+    {
+      "category": "Block",
+      "statement": "{ 1; 2; 3; }",
+      "expected": "3"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 5; x * x; }",
+      "expected": "25"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; true ? x : 0; }",
+      "expected": "10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; false ? 0 : x; }",
+      "expected": "10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ health = 50; heal(10); health; }",
+      "expected": "60",
+      "dependency": "heal"
+    },
+    {
+      "category": "Block",
+      "statement": "{ a = 10; b = 20; a < b; }",
+      "expected": "true"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 100; heal(10); }",
+      "expected": "110",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 0; heal(5); }",
+      "expected": "5",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 0; heal(5 + 5); }",
+      "expected": "10",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 0; heal(1 + 2 + 3); }",
+      "expected": "6",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 50; heal(10); }",
+      "expected": "60",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 100; heal(10); heal(10); }",
+      "expected": "120",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 1; heal(1); }",
+      "expected": "2",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 10; heal(-5); }",
+      "expected": "5",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 5; heal(0); }",
+      "expected": "5",
+      "dependency": "heal"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 10; heal(2 * 5); }",
+      "expected": "20",
+      "dependency": "heal"
+    },
+    {
+      "category": "Error",
+      "statement": "heal()",
+      "expected": "",
+      "dependency": "heal"
+    },
+    {
+      "category": "Error",
+      "statement": "heal(1, 2)",
+      "expected": "",
+      "dependency": "heal"
+    },
+    {
+      "category": "Error",
+      "statement": "heal(\"bad\")",
+      "expected": "",
+      "dependency": "heal"
+    },
+    {
+      "category": "Error",
+      "statement": "unknownFunction(10)",
+      "expected": ""
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 10; heal(5); health; }",
+      "expected": "15",
+      "dependency": "heal"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health; }",
+      "expected": "100",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.mana = 50; Player.mana; }",
+      "expected": "50",
+      "dependency": "Player"
+    },
+    {
+      "category": "Error",
+      "statement": "Player.unknownField",
+      "expected": "",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health + 10; }",
+      "expected": "110",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health == 100; }",
+      "expected": "true",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health > 50; }",
+      "expected": "true",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; true ? Player.health : Player.mana; }",
+      "expected": "100",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; false ? Player.health : Player.mana; }",
+      "expected": "50",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.health + Player.mana; }",
+      "expected": "150",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.health >= Player.mana; }",
+      "expected": "true",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.mana < Player.health; }",
+      "expected": "true",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; (Player.health + Player.mana) / 2; }",
+      "expected": "75",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.health != Player.mana; }",
+      "expected": "true",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health = 75; }",
+      "expected": "75",
+      "dependency": "Player"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 75; Player.health; }",
+      "expected": "75",
+      "dependency": "Player"
+    },
+    {
+      "category": "Embedded",
+      "statement": "$(1 + 2)",
+      "expected": "3"
+    },
+    {
+      "category": "Embedded",
+      "statement": "$(1 + 2 + 3)",
+      "expected": "6"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Value: $(1 + 2)\"",
+      "expected": "Value: 3"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Sum: $(1 + 2 + 3)\"",
+      "expected": "Sum: 6"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Health: $({ health = 60; health; })\"",
+      "expected": "Health: 60"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"A=$(1), B=$(2)\"",
+      "expected": "A=1, B=2"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Result: $(2 * 5)\"",
+      "expected": "Result: 10"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Bool: $(true)\"",
+      "expected": "Bool: true"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Nested: $((1 + 2) * 3)\"",
+      "expected": "Nested: 9"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Player: $({ Player.health = 75; Player.health; })\"",
+      "expected": "Player: 75",
+      "dependency": "Player"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 => 2",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 => 2 => 3",
+      "expected": "3"
+    },
+    {
+      "category": "Arrow",
+      "statement": "x = 1 => x = 2",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "{ x = 0; x = 1 => x = 2; x; }",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "{ health = 50; health => heal(10); }",
+      "expected": "60",
+      "dependency": "heal"
+    },
+    {
+      "category": "Arrow",
+      "statement": "true => false",
+      "expected": "false"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 + 1 => 3 + 4",
+      "expected": "7"
+    },
+    {
+      "category": "Arrow",
+      "statement": "{ x = 1; x = 2 => x; }",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 => 2 * 3",
+      "expected": "6"
+    },
+    {
+      "category": "Arrow",
+      "statement": "(1 => 2) => 3",
+      "expected": "3"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(10, 0))",
+      "expected": "Velocity(X=1, Y=0)",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(0, 10))",
+      "expected": "Velocity(X=0, Y=1)",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(10, 10))",
+      "expected": "Velocity(X=1, Y=1)",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(-10, 0))",
+      "expected": "Velocity(X=-1, Y=0)",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(0, 0))",
+      "expected": "Velocity(X=0, Y=0)",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(\"Player\", 10)",
+      "expected": "",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(10, Vector(1, 1))",
+      "expected": "",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(\"Player\")",
+      "expected": "",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(\"Player\", Vector(1, 1), 3)",
+      "expected": "",
+      "dependency": "ApplyForce"
+    },
+    {
+      "category": "Error",
+      "statement": "unknownCapability(1)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 +",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "true ? 1",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "(1 + 2",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 + )",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(1 2)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "{ 1 + 2",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "{ 1 + 2 3 + 4; }",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 + 2 garbage",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "true ? : 1",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "( )",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "{ ; }",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 + * 2",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(1,,2)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "Player.",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "10 && true",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "true && 10",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 / 0",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 % 0",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "unknownFunction(10)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "false || 10",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "!10",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "10 < true",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "Player.unknownField",
+      "expected": "",
+      "dependency": "Player"
+    },
+    {
+      "category": "Error",
+      "statement": "heal(\"bad\")",
+      "expected": "",
+      "dependency": "heal"
+    }
+  ]
+}
