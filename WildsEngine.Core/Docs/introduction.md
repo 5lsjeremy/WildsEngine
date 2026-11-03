@@ -1,126 +1,93 @@
-﻿# Wilds Engine
+# Wilds Engine - Architecture Introduction
 
-Wilds is a reusable game simulation and processing engine.
+Wilds is a reusable simulation-processing engine designed around a strict boundary: it knows how simulation work evolves, but it does not know what a particular game is about.
 
-It knows that it is running a game simulation, but it does not know what game is consuming it. Game-specific concepts, behaviors, entities, and rules belong outside Wilds Core.
+Consumer-specific entities, functions, data structures, and gameplay rules remain outside Wilds Core. The engine provides identity, state, processing, work coordination, and temporal history while allowing arbitrary consumer-owned runtime values to cross those boundaries.
 
-Wilds Core targets `netstandard2.1` so that its runtime model remains independent of a specific host such as Unity.
+## Foundational runtime
 
-## Architecture
+The foundational object model includes:
 
-Wilds is built around a small set of runtime concepts:
+- `IBaseObject` for stable runtime identity and topology;
+- `IComponent` for component-owned state, signal, and metadata;
+- `IState` for state processing;
+- `IContext` for variables and contextual metadata;
+- `ISignal` for outward communication;
+- instructions and tasks for processing intent and schedulable work;
+- registries for work lifetime independent of processors;
+- processors and bounded pools for reusable execution infrastructure.
 
-- `IBaseObject`
-- `IComponent`
-- `IState`
-- `IContext`
-- `ISignal`
-- `IStateInstruction`
-- `ITask`
-- registries
-- processors
-- processor pools
-- engine composition
+Component and context metadata can hold arbitrary consumer-owned values. The GUID remains canonical object identity; readable slugs can provide runtime context without replacing that identity.
 
-These concepts define how simulation objects are identified, how state is stored and changed, and how work moves through the runtime.
+## Unified BaseUnit model
 
-## IBaseObject
-
-`IBaseObject` is the common foundation for Wilds runtime objects.
-
-Every base object has:
-
-- a permanent `Guid` identity;
-- a readable, appendable slug;
-- neighboring Wilds objects;
-- access to its component.
-
-The GUID is the canonical identity.
-
-The slug is a human-readable runtime identity derived from the GUID and layer. Additional semantic segments may be appended without changing the object's GUID.
-
-Neighbor relationships are part of the base object because Wilds operates within a simulation topology. At this level, a neighbor simply represents another adjacent Wilds object. The base object does not need to interpret the semantic meaning of that relationship.
-
-## IComponent
-
-`IComponent` extends `IBaseObject` and represents an active component within the simulation.
-
-A component owns:
-
-- `State`
-- `Signal`
-- `Metadata`
-
-Component metadata supports arbitrary consumer-owned runtime values.
-
-`BaseObject` also provides convenient access to the owning component's State, Signal, and Metadata. Ownership of those values remains with the component.
-
-## IState
-
-`IState` represents the state-processing surface of a Wilds component.
-
-State owns:
-
-- its current `Context`;
-- the ability to process a Wilds-native `IStateInstruction`.
-
-A state does not need to receive its context as a separate processing argument because it already owns that context.
-
-Stateful processing may update the context as the simulation evolves.
-
-## IContext
-
-`IContext` represents the information available to state processing.
-
-It exposes:
-
-- `Variables`
-- contextual `Metadata`
-
-Both support arbitrary consumer-owned runtime values.
-
-Mutation occurs through explicit operations such as:
-
-- `SetVariable`
-- `SetMetadata`
-
-Component metadata and context metadata are deliberately separate:
-
-- **Component Metadata** describes the component.
-- **Context Metadata** describes its processing context.
-- **Context Variables** represent values available to or produced by processing.
-
-## ISignal
-
-`ISignal` represents the outward signaling surface associated with a Wilds component.
-
-The broad responsibility split is:
+Wilds now coordinates work and history through one unit family:
 
 ```text
-State   -> processes state
-Context -> holds the current processing environment
-Signal  -> communicates outward
+                 BaseUnit
+                    |
+       +------------+------------+-------------+------------+
+       |            |            |             |            |
+     Pulse       WorkUnit      Moment       Timeline       Epoch
+   request         work        result        history       history
 ```
 
-The signal model can evolve independently as event and simulation communication behavior expands.
+These units are related stages and scales of the same processing model.
 
-## IStateInstruction
+### Pulse
 
-`IStateInstruction` represents Wilds-native processing intent.
+A `Pulse` represents the coordinated request. It owns the WorkUnits that must resolve before the request can resolve.
 
-Instructions are distinct from executable tasks.
+### WorkUnit
 
-An instruction may describe coordinated work that must be translated or decomposed into one or more executable tasks before its processing is complete.
+A `WorkUnit` represents individually tracked required work. WorkUnits can complete, fail, or be cancelled independently while remaining owned by the Pulse that requires them.
 
-This separation allows instructions and tasks to have independent lifetimes.
+A Pulse cannot resolve successfully while required WorkUnits remain pending, failed, or cancelled.
 
-## ITask
+### Moment
 
-`ITask` represents schedulable work inside Wilds.
+A `Moment` represents a completed Pulse outcome. Success and failure are both historical truths. A failed computation is retained as a failed Moment rather than rewritten into success.
 
-Tasks can be registered, retrieved, processed, and retired independently from the processors that execute them.
+### Timeline and Epoch
 
-This establishes an important processing distinction:
+A `Timeline` collects Moments. An `Epoch` collects Timelines.
+
+The complete lifecycle is:
+
+```text
++------------------- ACTIVE WORK -------------------+
+|                                                   |
+|  Consumer                                         |
+|     |                                             |
+|     v                                             |
+|   Pulse                                           |
+|     |                                             |
+|     +---------> WorkUnit ------------------+      |
+|     +---------> WorkUnit ------------------+      |
+|     `---------> WorkUnit ------------------+      |
+|                                             |      |
+|                              all required work     |
+|                                     resolves      |
++-------------------------------------|-------------+
+                                      v
++------------------ HISTORY ------------------------+
+|                                                   |
+|                  Moment                           |
+|                     |                             |
+|                     v                             |
+|                  Timeline                         |
+|                     |                             |
+|                     v                             |
+|                   Epoch                           |
+|                                                   |
++---------------------------------------------------+
+```
+
+Consumer runtime-object references can survive this route. The engine does not need to convert an arbitrary consumer object into a Wilds-specific gameplay type simply to coordinate or retain it.
+
+## Processing infrastructure beneath the units
+
+Instructions and tasks remain lower-level processing infrastructure.
 
 ```text
 Instruction
@@ -132,291 +99,170 @@ coordinated processing intent
 Task / Tasks
     |
     v
-executable work
+processors + registries
     |
     v
-State / Context
+state / context
 ```
 
-Task lifetime is independent from processor lifetime.
+Registries own pending-work lifetime independently from processor leases. Processor pools can therefore rent, execute, reset, and return processors without implicitly destroying the work being coordinated.
 
-A processor may be returned to its pool while registered work continues to exist elsewhere in the runtime.
+## QSL companion integration
 
-## Registries
+Wilds Core remains independent of QSL. Integration belongs in `WildsEngine.Qsl`.
 
-Wilds uses registries to maintain runtime work independently from the processors operating on that work.
-
-The current processing architecture includes:
-
-- instruction registries;
-- task registries.
-
-Registry storage uses GUID identity and supports:
-
-- registration;
-- containment checks;
-- retrieval;
-- enumeration;
-- removal;
-- clearing.
-
-This allows instructions and tasks to remain available across processor leases without making processors responsible for owning the lifetime of pending work.
-
-## Processors
-
-Wilds currently separates processing into two major processor types.
-
-### InstructionsProcessor
-
-The instruction processor operates against the instruction registry and can delegate executable work through the task processor pool.
-
-### TaskProcessor
-
-The task processor operates against the task registry and provides the runtime boundary for task work.
-
-Processors are component-bound Wilds runtime objects.
-
-Component ownership is established by `ProcessorBase`, rather than being reimplemented by every concrete processor.
-
-## Processor Pools
-
-Wilds uses bounded object pools for processor reuse.
-
-Processor lifetime is deliberately separate from instruction and task lifetime.
-
-The engine can therefore:
+The current certified execution route is:
 
 ```text
-rent processor
-    |
-    v
-perform work
-    |
-    v
-return processor
+Consumer / QSL source
+          |
+          v
+    WildsQslExecutor
+          |
+          v
+      WildsEngine
+          |
+          v
+        Pulse
+          |
+          v
+       WorkUnit
+          |
+          v
+    QSL computation
+          |
+          v
+        Moment
+          |
+          v
+       Timeline
+          |
+          v
+         Epoch
 ```
 
-without requiring registered instructions or tasks to share that same lifetime.
+This establishes a clear responsibility split:
 
-The current pool implementation includes bounded concurrency, reuse, cancellation while waiting, reset behavior, and disposal handling.
+- **Consumer:** owns game-specific meaning and runtime vocabulary.
+- **QSL:** parses and evaluates computation.
+- **Wilds:** coordinates the work and preserves its historical outcome.
+- **WildsEngine.Qsl:** owns the handshake between Wilds and QSL.
 
-## Processing Model
+Wilds Core therefore does not need QSL AST, parser, or evaluator internals. QSL does not need Wilds processor pools, temporal units, or scheduling internals.
 
-The current architecture separates:
+## Certification boundary
 
-```text
-request
-   |
-   v
-instruction processing
-   |
-   v
-instruction set
-   |
-   v
-task decomposition
-   |
-   v
-task processing
-   |
-   v
-state / context changes
-   |
-   v
-completed instruction results
-   |
-   v
-result processing / combination
-   |
-   v
-completed request
-```
+Core certification is now separate from consumer conformance.
 
-The purpose of this separation is to allow larger requests to be broken into independently schedulable pieces of work while retaining the coordination required to produce a final result.
+The current Wilds/QSL core suite is certified at **156/156**, with zero certification failures and zero missing dependencies. It retains 156 Moments through one Timeline held by one Epoch.
 
-## Wilds Execution Surface
+Expected-error tests demonstrate an important semantic distinction: a test can pass because the runtime correctly produced a failed Moment. Runtime outcome describes what happened; certification status describes whether that behavior matched the contract.
 
-The intended public execution boundary belongs to Wilds.
+The original combined corpus also exposed 44 cases that depend upon consumer-provided runtime vocabulary. Those cases have been extracted into the consumer-conformance suite rather than being treated as core failures.
 
-Conceptually:
+## Consumer-facing API proposal
 
-```text
-Consumer
-    |
-    v
-Wilds.Execute(...)
-    |
-    v
-command processing
-    |
-    v
-Wilds runtime work
-    |
-    v
-completed Wilds result
-    |
-    v
-Consumer
-```
+The next architecture slice is an explicit consumer composition boundary.
 
-Consumers should not need to directly manage internal processor leases, registries, task pools, or instruction-processing infrastructure.
+QSL's existing consumer examples demonstrate the underlying host pattern: a consumer creates a `QslRuntimeRegistry`, registers standard evaluators, registers a host-owned descriptor and function, creates `QslRuntimeContext`, applies host state, creates `QslEngine`, and evaluates QSL. Host concepts such as `Player`, `health`, `mana`, and `heal` remain consumer concepts rather than QSL primitives.
 
-## QSL Integration
+Wilds should preserve that ownership boundary while hiding QSL-specific composition details behind `WildsEngine.Qsl`.
 
-Wilds Core remains independent of QSL.
-
-QSL integration belongs in the companion `WildsEngine.Qsl` layer.
-
-The intended execution direction is:
-
-```text
-Consumer
-    |
-    | command string
-    v
-Wilds.Execute(...)
-    |
-    v
-WildsEngine.Qsl
-    |
-    | source string
-    v
-QSL
-    |
-    | parse / evaluate / diagnostics
-    v
-QslProcessingResult
-    |
-    v
-WildsEngine.Qsl
-    |
-    | translated Wilds work
-    v
-Wilds Core processing
-    |
-    v
-instructions / tasks / state
-    |
-    v
-completed Wilds result
-    |
-    v
-WildsEngine.Qsl
-    |
-    v
-Consumer
-```
-
-QSL therefore acts beneath the Wilds execution surface rather than forming the public Wilds API.
-
-Wilds Core does not need to understand QSL AST types, parser diagnostics, provenance types, or other QSL-specific runtime structures.
-
-Likewise, QSL does not need to understand Wilds processor pools, registries, or task scheduling.
-
-The companion integration layer owns the handshake between the two systems.
-
-## QSL Processing Boundary
-
-QSL accepts source text for parsing:
+### Proposed surface
 
 ```csharp
-QslParseResult Parse(
-    string source)
+public interface IWildsQslConsumer
+{
+    void Configure(WildsQslConsumerBuilder builder);
+}
+
+public sealed class WildsQslConsumerBuilder
+{
+    public WildsQslConsumerBuilder AddValue(
+        string name,
+        object? value);
+
+    public WildsQslConsumerBuilder AddDescriptor(
+        string name,
+        object descriptor);
+
+    public WildsQslConsumerBuilder AddFunction(
+        string name,
+        object function);
+
+    public WildsQslConsumerBuilder AddCapability(
+        string name,
+        object capability);
+}
 ```
 
-The processed QSL result carries the semantic outcome back to the integration layer.
+This is an architectural proposal rather than a frozen API. Before it becomes public contract, each method should be mapped onto the current QSL registry/context APIs and certified through the consumer suite.
 
-Successful QSL processing can then be translated into Wilds work.
-
-Failed QSL parsing or evaluation should remain QSL-level processing information rather than being reinterpreted by Wilds Core.
-
-## BaseObject
-
-`BaseObject` provides the common implementation for:
-
-- GUID generation and preservation;
-- slug generation and extension;
-- neighbor storage and management;
-- component access.
-
-It also provides convenience access to:
-
-- `State`
-- `Signal`
-- `Metadata`
-
-These resolve through the object's component.
-
-## BaseComponent
-
-`BaseComponent` derives from `BaseObject` and implements `IComponent`.
-
-A component resolves its component relationship to itself:
+The intended consumer experience is:
 
 ```csharp
-Component => this
+public sealed class GameRuntime : IWildsQslConsumer
+{
+    public void Configure(
+        WildsQslConsumerBuilder builder)
+    {
+        builder
+            .AddDescriptor("Player", playerDescriptor)
+            .AddFunction("heal", healFunction)
+            .AddCapability("ApplyForce", physicsCapability);
+    }
+}
 ```
 
-It owns component metadata and requires concrete component implementations to provide their State and Signal behavior.
+Nothing in Wilds Core needs to know what `Player`, `heal`, or `ApplyForce` means.
 
-## Component Ownership
+## Consumer conformance
 
-Processing infrastructure follows a consistent component-ownership model.
+The extracted consumer suite currently gives this work a concrete proving ground: 44 cases whose dependencies were deliberately separated from the certified core corpus.
 
-Base processing abstractions receive their `IComponent` through construction and own that relationship for their derived runtime types.
+The conformance harness should ultimately let an external consumer provide:
 
-This prevents concrete processors, tasks, and registries from repeatedly reimplementing the same component relationship.
+- objects and descriptors;
+- functions;
+- capabilities;
+- arbitrary runtime data structures;
+- expected test results.
 
-## Certification
+Then the same execution machinery can validate them:
 
-Wilds includes certification coverage for the infrastructure currently implemented.
+```text
+Consumer registration
+        |
+        v
+Consumer test statement
+        |
+        v
+       QSL
+        |
+        v
+      Wilds
+        |
+        v
+      Pulse
+        |
+        v
+    WorkUnit
+        |
+        v
+     Moment
+        |
+        v
+    Timeline
+        |
+        v
+      Epoch
+        |
+        v
+Conformance report
+```
 
-Certification areas include:
+The next milestone is to implement this consumer-facing boundary using the actual QSL registration contracts, run all 44 extracted cases through it, and keep the existing 156/156 core certification unchanged.
 
-- object pooling;
-- engine composition;
-- task registry lifecycle;
-- high-volume task registry behavior;
-- processor acquisition and reuse;
-- processor cleanup after failure;
-- cancellation behavior;
-- current end-to-end instruction/task processing infrastructure.
+## Architectural rule
 
-Integration certification is being extended toward true stateful processing through the complete Wilds execution path.
-
-The larger QSL integration target is to eventually run the existing QSL certification corpus through the Wilds execution surface and prove both QSL processing and downstream Wilds processing together.
-
-## Design Boundaries
-
-Wilds Core remains independent of:
-
-- Unity
-- QSL
-- Cryo Nation
-- any particular game entity
-- any particular gameplay rule
-
-Wilds may understand concepts intrinsic to game simulation including:
-
-- components;
-- state;
-- context;
-- signals;
-- topology;
-- instructions;
-- tasks;
-- processing;
-- time;
-- change.
-
-Game-specific meaning belongs to consumers of the engine.
-
-> **Wilds knows how a game simulation evolves. It does not know what any particular game is about.**
-
-## Current Direction
-
-The foundational runtime model is now accompanied by processing infrastructure including task and instruction registries, processor pools, instruction processors, task processors, engine composition, and certification tests.
-
-The next vertical slice is to prove genuine stateful execution through the full processing path.
-
-After that path is certified natively, `WildsEngine.Qsl` can connect the Wilds execution surface to QSL and expand the same path toward full cross-engine certification.
+**Wilds owns coordination and history. QSL owns computation. Consumers own meaning.**
