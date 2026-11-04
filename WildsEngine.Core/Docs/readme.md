@@ -194,6 +194,102 @@ The intended responsibility split is:
 
 This routing policy is proposed behavior and is not yet part of the certified core baseline.
 
+### Proposed Neighbor-driven Pulse propagation
+
+Neighbor topology is intended to provide a causal boundary between independently
+executing Wilds objects.
+
+A Pulse belonging to one object may produce an effect that reaches one or more
+Neighbors. The originating Pulse does not absorb the Neighbor's resulting work.
+Instead, the Neighbor independently determines whether the received stimulus
+should create a new Pulse.
+
+Conceptually:
+
+```text
+Source object
+    |
+    v
+Source Pulse
+    |
+    +--> WorkUnits
+    |
+    +--> topology evaluation
+              |
+              v
+        Neighbor stimulus
+        intensity / context
+              |
+              v
+        Neighbor object
+              |
+              v
+        Independent Pulse
+              |
+              +--> WorkUnits
+              |
+              v
+            Moment
+              |
+              v
+           Timeline
+```
+
+The source Pulse and Neighbor Pulse therefore remain separate execution units.
+
+The intended invariants are:
+
+- a Pulse owns only its own required WorkUnits;
+- topology determines which Neighbors are eligible to receive an effect;
+- relationship distance, membership, and other certified topology operators may
+  participate in determining the effect delivered to a Neighbor;
+- a Neighbor decides independently whether the received effect produces work;
+- work caused inside the Neighbor belongs to a new Pulse owned by that Neighbor;
+- the originating Pulse does not wait for Neighbor work merely because it caused
+  the Neighbor stimulus;
+- failure, cancellation, or timeout of a Neighbor Pulse does not silently change
+  the completed outcome of its originating Pulse;
+- causal provenance may connect the resulting Pulse or Moment to the event that
+  stimulated it without merging their execution ownership;
+- each resulting Moment is recorded into the Timeline appropriate to the object
+  that owns the Pulse.
+
+This allows effects to propagate through topology without constructing one
+unbounded recursive Pulse.
+
+For example:
+
+```text
+Object A
+    |
+    | Pulse A, intensity 1.0
+    v
+Object B
+    |
+    | resulting independent Pulse B
+    | propagated intensity 0.6
+    v
+Object C
+    |
+    | resulting independent Pulse C
+    | propagated intensity 0.2
+    v
+below propagation threshold
+```
+
+The specific meaning of intensity remains consumer-owned. It may represent heat,
+force, awareness, influence, damage, sound, signal strength, resource pressure,
+or another consumer-defined quantity.
+
+Wilds owns the mechanics of topology, independent Pulse execution, work
+coordination, and history. The consumer owns the semantic meaning of the
+propagated effect.
+
+**Causal provenance connects execution without merging execution ownership.**
+
+Propagation policy is proposed behavior and is not yet part of the certified
+core baseline.
+
 ## Proposed consumer API
 
 The consumer-facing API moves to the milestone after Neighbor membership and Timeline routing are defined and certified.

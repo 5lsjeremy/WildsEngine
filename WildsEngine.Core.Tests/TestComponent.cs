@@ -3,7 +3,7 @@ using WildsEngine.Core.Components;
 
 namespace WildsEngine.Tests.Registry
 {
-    internal sealed class TestComponent :
+    public sealed class TestComponent :
         BaseComponent
     {
         private readonly IState _state;
