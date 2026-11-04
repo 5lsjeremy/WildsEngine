@@ -111,33 +111,135 @@ The former combined corpus has been split into:
 - **Core certification:** 156 engine-owned cases.
 - **Consumer conformance:** 44 consumer-dependent cases.
 
-## Proposed Neighbor and membership model
+## Neighbor topology and membership model
 
-Before freezing the consumer-facing API, the next internal architecture milestone is to define and certify Neighbor membership and distance.
+Wilds objects can participate in directional Neighbor relationships.
 
 A Neighbor is not limited to an immediately adjacent object. A Neighbor is another member of a shared relational collection or topology, with distance describing proximity inside that relationship.
 
 > **Membership establishes neighborhood. Distance establishes proximity. Adjacency is the special case where distance is 1.**
 
-For example, two pieces may belong to the same puzzle without touching. They remain neighbors because they share membership in the puzzle, while their distance expresses how separated they are within that structure.
+Relationship identity is defined by:
 
 ```text
-Shared collection / topology
-        |
-        +-- Member A
-        |
-        +-- Member B      distance 1 from A
-        |
-        +-- Member C      distance 2 from A
-        |
-        `-- Member D      distance 3 from A
+Neighbor.Id + Membership
 ```
 
-Distance is intentionally abstract. Depending on the consumer and topology, it may represent hops, cells, traversal depth, semantic separation, or another certified metric.
+Distance is relationship state rather than relationship identity and may change without replacing the relationship.
+
+Neighbor relationships are directional:
+
+```text
+A -> B
+```
+
+does not imply:
+
+```text
+B -> A
+```
+
+If both relationships exist, they remain independently mutable.
+
+The same Neighbor may also participate through multiple memberships:
+
+```text
+A
+|
++-- B : local
+|
+`-- B : remote
+```
+
+Those relationships remain independent even though they reference the same Neighbor object.
+
+Wilds provides reusable topology operations over relationship snapshots, including filtering, ordering, grouping, sampling, and scalar computations. Topology operators observe or transform snapshots without owning or mutating the source Neighbor collection.
+
+Distance is intentionally abstract. Depending on the consumer and topology, it may represent hops, cells, traversal depth, semantic separation, or another consumer-defined metric.
 
 Wilds owns the relationship mechanics. The consumer owns the meaning of the relationship and its distance metric.
 
-This model is proposed behavior and is not yet part of the certified core baseline.
+## Neighbor propagation and eligibility
+
+Wilds can interpret Neighbor distance through a propagation policy without assigning consumer-specific meaning to the propagated value.
+
+The current exponential distance-propagation model is:
+
+```text
+Iout = Iin * exp(-k * d)
+```
+
+where:
+
+- `Iin` is source intensity;
+- `d` is Neighbor relationship distance;
+- `k` is configured decay;
+- `Iout` is resulting propagated intensity.
+
+Propagation remains separate from topology. Neighbor topology owns relationship distance; propagation policy determines how that distance affects an intensity.
+
+Eligibility is evaluated separately from attenuation. A minimum-intensity eligibility policy determines whether the propagated value is sufficient for a Neighbor to qualify for a subsequent response.
+
+```text
+source intensity
+       |
+       v
+Neighbor topology
+       |
+       v
+distance propagation
+       |
+       v
+received intensity
+       |
+       v
+eligibility threshold
+       |
+       +---- eligible
+       |
+       `---- not eligible
+```
+
+The minimum-intensity boundary is inclusive:
+
+```text
+intensity < threshold    -> not eligible
+intensity = threshold    -> eligible
+intensity > threshold    -> eligible
+```
+
+For example:
+
+```text
+Source A
+intensity = 1.0
+decay = 0.5
+threshold = 0.25
+
+A -> B : distance 1
+         propagated intensity ~= 0.6065
+         eligible
+
+A -> C : distance 3
+         propagated intensity ~= 0.2231
+         not eligible
+```
+
+The meaning of intensity remains consumer-owned. Wilds only provides the mechanics for carrying an abstract magnitude through relationship and propagation policies.
+
+The currently established boundary is:
+
+```text
+topology
+   |
+   v
+propagation
+   |
+   v
+eligibility
+```
+
+The subsequent transition from an eligible Neighbor into causal execution remains proposed behavior.
 
 ## Proposed Timeline routing
 
@@ -169,42 +271,17 @@ The proposed routing rule is:
 - if the semantic state or applicable membership boundary changes, Wilds creates a new Timeline in the current Epoch;
 - returning to a previous semantic state creates a new contiguous Timeline rather than reopening an older Timeline.
 
-This preserves transition history:
-
-```text
-status.Emotions
-      |
-      v
-status.Actions
-      |
-      v
-status.Emotions
-```
-
 Timeline routing occurs at the history-recording boundary. Processors and processor pools remain responsible for performing work, not organizing temporal history.
 
-The intended responsibility split is:
-
-- the consumer supplies semantic and relational meaning;
-- Wilds owns Neighbor and membership mechanics and certified distance behavior;
-- Pulses and WorkUnits coordinate execution;
-- Moments preserve terminal outcomes;
-- Wilds owns Timeline selection and creation;
-- Epoch preserves the resulting sequence of Timelines.
-
-This routing policy is proposed behavior and is not yet part of the certified core baseline.
+This routing policy remains proposed behavior.
 
 ### Proposed Neighbor-driven Pulse propagation
 
-Neighbor topology is intended to provide a causal boundary between independently
-executing Wilds objects.
+Established Neighbor topology, propagation, and eligibility provide the foundation for a causal boundary between independently executing Wilds objects.
 
-A Pulse belonging to one object may produce an effect that reaches one or more
-Neighbors. The originating Pulse does not absorb the Neighbor's resulting work.
-Instead, the Neighbor independently determines whether the received stimulus
-should create a new Pulse.
+The next architecture boundary begins when a Neighbor has received sufficient propagated intensity to qualify for a response.
 
-Conceptually:
+An eligible Neighbor does not become additional work owned by the originating Pulse. Instead, the intended model allows that Neighbor to receive a causal stimulus and independently originate a new Pulse.
 
 ```text
 Source object
@@ -217,8 +294,13 @@ Source Pulse
     +--> topology evaluation
               |
               v
-        Neighbor stimulus
-        intensity / context
+        propagation
+              |
+              v
+         eligibility
+              |
+              v
+        causal stimulus
               |
               v
         Neighbor object
@@ -240,65 +322,23 @@ The source Pulse and Neighbor Pulse therefore remain separate execution units.
 The intended invariants are:
 
 - a Pulse owns only its own required WorkUnits;
-- topology determines which Neighbors are eligible to receive an effect;
-- relationship distance, membership, and other certified topology operators may
-  participate in determining the effect delivered to a Neighbor;
-- a Neighbor decides independently whether the received effect produces work;
+- topology determines which Neighbors are candidates to receive an effect;
+- propagation determines the resulting intensity through relationship state;
+- eligibility determines whether the propagated effect qualifies for response;
+- a Neighbor decides independently whether the received causal stimulus produces work;
 - work caused inside the Neighbor belongs to a new Pulse owned by that Neighbor;
-- the originating Pulse does not wait for Neighbor work merely because it caused
-  the Neighbor stimulus;
-- failure, cancellation, or timeout of a Neighbor Pulse does not silently change
-  the completed outcome of its originating Pulse;
-- causal provenance may connect the resulting Pulse or Moment to the event that
-  stimulated it without merging their execution ownership;
-- each resulting Moment is recorded into the Timeline appropriate to the object
-  that owns the Pulse.
-
-This allows effects to propagate through topology without constructing one
-unbounded recursive Pulse.
-
-For example:
-
-```text
-Object A
-    |
-    | Pulse A, intensity 1.0
-    v
-Object B
-    |
-    | resulting independent Pulse B
-    | propagated intensity 0.6
-    v
-Object C
-    |
-    | resulting independent Pulse C
-    | propagated intensity 0.2
-    v
-below propagation threshold
-```
-
-The specific meaning of intensity remains consumer-owned. It may represent heat,
-force, awareness, influence, damage, sound, signal strength, resource pressure,
-or another consumer-defined quantity.
-
-Wilds owns the mechanics of topology, independent Pulse execution, work
-coordination, and history. The consumer owns the semantic meaning of the
-propagated effect.
+- the originating Pulse does not wait for Neighbor work merely because it caused the Neighbor stimulus;
+- failure, cancellation, or timeout of a Neighbor Pulse does not silently change the completed outcome of its originating Pulse;
+- causal provenance may connect the resulting Pulse or Moment to the event that stimulated it without merging their execution ownership;
+- each resulting Moment is recorded into the Timeline appropriate to the object that owns the Pulse.
 
 **Causal provenance connects execution without merging execution ownership.**
 
-Propagation policy is proposed behavior and is not yet part of the certified
-core baseline.
+Distance propagation and minimum-intensity eligibility are implemented and tested. Causal stimulus delivery and independent Neighbor Pulse creation remain proposed behavior and are the next execution boundary to certify.
 
 ## Proposed consumer API
 
-The consumer-facing API moves to the milestone after Neighbor membership and Timeline routing are defined and certified.
-
-The consumer API is an endpoint into consumer-owned vocabulary, not a place to discover or redefine Wilds engine semantics. Stabilizing the internal relationship and history rules first allows the public boundary to remain small and stable.
-
-The existing QSL consumer model already demonstrates the underlying pattern: create a runtime registry, register evaluators, register host-owned descriptors and functions, create a runtime context, apply host state, and evaluate through `QslEngine`.
-
-The current Wilds-facing proposal remains deliberately thin:
+The consumer-facing API remains deliberately thin and should be frozen only after the engine-side relationship, propagation, causal execution, and Timeline-routing semantics are stable.
 
 ```csharp
 public interface IWildsQslConsumer
@@ -308,63 +348,60 @@ public interface IWildsQslConsumer
 
 public sealed class WildsQslConsumerBuilder
 {
-    public WildsQslConsumerBuilder AddValue(
-        string name,
-        object? value);
-
-    public WildsQslConsumerBuilder AddDescriptor(
-        string name,
-        object descriptor);
-
-    public WildsQslConsumerBuilder AddFunction(
-        string name,
-        object function);
-
-    public WildsQslConsumerBuilder AddCapability(
-        string name,
-        object capability);
+    public WildsQslConsumerBuilder AddValue(string name, object? value);
+    public WildsQslConsumerBuilder AddDescriptor(string name, object descriptor);
+    public WildsQslConsumerBuilder AddFunction(string name, object function);
+    public WildsQslConsumerBuilder AddCapability(string name, object capability);
 }
 ```
 
-**This API remains a proposal, not a certified contract.** Its final shape should be frozen only after the engine-side Neighbor, membership, distance, and Timeline-routing semantics are stable.
-
-A consumer should ultimately be able to express setup like:
-
-```csharp
-public sealed class GameRuntime : IWildsQslConsumer
-{
-    public void Configure(
-        WildsQslConsumerBuilder builder)
-    {
-        builder
-            .AddDescriptor("Player", playerDescriptor)
-            .AddFunction("heal", healFunction)
-            .AddCapability("ApplyForce", physicsCapability);
-    }
-}
-```
-
-`Player`, `heal`, and `ApplyForce` remain consumer vocabulary. Wilds only needs a registered runtime capable of resolving them through certified engine mechanics.
+**This API remains a proposal, not a certified contract.**
 
 ## Milestones
 
-### Milestone 1: Neighbor membership and distance
+### Milestone 1: Neighbor topology and relationships
 
-Define and certify the engine-side relationship model before exposing it through a consumer boundary.
+Implemented and tested:
+
+- membership participates in Neighbor relationship identity;
+- distance represents mutable relationship state;
+- duplicate relationships are rejected deterministically;
+- the same Neighbor can participate through distinct memberships;
+- relationships are directional and independently mutable;
+- topology mutation flows through state processing;
+- topology operators are deterministic and preserve source topology.
+
+### Milestone 2: Neighbor propagation and eligibility
+
+Implemented and tested:
+
+- propagation interprets relationship distance independently from topology;
+- exponential distance attenuation is supported;
+- zero distance preserves intensity;
+- zero decay preserves intensity;
+- invalid negative propagation values are rejected;
+- minimum-intensity eligibility uses an inclusive threshold;
+- below-threshold values are rejected;
+- topology, propagation, and eligibility compose without assuming execution ownership.
+
+### Milestone 3: Independent Neighbor Pulse propagation
+
+Define and certify the causal execution boundary.
 
 Target behaviors include:
 
-- membership establishes Neighbor qualification;
-- distance describes proximity within the shared relationship;
-- distance 1 represents adjacency by convention;
-- non-adjacent members of the same collection can remain Neighbors;
-- unrelated objects do not become Neighbors merely because they exist in the runtime;
-- duplicate relationship handling is deterministic;
-- arbitrary runtime objects can participate without becoming game-specific Wilds Core types.
+- an eligible Neighbor may receive a causal stimulus;
+- the receiving Neighbor independently determines its response;
+- resulting work belongs to a new Pulse owned by the receiving Neighbor;
+- originating and receiving Pulses retain independent WorkUnits and lifecycles;
+- failure or cancellation of the receiving Pulse cannot retroactively corrupt the originating Pulse;
+- causal provenance connects executions without merging execution ownership;
+- resulting Moments enter the history belonging to their owning objects;
+- propagation termination is explicit and deterministic.
 
-### Milestone 2: Semantic Timeline routing
+### Milestone 4: Semantic Timeline routing
 
-Use the certified relationship model as an available input to temporal organization.
+Use the relationship and causal model as available inputs to temporal organization.
 
 Target behaviors include:
 
@@ -376,28 +413,8 @@ Target behaviors include:
 - processors and pools remain independent of temporal-routing decisions;
 - all Timelines remain preserved by the current Epoch.
 
-### Milestone 3: Consumer API and conformance
+### Milestone 5: Consumer API and conformance
 
-Once engine semantics are stable, freeze the consumer-facing integration surface and run the extracted 44-case consumer suite against it.
+Once engine semantics are stable, freeze the consumer-facing integration surface and run the extracted 44-case consumer suite against it without weakening the existing 156/156 core certification baseline.
 
-The goal is to prove that consumer-provided objects, functions, capabilities, and data structures can traverse:
-
-```text
-Consumer semantics
-      |
-      v
-QSL -> Wilds -> Pulse -> WorkUnit -> Moment
-                                  |
-                                  v
-                         Timeline routing
-                                  |
-                                  v
-                              Timeline
-                                  |
-                                  v
-                                Epoch
-```
-
-without weakening the existing 156/156 core certification baseline.
-
-> Wilds owns coordination, relationships, and history. QSL owns computation. The consumer owns meaning.
+> **Wilds owns coordination, relationships, propagation mechanics, and history. QSL owns computation. The consumer owns meaning.**

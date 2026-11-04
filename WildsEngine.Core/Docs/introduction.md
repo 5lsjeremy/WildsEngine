@@ -1,91 +1,377 @@
 # Wilds Engine - Architecture Introduction
 
-Wilds is a reusable simulation-processing engine designed around a strict boundary: it knows how simulation work evolves, but it does not know what a particular game is about.
+Game worlds have a habit of becoming more than we originally planned for.
 
-Consumer-specific entities, functions, data structures, and gameplay rules remain outside Wilds Core. The engine provides identity, state, processing, work coordination, and temporal history while allowing arbitrary consumer-owned runtime values to cross those boundaries.
+An NPC walks into an art gallery. A fish encounters a fishing lure. A patron finds himself at a poker table with a cranky miner.
+
+None of those ideas is especially difficult to imagine. The difficult part is letting them belong naturally to the same world without scripting every possible interaction, building increasingly specialized data structures, or handing more and more responsibility to processing that becomes difficult to understand later.
+
+And then tomorrow you add something else.
+
+Maybe it's an object. Maybe it's a relationship, a signal, a new capability, or an entirely different social situation. It wasn't there when you first imagined the world, but now it belongs there.
+
+**Your engine has to let it belong there too.**
+
+If every new idea requires tearing down, rebuilding, or rebalancing the engine's understanding of the world, eventually the architecture starts deciding what that world is allowed to become.
+
+That's a problem.
+
+An NPC shouldn't feel alive only because we managed to anticipate enough reactions. A world becomes much more interesting when its inhabitants can participate in what is happening around them, including situations we didn't explicitly script for them.
+
+That's where Wilds takes a different position.
+
+**Wilds cannot be your game world, and it doesn't want to be.**
+
+You know what an art gallery is. You know what the fishing lure means. You decide why the miner is cranky, why he's playing poker, what he wants, and whether anybody else in the room cares.
+
+That's your world.
+
+Describe those things. Give them properties, relationships, rules, capabilities, and meaning. Give your agents reasons to care about them.
+
+Then hand them off.
+
+Wilds works underneath that meaning. It deals with the machinery that lets those things participate together: state, relationships, work, provenance, propagation, causality, and history.
+
+It doesn't need an `ArtGallery`, `FishingLure`, `CrankyMiner`, or `PokerTable` built into the engine.
+
+It needs enough foundation for those things to exist, encounter one another, matter to one another, and create something that wasn't explicitly written as a path from A to B.
+
+**Your game defines the world. Wilds gives its inhabitants room to experience it.**
+
+## Surprise is part of the point
+
+If we do this right, every once in a while Wilds should surprise you.
+
+You should be playing your own game and find yourself asking:
+
+> **"Did I code that?"**
+
+Or maybe:
+
+> **"Where is that NPC going?"**
+
+Follow them.
+
+There should be an answer.
+
+Not because Wilds secretly decided what your NPC wanted. Not because some black box invented part of your game for you.
+
+What you should find are things you understand: simple rules, state, relationships, previous experiences, and things happening in the world that came together in a way you never explicitly scripted.
+
+**That's the kind of surprise we're after.**
+
+You shouldn't have to write every interaction that can possibly happen. You should be able to describe enough of your world that interesting interactions have room to happen.
+
+But there's another side to that bargain.
+
+**Wilds spills its secrets. It has to.**
+
+When something surprises you, follow it. Track the logs. Follow the provenance. Find out what happened and what brought the world to that Moment.
+
+Because **"Did I code that?" should be a fun question, not a debugging nightmare.**
+
+You still have a game to build. You have to tune it, balance it, understand it, and eventually put it in front of players.
+
+So we don't get to hide behind emergence.
+
+**If Wilds helps create the experience, Wilds should help you understand how you got there.**
+
+That's how we leave room for surprise without asking you to surrender your vision.
+
+## Take the ecosystem with you
+
+Eventually, you finish the game.
+
+The fish probably doesn't come with you.
+
+The gallery closes. The lure gets packed away. The cranky miner can stay at the poker table. They belonged to that world.
+
+That's okay.
+
+**But why should everything you learned about making them matter to each other stay behind with them?**
+
+What if, instead of starting over, the lessons from one finished world became part of the foundation for the next?
+
+Your next game can have completely different objects, different relationships, different rules, and different meanings. In fact, we hope it does.
+
+You don't need to bring the fish.
+
+**Bring the ecosystem that taught the fish how to belong.**
+
+Build on what worked. Change what didn't. Add things we haven't thought of yet. Let the next project teach you more about simulation without requiring Wilds to understand what that particular world means.
+
+Wilds can move with you, not because it carries your old world into the new one, but because the machinery underneath that world was never supposed to belong to the fish in the first place.
+
+## The problem underneath all of this
+
+Wilds can surprise you, but it shouldn't leave you guessing. You should be able to follow what happened, understand why it happened, tune it when you need to, and take what you've learned with you into whatever world you build next.
+
+Somewhere underneath all of this is the problem we've been chasing from the beginning:
+
+> **A simulated entity should be able to encounter something the engine itself has never been taught to understand.**
+
+The longer we worked on that problem, the clearer something else became.
+
+**We couldn't solve it by teaching Wilds more and more about the world. We had to teach Wilds less about the world, and more about how a world works.**
+
+That changes the questions the engine needs to ask:
+
+> **What exists?**
+>
+> **What is happening?**
+>
+> **What work needs to be done?**
+>
+> **What is true right now?**
+>
+> **What is related to what?**
+>
+> **Can an effect reach something else?**
+>
+> **Does that effect matter enough to cause a response?**
+>
+> **If something responds, whose occurrence is it?**
+>
+> **What actually happened?**
+>
+> **Can we understand why it happened?**
+>
+> **How does it become part of history?**
+
+The consumer supplies the answers that give those questions meaning. Wilds supplies the mechanics that allow those answers to participate in the same simulation.
+
+**Wilds does not need to know what something is in order to coordinate what happens because of it.**
+
+That leaves us with a useful boundary.
+
+**The consumer owns the meaning of the world. Wilds owns the reusable simulation mechanics underneath it.**
+
+Everything that follows comes from trying to preserve that boundary.
+
+`IBaseObject` begins with **what exists**.
+
+`IBaseUnit` begins with **what happens**.
+
+From there, state, context, work, topology, propagation, provenance, causality, and history each answer another part of the problem.
+
+**That's where the architecture begins.**
+
+## Stateful processing and the Wilds model
+
+Wilds does not exist because state machines or behavior trees are inherently wrong. They answer important questions. Wilds exists because a simulation can eventually need to ask a broader set of questions than behavior selection alone is intended to answer.
+
+| Stateful / behavior-centered framing | Wilds framing |
+| --- | --- |
+| What state is the entity in? | What exists, and what is true here? |
+| What condition or transition fired? | What occurrence has begun? |
+| Which known behavior should execute? | What work must resolve? |
+| What should this entity react to? | What is related to this entity or occurrence? |
+| Which authored branch handles this stimulus? | How strongly does the stimulus propagate through the relationship? |
+| Does the current behavior transition? | Is the receiving object eligible to respond? |
+| Continue or replace the current behavior. | If it responds, begin an independently owned occurrence. |
+| Preserve whatever history the consumer explicitly models. | Resolve the occurrence into a Moment and retain it through Timeline and Epoch history. |
+
+The important difference is not that Wilds removes state. State remains fundamental. The difference is that **state is one question in the simulation rather than the container for every question the simulation can ask.**
+
+An NPC does not need to live only as a continuously reacting state machine. It can participate in a world of relationships and occurrences whose concrete meanings remain consumer-owned.
+
+An art gallery can matter without Wilds knowing what art is.
+
+A fishing lure can matter without Wilds knowing what fishing is.
+
+A cranky miner at a poker table can matter without Wilds knowing what a miner, mood, game of poker, or social encounter means.
+
+Wilds concerns itself with the mechanics by which those things can exist, relate, influence, qualify, produce work, cause new occurrences, and leave history.
+
+## The simulation question chain
+
+The architecture is easiest to understand as a sequence of questions. Each major subsystem exists because a different question has become meaningful.
+
+```text
+What exists?
+    |
+    v
+IBaseObject
+    |
+    v
+What is happening?
+    |
+    v
+IBaseUnit / Pulse
+    |
+    v
+What work must resolve?
+    |
+    v
+WorkUnit
+    |
+    v
+What state and context does it encounter?
+    |
+    v
+processing infrastructure
+    |
+    v
+What actually happened?
+    |
+    v
+Moment
+    |
+    v
+What is related?
+    |
+    v
+topology
+    |
+    v
+How strongly does the effect reach it?
+    |
+    v
+propagation
+    |
+    v
+Is that enough to matter?
+    |
+    v
+eligibility
+    |
+    v
+Does another occurrence begin?
+    |
+    v
+causal stimulus -> independent Pulse
+    |
+    v
+What history did these outcomes create?
+    |
+    v
+Timeline -> Epoch
+```
+
+Wilds deliberately avoids collapsing these questions into a single behavioral decision.
 
 ## Foundational runtime
 
-The foundational object model includes:
+The question-driven model begins with two parallel foundational abstractions: `IBaseObject` and `IBaseUnit`.
+
+They have different purposes and different personalities in the runtime. Neither replaces the other.
+
+### IBaseObject: what exists?
+
+> **Wilds is asking:** *What is participating in the simulation?*
+
+`IBaseObject` represents runtime existence. It provides stable identity for objects that participate in the simulation and forms the foundation for component ownership and relational topology.
+
+The object-side runtime includes:
 
 - `IBaseObject` for stable runtime identity and topology;
 - `IComponent` for component-owned state, signal, and metadata;
 - `IState` for state processing;
 - `IContext` for variables and contextual metadata;
-- `ISignal` for outward communication;
-- instructions and tasks for processing intent and schedulable work;
-- registries for work lifetime independent of processors;
-- processors and bounded pools for reusable execution infrastructure.
+- `ISignal` for outward communication.
 
 Component and context metadata can hold arbitrary consumer-owned values. The GUID remains canonical object identity; readable slugs can provide runtime context without replacing that identity.
 
-## Unified BaseUnit model
+An `IBaseObject` can therefore exist, hold runtime state, participate in relationships, and become involved in processing without becoming a work or history object.
 
-Wilds now coordinates work and history through one unit family:
+### IBaseUnit: what is happening?
+
+> **Wilds is asking:** *What occurrence is being coordinated or remembered?*
+
+`IBaseUnit` represents runtime occurrence. It is the parallel foundation for coordinated work and temporal history.
 
 ```text
-                 BaseUnit
-                    |
-       +------------+------------+-------------+------------+
-       |            |            |             |            |
-     Pulse       WorkUnit      Moment       Timeline       Epoch
-   request         work        result        history       history
+                         IBaseUnit
+                            |
+                         BaseUnit
+                            |
+          +---------+---------+--------+----------+
+          |         |         |        |          |
+        Pulse    WorkUnit    Moment  Timeline    Epoch
+       request     work      result   history   history
 ```
 
-These units are related stages and scales of the same processing model.
+Where `IBaseObject` identifies participants in the simulation, `IBaseUnit` identifies occurrences within the simulation.
 
-### Pulse
+```text
+IBaseObject                         IBaseUnit
+    |                                  |
+    | runtime existence                | runtime occurrence
+    |                                  |
+    +-- identity                       +-- Pulse
+    +-- component                      +-- WorkUnit
+    +-- state                          +-- Moment
+    +-- context / metadata             +-- Timeline
+    +-- signal                         +-- Epoch
+    +-- topology
+```
 
-A `Pulse` represents the coordinated request. It owns the WorkUnits that must resolve before the request can resolve.
+An `IBaseObject` answers **what is participating**.
 
-### WorkUnit
+An `IBaseUnit` answers **what is happening, what work belongs to it, and how that occurrence becomes history**.
 
-A `WorkUnit` represents individually tracked required work. WorkUnits can complete, fail, or be cancelled independently while remaining owned by the Pulse that requires them.
+Objects can participate in work without becoming units. Units can carry references to arbitrary consumer-owned runtime objects without requiring those objects to become Wilds-specific gameplay types.
 
-A Pulse cannot resolve successfully while required WorkUnits remain pending, failed, or cancelled.
+This is one of Wilds' foundational separations: **existence and occurrence are related, but they are not the same thing.**
 
-### Moment
+## The IBaseUnit execution and temporal model
 
-A `Moment` represents a completed Pulse outcome. Success and failure are both historical truths. A failed computation is retained as a failed Moment rather than rewritten into success.
+Wilds coordinates work and history through one unit family. Execution and history are not separate models joined afterward. They are stages and scales of the same unit model.
 
-### Timeline and Epoch
+### Pulse: what is being asked to happen?
+
+> **Wilds is asking:** *What coordinated occurrence has begun, and what must become true before it can honestly resolve?*
+
+A `Pulse` represents the coordinated request.
+
+The Pulse owns the `WorkUnit` instances required to resolve that request. It cannot resolve successfully merely because processing stopped or returned a value. Its required work must resolve consistently with the claimed outcome.
+
+The Pulse establishes an execution boundary around an occurrence without needing to know the consumer-specific meaning of that occurrence.
+
+### WorkUnit: what work must resolve?
+
+> **Wilds is asking:** *What required work remains, and what happened to each required part?*
+
+A `WorkUnit` represents individually tracked required work belonging to a Pulse.
+
+WorkUnits can complete, fail, or be cancelled independently while remaining owned by the Pulse that requires them. A Pulse cannot honestly report successful resolution while required work remains unresolved or has produced an incompatible outcome.
+
+This separates **execution machinery** from **execution truth**.
+
+Tasks may perform lower-level schedulable work. A WorkUnit records whether a required part of the Pulse's obligation actually resolved.
+
+### Moment: what actually happened?
+
+> **Wilds is asking:** *What was the resolved outcome of this occurrence?*
+
+A `Moment` represents a completed Pulse outcome.
+
+Success, failure, and cancellation are historical truths. A failed computation is not rewritten into success merely because control returned from the processing route. The Moment preserves what actually happened.
+
+Wilds therefore preserves the distinction between **what was requested** and **what became true**.
+
+### Timeline and Epoch: what history did those outcomes create?
+
+> **Wilds is asking:** *How does this resolved occurrence belong to a larger history?*
 
 A `Timeline` collects Moments. An `Epoch` collects Timelines.
 
-The complete lifecycle is:
-
 ```text
-+------------------- ACTIVE WORK -------------------+
-|                                                   |
-|  Consumer                                         |
-|     |                                             |
-|     v                                             |
-|   Pulse                                           |
-|     |                                             |
-|     +---------> WorkUnit ------------------+      |
-|     +---------> WorkUnit ------------------+      |
-|     `---------> WorkUnit ------------------+      |
-|                                             |      |
-|                              all required work     |
-|                                     resolves      |
-+-------------------------------------|-------------+
-                                      v
-+------------------ HISTORY ------------------------+
-|                                                   |
-|                  Moment                           |
-|                     |                             |
-|                     v                             |
-|                  Timeline                         |
-|                     |                             |
-|                     v                             |
-|                   Epoch                           |
-|                                                   |
-+---------------------------------------------------+
+request              execution             result             history
+   |                     |                    |                   |
+ Pulse  ------------> WorkUnit ----------> Moment ----------> Timeline
+                                                                  |
+                                                                  v
+                                                                Epoch
 ```
 
-Consumer runtime-object references can survive this route. The engine does not need to convert an arbitrary consumer object into a Wilds-specific gameplay type simply to coordinate or retain it.
+Consumer runtime-object references can survive this complete route without being converted into Wilds-specific gameplay types.
+
+Wilds coordinates the occurrence and preserves its history. The consumer retains ownership of what the carried object or result means.
 
 ## Processing infrastructure beneath the units
+
+> **Wilds is asking:** *What machinery is required to perform the work without confusing that machinery with the occurrence being coordinated?*
 
 Instructions and tasks remain lower-level processing infrastructure.
 
@@ -105,13 +391,211 @@ processors + registries
 state / context
 ```
 
-Registries own pending-work lifetime independently from processor leases. Processor pools can therefore rent, execute, reset, and return processors without implicitly destroying the work being coordinated.
+Instructions describe processing intent. Tasks provide schedulable work. Processors execute against the appropriate runtime structures. Registries preserve pending-work lifetime independently from processor leases.
+
+Processor pools can therefore rent, execute, reset, and return processors without implicitly destroying the work being coordinated.
+
+The lifetime of execution infrastructure is not necessarily the lifetime of simulation truth.
+
+## State and context
+
+> **Wilds is asking:** *What is true here, and what information is available to this work?*
+
+State remains an important part of Wilds. It simply does not need to carry the explanatory burden of the entire simulation.
+
+State and context provide runtime conditions encountered during processing. They do not define what those conditions mean to a particular game.
+
+A consumer-owned value can represent an NPC's interests, an artwork, a lure, a social disposition, a physical object, or some future concept Wilds has never seen. That value may participate in processing without becoming a Wilds Core type.
+
+This is how Wilds can use state without forcing every possible interaction to become another engine-known state.
+
+## Relational topology
+
+Once objects exist, the simulator can ask about their relationships without yet deciding what those relationships mean.
+
+> **Wilds is asking:** *What is related to this object?*
+
+Wilds objects can participate in directional `Neighbor` relationships.
+
+Relationship identity is defined by:
+
+```text
+Neighbor.Id + Membership
+```
+
+Distance is independently mutable relationship state. The same pair of objects can participate through different memberships, and `A -> B` does not imply `B -> A`.
+
+Topology mutation can flow through state processing, while reusable operators query relationship snapshots without mutating the source collection.
+
+Topology answers which relationships exist and what their current relational state is. It does not decide what a gallery, lure, miner, NPC, social relationship, attraction, threat, or opportunity means.
+
+That meaning remains consumer-owned.
+
+## Propagation
+
+Knowing that two objects are related does not yet mean that every occurrence involving one automatically forces a response from the other.
+
+> **Wilds is asking:** *How much of this effect reaches the related object?*
+
+Neighbor topology can feed a separate propagation model.
+
+The current distance attenuation model is exponential:
+
+```text
+Iout = Iin * exp(-k * d)
+```
+
+Topology supplies relationship distance. Propagation interprets that distance and produces received intensity.
+
+The meaning of intensity remains consumer-owned. It may represent any consumer-defined magnitude without becoming a Wilds Core gameplay concept.
+
+Relationship and effect transmission are therefore different questions.
+
+## Eligibility
+
+Propagation determines what arrives. It does not determine whether the receiver must act.
+
+> **Wilds is asking:** *Is what arrived sufficient for this Neighbor to qualify for a response?*
+
+Eligibility evaluates the propagated result against the applicable threshold.
+
+```text
+source intensity
+       |
+       v
+    topology
+       |
+       v
+  propagation
+       |
+       v
+received intensity
+       |
+       v
+  eligibility
+       |
+       +---- eligible
+       |
+       `---- not eligible
+```
+
+The minimum-intensity threshold is inclusive. Intensity exactly at the threshold is eligible; intensity below it is not.
+
+Eligibility is deliberately not behavior.
+
+An eligible Neighbor has qualified for a subsequent response. Wilds has not declared what that response means, nor has it forced the Neighbor into a predetermined behavioral branch.
+
+The consumer may ultimately interpret the qualifying occurrence as curiosity about a painting, interest in a lure, annoyance with another patron, concern about a threat, or something else entirely.
+
+Wilds needs none of those concepts in Core.
+
+## Causal execution boundary
+
+The next architecture boundary begins after a Neighbor becomes eligible.
+
+At this point Wilds encounters one of the most important questions in the execution model:
+
+> **Wilds is asking:** *If this Neighbor responds, whose work is that response?*
+
+The intended answer is: **the responding Neighbor's**.
+
+The Neighbor's resulting work is not attached to the originating Pulse. Instead, the eligible Neighbor receives a causal stimulus and may originate an independent Pulse with its own WorkUnits and eventual Moment.
+
+```text
+Pulse A
+   |
+   v
+topology
+   |
+   v
+propagation
+   |
+   v
+eligibility
+   |
+   v
+causal stimulus to B
+   |
+   v
+Pulse B
+   |
+   +--> WorkUnits B
+   |
+   v
+Moment B
+```
+
+Pulse A and Pulse B remain independent execution units.
+
+Causality answers:
+
+> *What contributed to this occurrence beginning?*
+
+Execution ownership answers:
+
+> *Whose occurrence is this?*
+
+Those are related questions, but they are not the same question.
+
+**Causal provenance connects execution without merging execution ownership.**
+
+Causal stimulus delivery and independent Neighbor Pulse creation are the next execution boundary to define and certify.
+
+## From reaction to participation
+
+This is the practical payoff of the architecture.
+
+A reactive design can model an NPC responding to recognized inputs extremely well. Wilds adds a substrate through which the NPC can participate in a larger, consumer-defined world without requiring Wilds Core to enumerate that world's possible meanings.
+
+Consider the opening examples conceptually.
+
+### An art gallery
+
+Wilds does not need to contain an `ArtGalleryState` or decide whether an NPC appreciates art.
+
+The gallery and NPC can exist as runtime participants. Their consumer-defined data and relationships can enter processing. Propagation and eligibility can determine whether a relevant occurrence reaches the NPC strongly enough to qualify for a response. Consumer logic supplies what that response means.
+
+Wilds coordinates the resulting work and history.
+
+### A fishing lure
+
+Wilds does not need a built-in concept of fishing.
+
+A lure can participate as a consumer-owned runtime object. Relationships, context, propagated influence, and eligibility can determine whether another participant qualifies to respond. The consumer decides whether that means investigation, avoidance, pursuit, indifference, or something Wilds has never been designed to name.
+
+### A cranky miner at a poker table
+
+Wilds does not need to know what a miner is, what crankiness means, or how poker is played.
+
+Those meanings belong to the consumer.
+
+Wilds can provide identities, relationships, context, state, propagation, eligibility, independent execution, and historical outcomes around the encounter. The consumer's vocabulary determines what the interaction means.
+
+The goal is not an NPC with infinitely more hard-coded reactions.
+
+The goal is an NPC that can **participate in situations whose meaning exists outside the engine**.
+
+## Why the questions stay separate
+
+The separation between these questions is not accidental complexity. It prevents one answer from silently becoming another.
+
+- Being related does not mean being affected.
+- Being affected does not mean being eligible to respond.
+- Being eligible does not prescribe a behavior.
+- Responding does not make the response part of the originating Pulse.
+- Completing processing does not imply success.
+- A result does not disappear merely because execution has ended.
+- Consumer meaning does not need to become engine vocabulary.
+
+This lets Wilds model coordination, relationships, consequences, causality, and history while remaining deliberately ignorant of the consumer's specific world.
 
 ## QSL companion integration
 
+> **Wilds is asking:** *Who owns computation, and who owns the coordination around that computation?*
+
 Wilds Core remains independent of QSL. Integration belongs in `WildsEngine.Qsl`.
 
-The current certified execution route is:
+The certified route remains:
 
 ```text
 Consumer / QSL source
@@ -141,128 +625,63 @@ Consumer / QSL source
          Epoch
 ```
 
-This establishes a clear responsibility split:
+The responsibility split remains:
 
 - **Consumer:** owns game-specific meaning and runtime vocabulary.
 - **QSL:** parses and evaluates computation.
-- **Wilds:** coordinates the work and preserves its historical outcome.
+- **Wilds:** coordinates work, relationships, propagation mechanics, causal boundaries, and history.
 - **WildsEngine.Qsl:** owns the handshake between Wilds and QSL.
 
-Wilds Core therefore does not need QSL AST, parser, or evaluator internals. QSL does not need Wilds processor pools, temporal units, or scheduling internals.
+Wilds Core therefore does not need QSL parser or evaluator internals, and QSL does not need to own Wilds processing, relationship, or temporal mechanics.
+
+The computation source is not what gives Wilds its execution identity. Wilds needs a computed result and the execution facts surrounding it; the source of that computation may remain outside Core.
 
 ## Certification boundary
 
-Core certification is now separate from consumer conformance.
+> **Wilds is asking:** *Which guarantees belong to the engine itself, and which depend on consumer-provided meaning?*
 
-The current Wilds/QSL core suite is certified at **156/156**, with zero certification failures and zero missing dependencies. It retains 156 Moments through one Timeline held by one Epoch.
+Core certification remains separate from consumer conformance.
 
-Expected-error tests demonstrate an important semantic distinction: a test can pass because the runtime correctly produced a failed Moment. Runtime outcome describes what happened; certification status describes whether that behavior matched the contract.
+The current Wilds/QSL core suite is certified at **156/156**, with zero certification failures and zero missing dependencies. The extracted consumer-conformance corpus contains 44 consumer-dependent cases.
 
-The original combined corpus also exposed 44 cases that depend upon consumer-provided runtime vocabulary. Those cases have been extracted into the consumer-conformance suite rather than being treated as core failures.
+Neighbor testing also establishes directional topology, relationship identity, independent memberships, deterministic topology operations, exponential distance attenuation, and inclusive minimum-intensity eligibility behavior.
+
+The current relational execution boundary therefore reaches:
+
+```text
+topology -> propagation -> eligibility
+```
+
+The next boundary is:
+
+```text
+eligible Neighbor -> causal stimulus -> independent Pulse
+```
+
+Runtime outcome and certification outcome remain intentionally different concepts. A certification test can correctly succeed because Wilds produced the failure or cancellation required by the contract. Certification asks whether the engine accurately represented what happened.
 
 ## Consumer-facing API proposal
 
-The next architecture slice is an explicit consumer composition boundary.
+> **Wilds is asking:** *How can consumers provide meaning without forcing that meaning into Core?*
 
-QSL's existing consumer examples demonstrate the underlying host pattern: a consumer creates a `QslRuntimeRegistry`, registers standard evaluators, registers a host-owned descriptor and function, creates `QslRuntimeContext`, applies host state, creates `QslEngine`, and evaluates QSL. Host concepts such as `Player`, `health`, `mana`, and `heal` remain consumer concepts rather than QSL primitives.
+The consumer-facing API remains an architectural proposal rather than a frozen contract. It should be finalized only after the engine-side relationship, propagation, causal execution, and Timeline-routing semantics are stable.
 
-Wilds should preserve that ownership boundary while hiding QSL-specific composition details behind `WildsEngine.Qsl`.
+The intended ownership boundary remains unchanged: consumer vocabulary remains consumer-owned, while Wilds provides certified engine mechanics capable of carrying that vocabulary through processing and history.
 
-### Proposed surface
+A consumer should be able to provide its own objects, functions, capabilities, contextual values, and runtime data structures without requiring Wilds Core to redefine them as engine concepts.
 
-```csharp
-public interface IWildsQslConsumer
-{
-    void Configure(WildsQslConsumerBuilder builder);
-}
+The art gallery should belong to the consumer.
 
-public sealed class WildsQslConsumerBuilder
-{
-    public WildsQslConsumerBuilder AddValue(
-        string name,
-        object? value);
+The fishing lure should belong to the consumer.
 
-    public WildsQslConsumerBuilder AddDescriptor(
-        string name,
-        object descriptor);
+The cranky miner should belong to the consumer.
 
-    public WildsQslConsumerBuilder AddFunction(
-        string name,
-        object function);
-
-    public WildsQslConsumerBuilder AddCapability(
-        string name,
-        object capability);
-}
-```
-
-This is an architectural proposal rather than a frozen API. Before it becomes public contract, each method should be mapped onto the current QSL registry/context APIs and certified through the consumer suite.
-
-The intended consumer experience is:
-
-```csharp
-public sealed class GameRuntime : IWildsQslConsumer
-{
-    public void Configure(
-        WildsQslConsumerBuilder builder)
-    {
-        builder
-            .AddDescriptor("Player", playerDescriptor)
-            .AddFunction("heal", healFunction)
-            .AddCapability("ApplyForce", physicsCapability);
-    }
-}
-```
-
-Nothing in Wilds Core needs to know what `Player`, `heal`, or `ApplyForce` means.
-
-## Consumer conformance
-
-The extracted consumer suite currently gives this work a concrete proving ground: 44 cases whose dependencies were deliberately separated from the certified core corpus.
-
-The conformance harness should ultimately let an external consumer provide:
-
-- objects and descriptors;
-- functions;
-- capabilities;
-- arbitrary runtime data structures;
-- expected test results.
-
-Then the same execution machinery can validate them:
-
-```text
-Consumer registration
-        |
-        v
-Consumer test statement
-        |
-        v
-       QSL
-        |
-        v
-      Wilds
-        |
-        v
-      Pulse
-        |
-        v
-    WorkUnit
-        |
-        v
-     Moment
-        |
-        v
-    Timeline
-        |
-        v
-      Epoch
-        |
-        v
-Conformance report
-```
-
-The next milestone is to implement this consumer-facing boundary using the actual QSL registration contracts, run all 44 extracted cases through it, and keep the existing 156/156 core certification unchanged.
+The simulation mechanics that allow them to matter to one another are where Wilds belongs.
 
 ## Architectural rule
 
-**Wilds owns coordination and history. QSL owns computation. Consumers own meaning.**
+**Wilds owns coordination, relationships, propagation mechanics, causal execution boundaries, and history. QSL owns computation. Consumers own meaning.**
+
+Or, stated as the thesis of the engine:
+
+**Wilds does not need to understand the world in order to let the world interact.**
