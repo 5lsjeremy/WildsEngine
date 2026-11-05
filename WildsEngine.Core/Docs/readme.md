@@ -17,7 +17,7 @@ BaseUnit
   `- Epoch      collection of Timelines
 ```
 
-A Pulse owns its required WorkUnits and cannot resolve successfully until the required work resolves honestly. Failed or cancelled work cannot silently become a successful Pulse.
+A Pulse owns its required WorkUnits and cannot resolve successfully until the required work resolves honestly. Failed or canceled work cannot silently become a successful Pulse.
 
 ```text
 Consumer request
@@ -375,7 +375,7 @@ Implemented and tested:
 
 Implemented and tested:
 
-- propagation interprets relationship distance independently from topology;
+- propagation interprets relationship distance independently of topology;
 - exponential distance attenuation is supported;
 - zero distance preserves intensity;
 - zero decay preserves intensity;
