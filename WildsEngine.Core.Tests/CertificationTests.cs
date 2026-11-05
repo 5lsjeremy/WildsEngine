@@ -145,7 +145,7 @@ namespace WildsEngine.Core.Tests
             TestLog.Pass(
                 "Wilds / QSL core certification");
         }
-        
+
         [Fact]
         public async Task WildsQslRequestCertification()
         {
@@ -163,6 +163,44 @@ namespace WildsEngine.Core.Tests
 
             TestLog.Pass(
                 "Wilds / QSL request certification");
+        }
+
+        [Fact]
+        public async Task WildsQslEndToEndCertification()
+        {
+            TestLog.Initialize();
+
+            TestLog.Section(
+                "Wilds / QSL End-to-End Certification");
+
+            TestLog.Write(
+                "[START] Wilds / QSL end-to-end certification");
+
+            await Certification
+                .WildsQslEndToEndCertification
+                .RunAllAsync();
+
+            TestLog.Pass(
+                "Wilds / QSL end-to-end certification");
+        }
+
+        [Fact]
+        public async Task WildsQslProvenanceCertification()
+        {
+            TestLog.Initialize();
+
+            TestLog.Section(
+                "Wilds / QSL Provenance Certification");
+
+            TestLog.Write(
+                "[START] Wilds / QSL provenance certification");
+
+            await Certification
+                .WildsQslProvenanceCertification
+                .RunAllAsync();
+
+            TestLog.Pass(
+                "Wilds / QSL provenance certification");
         }
     }
 }

@@ -35,7 +35,7 @@ namespace WildsEngine.Core.Tests.Certification
         [JsonPropertyName("expected")]
         public string Expected { get; set; } =
             string.Empty;
-        
+
         [JsonPropertyName("dependency")]
         public string? Dependency { get; set; }
     }
@@ -50,7 +50,7 @@ namespace WildsEngine.Core.Tests.Certification
 
         [JsonPropertyName("failed")]
         public int Failed { get; set; }
-        
+
         [JsonPropertyName("missingDependencies")]
         public int MissingDependencies { get; set; }
 
@@ -194,9 +194,10 @@ namespace WildsEngine.Core.Tests.Certification
                 "=== Wilds / QSL Core Certification ===");
 
             TestLog.State(
-                "Route: QSL source -> WildsQslExecutor -> " +
-                "WildsEngine -> Pulse -> WorkUnit -> " +
-                "QSL -> Moment -> Timeline -> Epoch");
+                "Route: QSL source -> WildsEngine -> " +
+                "Pulse -> WorkUnit -> Wilds/QSL integration -> " +
+                "QSL -> WorkUnit result -> Moment -> " +
+                "Timeline -> Epoch");
 
             TestLog.State(
                 "Suite: " +
@@ -326,7 +327,7 @@ namespace WildsEngine.Core.Tests.Certification
                 report.MissingDependencies,
                 "Every certification result must be accounted for " +
                 "as passed, failed, or missing a dependency.");
-            
+
             Assert(
                 report.IsCertified,
                 "Wilds / QSL core certification requires every " +
@@ -343,12 +344,13 @@ namespace WildsEngine.Core.Tests.Certification
                 "Certification status: " +
                 GetCertificationStatus(
                     report));
+
             TestLog.State(
                 "Missing Dependencies: " +
                 report.MissingDependencies);
 
             TestLog.State(
-                "Completed Moments:    " +
+                "Completed Moments: " +
                 report.CompletedMoments);
 
             TestLog.State(
@@ -364,7 +366,6 @@ namespace WildsEngine.Core.Tests.Certification
                 report.EpochTimelines);
 
             return report;
-
         }
 
         private static WildsQslCertificationSuite LoadSuite(
@@ -410,8 +411,7 @@ namespace WildsEngine.Core.Tests.Certification
                 return suite;
             }
             catch (Exception exception)
-                when (exception is not
-                      FileNotFoundException)
+                when (exception is not FileNotFoundException)
             {
                 throw new InvalidOperationException(
                     "Certification suite could not be loaded.",
@@ -422,8 +422,7 @@ namespace WildsEngine.Core.Tests.Certification
         private static async Task<WildsQslCertificationResult>
             ExecuteTestAsync(
                 WildsQslExecutor executor,
-                global::WildsEngine.Core.WildsEngine
-                    wildsEngine,
+                global::WildsEngine.Core.WildsEngine wildsEngine,
                 WildsQslCertificationTest test)
         {
             var expectsError =
@@ -442,9 +441,16 @@ namespace WildsEngine.Core.Tests.Certification
                 /*
                  * This is the important certification boundary.
                  *
-                 * The QSL source enters Wilds directly.
-                 * Wilds owns the Pulse and WorkUnit before QSL
-                 * evaluates the statement.
+                 * The adapter submits the QSL source through
+                 * WildsEngine.ExecuteAsync.
+                 *
+                 * Wilds owns the Pulse and WorkUnit lifecycle.
+                 * QSL performs delegated computation while the
+                 * WorkUnit is processing.
+                 *
+                 * The QSL result returns to Wilds before Wilds
+                 * completes the WorkUnit and resolves the terminal
+                 * Moment.
                  */
                 moment =
                     await executor.ExecuteAsync(
@@ -454,11 +460,13 @@ namespace WildsEngine.Core.Tests.Certification
             catch (Exception exception)
             {
                 /*
-                 * WildsEngine.ExecuteAsync is expected to turn
-                 * operation failures into failed Moments.
+                 * WildsEngine.ExecuteAsync must convert delegated
+                 * processing failures into failed WorkUnits and
+                 * failed Moments.
                  *
-                 * An exception escaping the executor means the
-                 * complete Wilds route did not resolve honestly.
+                 * An exception escaping this route means Wilds
+                 * did not resolve the request into honest temporal
+                 * history.
                  */
                 return new WildsQslCertificationResult
                 {
@@ -473,10 +481,13 @@ namespace WildsEngine.Core.Tests.Certification
 
                     Output =
                         string.Empty,
+
                     Dependency =
                         test.Dependency,
+
                     Status =
                         WildsQslCertificationStatus.Failed,
+
                     Passed =
                         false,
 
@@ -539,7 +550,7 @@ namespace WildsEngine.Core.Tests.Certification
                     .Timelines[0]
                     .Moments
                     .Count ==
-                    timelineAfter &&
+                timelineAfter &&
                 ReferenceEquals(
                     moment,
                     wildsEngine.Epoch
@@ -549,170 +560,149 @@ namespace WildsEngine.Core.Tests.Certification
             if (moment.Outcome ==
                 MomentOutcome.Completed)
             {
-                var output =
-                    FormatValue(
-                        moment.Result);
-
-                var passed =
-                    !expectsError &&
-                    moment.Exception == null &&
-                    moment.WorkUnitIds.Count == 1 &&
-                    timelineRecorded &&
-                    epochRecorded &&
-                    string.Equals(
-                        output,
-                        test.Expected,
-                        StringComparison.Ordinal);
-
-                return new WildsQslCertificationResult
-                {
-                    Category =
-                        test.Category,
-
-                    Statement =
-                        test.Statement,
-
-                    Expected =
-                        test.Expected,
-
-                    Output =
-                        output,
-                    Dependency =
-                        test.Dependency,
-                    Status =
-                        ClassifyResult(
-                            test,
-                            passed,
-                            dependencyMissing: false),
-                    Passed =
-                        passed,
-
-                    QslSucceeded =
-                        true,
-
-                    EnteredWilds =
-                        true,
-
-                    MomentCompleted =
-                        true,
-
-                    TimelineRecorded =
-                        timelineRecorded,
-
-                    EpochRecorded =
-                        epochRecorded,
-
-                    MomentOutcome =
-                        moment.Outcome.ToString(),
-
-                    ParseFailed =
-                        false,
-
-                    EvaluationFailed =
-                        false,
-
-                    ParserDiagnostics =
-                        Array.Empty<string>(),
-
-                    RuntimeDiagnostics =
-                        Array.Empty<string>(),
-
-                    Exception =
-                        null
-                };
+                return CreateCompletedResult(
+                    test,
+                    moment,
+                    expectsError,
+                    timelineRecorded,
+                    epochRecorded);
             }
 
             if (moment.Outcome ==
                     MomentOutcome.Failed &&
                 moment.Exception is
-                    WildsQslExecutionException
-                    qslException)
+                    WildsQslExecutionException qslException)
             {
-                var processingResult =
-                    qslException.Result;
-
-                var parserDiagnostics =
-                    CopyParserDiagnostics(
-                        processingResult);
-
-                var runtimeDiagnostics =
-                    CopyRuntimeDiagnostics(
-                        processingResult);
-
-                var output =
-                    FormatValue(
-                        processingResult.Value);
-                var dependencyMissing =
-                    IsDeclaredDependencyMissing(
-                        test,
-                        runtimeDiagnostics);
-                var passed =
-                    expectsError &&
-                    !processingResult.Succeeded &&
-                    moment.Result == null &&
-                    moment.WorkUnitIds.Count == 1 &&
-                    timelineRecorded &&
-                    epochRecorded;
-
-                return new WildsQslCertificationResult
-                {
-                    Category =
-                        test.Category,
-
-                    Statement =
-                        test.Statement,
-
-                    Expected =
-                        test.Expected,
-
-                    Output =
-                        output,
-                    Dependency =
-                        test.Dependency,
-                    Status =
-                        ClassifyResult(
-                            test,
-                            passed,
-                            dependencyMissing),
-                    Passed =
-                        passed &&
-                        !dependencyMissing,
-                    QslSucceeded =
-                        processingResult.Succeeded,
-
-                    EnteredWilds =
-                        true,
-
-                    MomentCompleted =
-                        false,
-
-                    TimelineRecorded =
-                        timelineRecorded,
-
-                    EpochRecorded =
-                        epochRecorded,
-
-                    MomentOutcome =
-                        moment.Outcome.ToString(),
-
-                    ParseFailed =
-                        processingResult.ParseFailed,
-
-                    EvaluationFailed =
-                        processingResult.EvaluationFailed,
-
-                    ParserDiagnostics =
-                        parserDiagnostics,
-
-                    RuntimeDiagnostics =
-                        runtimeDiagnostics,
-
-                    Exception =
-                        processingResult.Exception?
-                            .Message ??
-                        qslException.Message
-                };
+                return CreateFailedQslResult(
+                    test,
+                    moment,
+                    qslException,
+                    expectsError,
+                    timelineRecorded,
+                    epochRecorded);
             }
+
+            return CreateUnexpectedResult(
+                test,
+                moment,
+                timelineRecorded,
+                epochRecorded);
+        }
+
+        private static WildsQslCertificationResult CreateCompletedResult(
+            WildsQslCertificationTest test,
+            IMoment moment,
+            bool expectsError,
+            bool timelineRecorded,
+            bool epochRecorded)
+        {
+            var output =
+                FormatValue(
+                    moment.Result);
+
+            var passed =
+                !expectsError &&
+                moment.Exception == null &&
+                moment.WorkUnitIds.Count == 1 &&
+                timelineRecorded &&
+                epochRecorded &&
+                string.Equals(
+                    output,
+                    test.Expected,
+                    StringComparison.Ordinal);
+
+            return new WildsQslCertificationResult
+            {
+                Category =
+                    test.Category,
+
+                Statement =
+                    test.Statement,
+
+                Expected =
+                    test.Expected,
+
+                Output =
+                    output,
+
+                Dependency =
+                    test.Dependency,
+
+                Status =
+                    ClassifyResult(
+                        test,
+                        passed,
+                        dependencyMissing: false),
+
+                Passed =
+                    passed,
+
+                QslSucceeded =
+                    true,
+
+                EnteredWilds =
+                    true,
+
+                MomentCompleted =
+                    true,
+
+                TimelineRecorded =
+                    timelineRecorded,
+
+                EpochRecorded =
+                    epochRecorded,
+
+                MomentOutcome =
+                    moment.Outcome.ToString(),
+
+                ParseFailed =
+                    false,
+
+                EvaluationFailed =
+                    false,
+
+                ParserDiagnostics =
+                    Array.Empty<string>(),
+
+                RuntimeDiagnostics =
+                    Array.Empty<string>(),
+
+                Exception =
+                    null
+            };
+        }
+
+        private static WildsQslCertificationResult CreateFailedQslResult(
+            WildsQslCertificationTest test,
+            IMoment moment,
+            WildsQslExecutionException qslException,
+            bool expectsError,
+            bool timelineRecorded,
+            bool epochRecorded)
+        {
+            var processingResult =
+                qslException.Result;
+
+            var parserDiagnostics =
+                CopyParserDiagnostics(
+                    processingResult);
+
+            var runtimeDiagnostics =
+                CopyRuntimeDiagnostics(
+                    processingResult);
+
+            var dependencyMissing =
+                IsDeclaredDependencyMissing(
+                    test,
+                    runtimeDiagnostics);
+
+            var passed =
+                expectsError &&
+                !processingResult.Succeeded &&
+                moment.Result == null &&
+                moment.WorkUnitIds.Count == 1 &&
+                timelineRecorded &&
+                epochRecorded;
 
             return new WildsQslCertificationResult
             {
@@ -727,11 +717,84 @@ namespace WildsEngine.Core.Tests.Certification
 
                 Output =
                     FormatValue(
-                        moment.Result),
+                        processingResult.Value),
+
                 Dependency =
                     test.Dependency,
+
+                Status =
+                    ClassifyResult(
+                        test,
+                        passed,
+                        dependencyMissing),
+
+                Passed =
+                    passed &&
+                    !dependencyMissing,
+
+                QslSucceeded =
+                    processingResult.Succeeded,
+
+                EnteredWilds =
+                    true,
+
+                MomentCompleted =
+                    false,
+
+                TimelineRecorded =
+                    timelineRecorded,
+
+                EpochRecorded =
+                    epochRecorded,
+
+                MomentOutcome =
+                    moment.Outcome.ToString(),
+
+                ParseFailed =
+                    processingResult.ParseFailed,
+
+                EvaluationFailed =
+                    processingResult.EvaluationFailed,
+
+                ParserDiagnostics =
+                    parserDiagnostics,
+
+                RuntimeDiagnostics =
+                    runtimeDiagnostics,
+
+                Exception =
+                    processingResult.Exception?.Message ??
+                    qslException.Message
+            };
+        }
+
+        private static WildsQslCertificationResult CreateUnexpectedResult(
+            WildsQslCertificationTest test,
+            IMoment moment,
+            bool timelineRecorded,
+            bool epochRecorded)
+        {
+            return new WildsQslCertificationResult
+            {
+                Category =
+                    test.Category,
+
+                Statement =
+                    test.Statement,
+
+                Expected =
+                    test.Expected,
+
+                Output =
+                    FormatValue(
+                        moment.Result),
+
+                Dependency =
+                    test.Dependency,
+
                 Status =
                     WildsQslCertificationStatus.Failed,
+
                 Passed =
                     false,
 
@@ -766,8 +829,7 @@ namespace WildsEngine.Core.Tests.Certification
                     Array.Empty<string>(),
 
                 Exception =
-                    moment.Exception?
-                        .Message ??
+                    moment.Exception?.Message ??
                     "Unexpected terminal Moment outcome: " +
                     moment.Outcome
             };
@@ -775,8 +837,7 @@ namespace WildsEngine.Core.Tests.Certification
 
         private static void ValidateCompleteHistory(
             WildsQslCertificationSuite suite,
-            global::WildsEngine.Core.WildsEngine
-                wildsEngine)
+            global::WildsEngine.Core.WildsEngine wildsEngine)
         {
             Assert(
                 wildsEngine.Timeline.Count ==
@@ -810,9 +871,8 @@ namespace WildsEngine.Core.Tests.Certification
                 "certification Moment history.");
         }
 
-        private static string[]
-            CopyParserDiagnostics(
-                QslProcessingResult processingResult)
+        private static string[] CopyParserDiagnostics(
+            QslProcessingResult processingResult)
         {
             var diagnostics =
                 new string[
@@ -834,9 +894,8 @@ namespace WildsEngine.Core.Tests.Certification
             return diagnostics;
         }
 
-        private static string[]
-            CopyRuntimeDiagnostics(
-                QslProcessingResult processingResult)
+        private static string[] CopyRuntimeDiagnostics(
+            QslProcessingResult processingResult)
         {
             var diagnostics =
                 new string[
@@ -925,31 +984,29 @@ namespace WildsEngine.Core.Tests.Certification
                 layer);
         }
 
-        private static
-            global::WildsEngine.Core.WildsEngine
+        private static global::WildsEngine.Core.WildsEngine
             CreateWildsEngine(
                 IComponent component)
         {
-            return new
-                global::WildsEngine.Core.WildsEngine(
-                    component,
-                    new WildsEngineOptions
-                    {
-                        Layer =
-                            "certification.qsl.core",
+            return new global::WildsEngine.Core.WildsEngine(
+                component,
+                new WildsEngineOptions
+                {
+                    Layer =
+                        "certification.qsl.core",
 
-                        RetainedInstructionsProcessors =
-                            1,
+                    RetainedInstructionsProcessors =
+                        1,
 
-                        ConcurrentInstructionsProcessors =
-                            1,
+                    ConcurrentInstructionsProcessors =
+                        1,
 
-                        RetainedTaskProcessors =
-                            1,
+                    RetainedTaskProcessors =
+                        1,
 
-                        ConcurrentTaskProcessors =
-                            1
-                    });
+                    ConcurrentTaskProcessors =
+                        1
+                });
         }
 
         private static string CreateTestName(
@@ -970,45 +1027,36 @@ namespace WildsEngine.Core.Tests.Certification
             Console.WriteLine();
             Console.WriteLine(
                 "========================================");
-
             Console.WriteLine(
                 "Total:                " +
                 report.Total);
-
             Console.WriteLine(
                 "Passed:               " +
                 report.Passed);
-
             Console.WriteLine(
                 "Failed:               " +
                 report.Failed);
             Console.WriteLine(
                 "Missing Dependencies: " +
                 report.MissingDependencies);
-
             Console.WriteLine(
                 "Completed Moments:    " +
                 report.CompletedMoments);
-
             Console.WriteLine(
                 "Failed Moments:       " +
                 report.FailedMoments);
-
             Console.WriteLine(
                 "Timeline Moments:     " +
                 report.TimelineMoments);
-
             Console.WriteLine(
                 "Epoch Timelines:      " +
                 report.EpochTimelines);
-
             Console.WriteLine(
                 "========================================");
         }
 
         private static void WriteFailures(
-            IReadOnlyList<WildsQslCertificationResult>
-                results)
+            IReadOnlyList<WildsQslCertificationResult> results)
         {
             Console.WriteLine();
             Console.WriteLine(
@@ -1022,86 +1070,8 @@ namespace WildsEngine.Core.Tests.Certification
                     continue;
                 }
 
-                Console.WriteLine();
-                Console.WriteLine(
-                    "[" +
-                    result.Category +
-                    "] " +
-                    result.Statement);
-
-                Console.WriteLine(
-                    "  Status:   " +
-                    result.Status);
-                Console.WriteLine(
-                    "  Expected: " +
-                    (
-                        string.IsNullOrEmpty(
-                            result.Expected)
-                            ? "<error>"
-                            : result.Expected
-                    ));
-
-                Console.WriteLine(
-                    "  Actual:   " +
-                    (
-                        string.IsNullOrEmpty(
-                            result.Output)
-                            ? "<null>"
-                            : result.Output
-                    ));
-
-                Console.WriteLine(
-                    "  Outcome: " +
-                    (
-                        string.IsNullOrEmpty(
-                            result.MomentOutcome)
-                            ? "<none>"
-                            : result.MomentOutcome
-                    ));
-
-                Console.WriteLine(
-                    "  QSL succeeded: " +
-                    result.QslSucceeded);
-
-                Console.WriteLine(
-                    "  Entered Wilds: " +
-                    result.EnteredWilds);
-
-                Console.WriteLine(
-                    "  Moment completed: " +
-                    result.MomentCompleted);
-
-                Console.WriteLine(
-                    "  Timeline recorded: " +
-                    result.TimelineRecorded);
-
-                Console.WriteLine(
-                    "  Epoch recorded: " +
-                    result.EpochRecorded);
-
-                foreach (var diagnostic in
-                         result.ParserDiagnostics)
-                {
-                    Console.WriteLine(
-                        "  Parser: " +
-                        diagnostic);
-                }
-
-                foreach (var diagnostic in
-                         result.RuntimeDiagnostics)
-                {
-                    Console.WriteLine(
-                        "  Runtime: " +
-                        diagnostic);
-                }
-
-                if (!string.IsNullOrEmpty(
-                        result.Exception))
-                {
-                    Console.WriteLine(
-                        "  Exception: " +
-                        result.Exception);
-                }
+                WriteResultDetails(
+                    result);
             }
         }
 
@@ -1109,21 +1079,103 @@ namespace WildsEngine.Core.Tests.Certification
             IReadOnlyList<WildsQslCertificationResult> results)
         {
             Console.WriteLine();
-            Console.WriteLine("Missing consumer dependencies:");
+            Console.WriteLine(
+                "Missing consumer dependencies:");
+
             foreach (var result in results)
             {
-                if (result.Status != WildsQslCertificationStatus.MissingDependency)
+                if (result.Status !=
+                    WildsQslCertificationStatus.MissingDependency)
                 {
                     continue;
                 }
-                Console.WriteLine();
-                Console.WriteLine("[" + result.Category + "] " + result.Statement);
-                Console.WriteLine("  Dependency: " + (result.Dependency ?? "<unspecified>"));
-                Console.WriteLine("  Moment outcome: " + result.MomentOutcome);
-                foreach (var diagnostic in result.RuntimeDiagnostics)
-                {
-                    Console.WriteLine("  Runtime: " + diagnostic);
-                }
+
+                WriteResultDetails(
+                    result);
+            }
+        }
+
+        private static void WriteResultDetails(
+            WildsQslCertificationResult result)
+        {
+            Console.WriteLine();
+            Console.WriteLine(
+                "[" +
+                result.Category +
+                "] " +
+                result.Statement);
+
+            Console.WriteLine(
+                "  Status: " +
+                result.Status);
+
+            Console.WriteLine(
+                "  Dependency: " +
+                (result.Dependency ?? "<none>"));
+
+            Console.WriteLine(
+                "  Expected: " +
+                (string.IsNullOrEmpty(
+                    result.Expected)
+                    ? "<error>"
+                    : result.Expected));
+
+            Console.WriteLine(
+                "  Actual: " +
+                (string.IsNullOrEmpty(
+                    result.Output)
+                    ? "<null>"
+                    : result.Output));
+
+            Console.WriteLine(
+                "  Outcome: " +
+                (string.IsNullOrEmpty(
+                    result.MomentOutcome)
+                    ? "<none>"
+                    : result.MomentOutcome));
+
+            Console.WriteLine(
+                "  QSL succeeded: " +
+                result.QslSucceeded);
+
+            Console.WriteLine(
+                "  Entered Wilds: " +
+                result.EnteredWilds);
+
+            Console.WriteLine(
+                "  Moment completed: " +
+                result.MomentCompleted);
+
+            Console.WriteLine(
+                "  Timeline recorded: " +
+                result.TimelineRecorded);
+
+            Console.WriteLine(
+                "  Epoch recorded: " +
+                result.EpochRecorded);
+
+            foreach (var diagnostic in
+                     result.ParserDiagnostics)
+            {
+                Console.WriteLine(
+                    "  Parser: " +
+                    diagnostic);
+            }
+
+            foreach (var diagnostic in
+                     result.RuntimeDiagnostics)
+            {
+                Console.WriteLine(
+                    "  Runtime: " +
+                    diagnostic);
+            }
+
+            if (!string.IsNullOrEmpty(
+                    result.Exception))
+            {
+                Console.WriteLine(
+                    "  Exception: " +
+                    result.Exception);
             }
         }
 
@@ -1138,18 +1190,29 @@ namespace WildsEngine.Core.Tests.Certification
 
             try
             {
-                var reportDirectory = Path.GetDirectoryName(reportPath);
-                if (!string.IsNullOrEmpty(reportDirectory))
+                var reportDirectory =
+                    Path.GetDirectoryName(
+                        reportPath);
+
+                if (!string.IsNullOrEmpty(
+                        reportDirectory))
                 {
-                    Directory.CreateDirectory(reportDirectory);
+                    Directory.CreateDirectory(
+                        reportDirectory);
                 }
+
                 var reportJson =
                     JsonSerializer.Serialize(
                         report,
                         new JsonSerializerOptions
                         {
-                            WriteIndented = true,
-                            Converters = { new JsonStringEnumConverter() }
+                            WriteIndented =
+                                true,
+
+                            Converters =
+                            {
+                                new JsonStringEnumConverter()
+                            }
                         });
 
                 File.WriteAllText(
@@ -1167,16 +1230,20 @@ namespace WildsEngine.Core.Tests.Certification
                     exception);
             }
         }
-        
+
         private static WildsQslCertificationStatus ClassifyResult(
             WildsQslCertificationTest test,
             bool behavioralPass,
             bool dependencyMissing)
         {
-            if (!string.IsNullOrWhiteSpace(test.Dependency) && dependencyMissing)
+            if (!string.IsNullOrWhiteSpace(
+                    test.Dependency) &&
+                dependencyMissing)
             {
-                return WildsQslCertificationStatus.MissingDependency;
+                return WildsQslCertificationStatus
+                    .MissingDependency;
             }
+
             return behavioralPass
                 ? WildsQslCertificationStatus.Passed
                 : WildsQslCertificationStatus.Failed;
@@ -1186,18 +1253,26 @@ namespace WildsEngine.Core.Tests.Certification
             WildsQslCertificationTest test,
             IReadOnlyList<string> runtimeDiagnostics)
         {
-            if (string.IsNullOrWhiteSpace(test.Dependency))
+            if (string.IsNullOrWhiteSpace(
+                    test.Dependency))
             {
                 return false;
             }
-            var expected = "Unresolved identifier: " + test.Dependency;
+
+            var expected =
+                "Unresolved identifier: " +
+                test.Dependency;
+
             foreach (var diagnostic in runtimeDiagnostics)
             {
-                if (diagnostic.Contains(expected, StringComparison.Ordinal))
+                if (diagnostic.Contains(
+                        expected,
+                        StringComparison.Ordinal))
                 {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -1208,10 +1283,14 @@ namespace WildsEngine.Core.Tests.Certification
             {
                 return "CERTIFIED";
             }
-            if (report.Failed == 0 && report.MissingDependencies > 0)
+
+            if (report.Failed == 0 &&
+                report.MissingDependencies > 0)
             {
-                return "INCOMPLETE - CONSUMER DEPENDENCIES MISSING";
+                return
+                    "INCOMPLETE - CONSUMER DEPENDENCIES MISSING";
             }
+
             return "NOT CERTIFIED";
         }
 
@@ -1226,4 +1305,56 @@ namespace WildsEngine.Core.Tests.Certification
             }
         }
     }
+    public static class WildsQslEndToEndCertification
+    {
+        public static async Task RunAllAsync()
+        {
+            TestLog.Write(
+                "=== Wilds / QSL End-to-End Certification ===");
+
+            TestLog.State(
+                "Route: Wilds -> Pulse -> WorkUnit -> " +
+                "QSL -> WorkUnit result -> Moment -> " +
+                "Timeline -> Epoch");
+
+            var tests =
+                new global::WildsEngine.Core.Tests
+                    .WildsQslEndToEndTests();
+
+            await tests
+                .QslWorkResolvesThroughCompleteWildsLifecycle()
+                .ConfigureAwait(false);
+
+            TestLog.Pass(
+                "Wilds / QSL end-to-end lifecycle certification");
+        }
+    }
+
+    public static class WildsQslProvenanceCertification
+    {
+        public static async Task RunAllAsync()
+        {
+            TestLog.Write(
+                "=== Wilds / QSL Provenance Certification ===");
+
+            var tests =
+                new global::WildsEngine.Core.Tests
+                    .WildsQslProvenanceIntegrationTests();
+
+            tests
+                .QslStatePackageIdentitySurvivesRequestEnvelope();
+
+            await tests
+                .QslRuntimeDiagnosticsSurviveWildsFailureRoute()
+                .ConfigureAwait(false);
+
+            await tests
+                .QslParseDiagnosticsSurviveWildsFailureRoute()
+                .ConfigureAwait(false);
+
+            TestLog.Pass(
+                "Wilds / QSL provenance certification");
+        }
+    }
+
 }
