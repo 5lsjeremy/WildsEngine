@@ -145,5 +145,24 @@ namespace WildsEngine.Core.Tests
             TestLog.Pass(
                 "Wilds / QSL core certification");
         }
+        
+        [Fact]
+        public async Task WildsQslRequestCertification()
+        {
+            TestLog.Initialize();
+
+            TestLog.Section(
+                "Wilds / QSL Request Certification");
+
+            TestLog.Write(
+                "[START] Wilds / QSL request certification");
+
+            await Certification
+                .WildsQslRequestCertification
+                .RunAllAsync();
+
+            TestLog.Pass(
+                "Wilds / QSL request certification");
+        }
     }
 }

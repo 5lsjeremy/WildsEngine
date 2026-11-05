@@ -1,0 +1,1789 @@
+WILDS / QSL CERTIFICATION CONTEXT
+Generated: 2026-11-05T14:33:25.3122802-05:00
+Wilds root: C:\Users\jmatt\source\WildsEngine\Audit
+PowerShell: 5.1.26100.9711
+CLR: 4.0.30319.42000
+QSL root: C:\Users\jmatt\source\QSL
+
+================================================================================
+PROJECT INVENTORY
+================================================================================
+
+================================================================================
+PROJECT FILE CONTENTS
+================================================================================
+
+================================================================================
+CURRENT EXECUTION / TEMPORAL / QSL SOURCE
+================================================================================
+
+================================================================================
+EXECUTION AND INTEGRATION TEST SOURCE
+================================================================================
+
+================================================================================
+EXECUTION API MATCHES
+================================================================================
+
+PATTERN: ExecuteAsync
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: Execute(
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: ExecuteInstructionAsync
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: QslProcessingResult
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: QslEngine
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: Pulse
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: WorkUnit
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: Moment
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: Timeline
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: Epoch
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: ComputedResult
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: QslWilds
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: WildsQsl
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: Coordinator
+--------------------------------------------------------------------------------
+<no matches>
+
+PATTERN: Resolve
+--------------------------------------------------------------------------------
+<no matches>
+
+================================================================================
+QSL CERTIFICATION ASSETS
+================================================================================
+
+FILE: C:\Users\jmatt\source\QSL\QSL.Cli\Certification\qsl_statement_testing.json
+--------------------------------------------------------------------------------
+{
+  "tests": [
+    {
+      "category": "Arithmetic",
+      "statement": "1 + 2",
+      "expected": "3"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 - 3",
+      "expected": "7"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 * 4",
+      "expected": "20"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "20 / 5",
+      "expected": "4"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 % 3",
+      "expected": "1"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "1 + 2 + 4 + 1",
+      "expected": "8"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "1 + 2 / 2 + 1",
+      "expected": "3"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 - 2 + 5",
+      "expected": "13"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 - (2 + 5)",
+      "expected": "3"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "100 / 5 / 2",
+      "expected": "10"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 * 2 * 3",
+      "expected": "30"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 * 2 + 3",
+      "expected": "13"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "5 + 2 * 3",
+      "expected": "11"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "(1 + 2) * (3 + 4)",
+      "expected": "21"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "0 * 100",
+      "expected": "0"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "2.5 + 1.5",
+      "expected": "4"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "10 / 4",
+      "expected": "2.5"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "9 % 4",
+      "expected": "1"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "1 - 5",
+      "expected": "-4"
+    },
+    {
+      "category": "Arithmetic",
+      "statement": "((8 + 2) * 3) / 5",
+      "expected": "6"
+    },
+    {
+      "category": "Unary",
+      "statement": "-10",
+      "expected": "-10"
+    },
+    {
+      "category": "Unary",
+      "statement": "--10",
+      "expected": "10"
+    },
+    {
+      "category": "Unary",
+      "statement": "---10",
+      "expected": "-10"
+    },
+    {
+      "category": "Unary",
+      "statement": "!false",
+      "expected": "true"
+    },
+    {
+      "category": "Unary",
+      "statement": "!true",
+      "expected": "false"
+    },
+    {
+      "category": "Unary",
+      "statement": "!!true",
+      "expected": "true"
+    },
+    {
+      "category": "Unary",
+      "statement": "!(1 == 2)",
+      "expected": "true"
+    },
+    {
+      "category": "Unary",
+      "statement": "-(1 + 2)",
+      "expected": "-3"
+    },
+    {
+      "category": "Unary",
+      "statement": "-5 * 2",
+      "expected": "-10"
+    },
+    {
+      "category": "Unary",
+      "statement": "+10",
+      "expected": "10"
+    },
+    {
+      "category": "Comparison",
+      "statement": "5 < 10",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "10 > 20",
+      "expected": "false"
+    },
+    {
+      "category": "Comparison",
+      "statement": "10 == 10",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "10 != 5",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "5 <= 5",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "5 >= 10",
+      "expected": "false"
+    },
+    {
+      "category": "Comparison",
+      "statement": "(1 + 2) == 3",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "1 + 2 == 2 + 1",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "true == true",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "true != false",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "3 < 3",
+      "expected": "false"
+    },
+    {
+      "category": "Comparison",
+      "statement": "3 <= 3",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "4 > 3",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "4 >= 4",
+      "expected": "true"
+    },
+    {
+      "category": "Comparison",
+      "statement": "(10 / 2) >= (2 + 3)",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "true || false",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false && false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "false || false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && true || false",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && (false || true)",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "!false && true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false || true && false",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "(false || true) && true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && !false",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false && unknownFunction()",
+      "expected": "false"
+    },
+    {
+      "category": "Logical",
+      "statement": "true || unknownFunction()",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "false || true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "true && true",
+      "expected": "true"
+    },
+    {
+      "category": "Logical",
+      "statement": "!(true && false)",
+      "expected": "true"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? 1 : 0",
+      "expected": "1"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? 1 : 0",
+      "expected": "0"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(5 > 3) ? 10 : 20",
+      "expected": "10"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? (1 + 2) : (3 + 4)",
+      "expected": "3"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? (1 + 2) : (3 + 4)",
+      "expected": "7"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? (false ? 1 : 2) : 3",
+      "expected": "2"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(1 + 2 == 3) ? (10 * 2) : (5 * 2)",
+      "expected": "20"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? 10 : unknownFunction()",
+      "expected": "10"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? unknownFunction() : 20",
+      "expected": "20"
+    },
+    {
+      "category": "Ternary",
+      "statement": "1 < 2 ? 3 < 4 ? 5 : 6 : 7",
+      "expected": "5"
+    },
+    {
+      "category": "Ternary",
+      "statement": "true ? true : false",
+      "expected": "true"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? true : false",
+      "expected": "false"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(10 > 5) ? 10 / 2 : 0",
+      "expected": "5"
+    },
+    {
+      "category": "Ternary",
+      "statement": "(2 * 3 == 6) ? 9 % 4 : 0",
+      "expected": "1"
+    },
+    {
+      "category": "Ternary",
+      "statement": "false ? 1 : true ? 2 : 3",
+      "expected": "2"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(1 + 2) * 3",
+      "expected": "9"
+    },
+    {
+      "category": "Grouping",
+      "statement": "1 + (2 * 3)",
+      "expected": "7"
+    },
+    {
+      "category": "Grouping",
+      "statement": "((1 + 2) * (3 + 4)) / 7",
+      "expected": "3"
+    },
+    {
+      "category": "Grouping",
+      "statement": "1 + 2 * 3 == 7",
+      "expected": "true"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(1 + 2) * 3 == 9",
+      "expected": "true"
+    },
+    {
+      "category": "Grouping",
+      "statement": "true || false && false",
+      "expected": "true"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(true || false) && false",
+      "expected": "false"
+    },
+    {
+      "category": "Grouping",
+      "statement": "((10 - 2) / 2) + 1",
+      "expected": "5"
+    },
+    {
+      "category": "Grouping",
+      "statement": "(((5)))",
+      "expected": "5"
+    },
+    {
+      "category": "Grouping",
+      "statement": "-(2 + 3) * 2",
+      "expected": "-10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "health = 50",
+      "expected": "50"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = 10",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 10; x; }",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 10; x + 5; }",
+      "expected": "15"
+    },
+    {
+      "category": "Assignment",
+      "statement": "a = b = 10",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ a = b = 10; a + b; }",
+      "expected": "20"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = 1 + 2 * 3",
+      "expected": "7"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = true",
+      "expected": "true"
+    },
+    {
+      "category": "Assignment",
+      "statement": "x = false ? 1 : 2",
+      "expected": "2"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 1; x = x + 1; x; }",
+      "expected": "2"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ health = 50; health; }",
+      "expected": "50"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ mana = 25; mana; }",
+      "expected": "25"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ a = 1; b = 2; b = a + b; b; }",
+      "expected": "3"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 5; y = x * 2; y; }",
+      "expected": "10"
+    },
+    {
+      "category": "Assignment",
+      "statement": "{ x = 10; x = -x; x; }",
+      "expected": "-10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ 1 + 2; 3 + 4; }",
+      "expected": "7"
+    },
+    {
+      "category": "Block",
+      "statement": "{ 1 + 2; 3 * 4; }",
+      "expected": "12"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; x; }",
+      "expected": "10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; x = x + 5; x; }",
+      "expected": "15"
+    },
+    {
+      "category": "Block",
+      "statement": "{ health = 100; heal(10); }",
+      "expected": "110"
+    },
+    {
+      "category": "Block",
+      "statement": "{ a = 1; b = 2; a + b; }",
+      "expected": "3"
+    },
+    {
+      "category": "Block",
+      "statement": "{ a = 2; b = 3; a * b; }",
+      "expected": "6"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 1; x = x + 1; x = x + 1; x; }",
+      "expected": "3"
+    },
+    {
+      "category": "Block",
+      "statement": "{ true; false; }",
+      "expected": "false"
+    },
+    {
+      "category": "Block",
+      "statement": "{ 1; 2; 3; }",
+      "expected": "3"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 5; x * x; }",
+      "expected": "25"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; true ? x : 0; }",
+      "expected": "10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ x = 10; false ? 0 : x; }",
+      "expected": "10"
+    },
+    {
+      "category": "Block",
+      "statement": "{ health = 50; heal(10); health; }",
+      "expected": "60"
+    },
+    {
+      "category": "Block",
+      "statement": "{ a = 10; b = 20; a < b; }",
+      "expected": "true"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 100; heal(10); }",
+      "expected": "110"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 0; heal(5); }",
+      "expected": "5"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 0; heal(5 + 5); }",
+      "expected": "10"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 0; heal(1 + 2 + 3); }",
+      "expected": "6"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 50; heal(10); }",
+      "expected": "60"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 100; heal(10); heal(10); }",
+      "expected": "120"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 1; heal(1); }",
+      "expected": "2"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 10; heal(-5); }",
+      "expected": "5"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 5; heal(0); }",
+      "expected": "5"
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 10; heal(2 * 5); }",
+      "expected": "20"
+    },
+    {
+      "category": "Error",
+      "statement": "heal()",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(1, 2)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(\"bad\")",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "unknownFunction(10)",
+      "expected": ""
+    },
+    {
+      "category": "FunctionCall",
+      "statement": "{ health = 10; heal(5); health; }",
+      "expected": "15"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health; }",
+      "expected": "100"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.mana = 50; Player.mana; }",
+      "expected": "50"
+    },
+    {
+      "category": "Error",
+      "statement": "Player.unknownField",
+      "expected": ""
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health + 10; }",
+      "expected": "110"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health == 100; }",
+      "expected": "true"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health > 50; }",
+      "expected": "true"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; true ? Player.health : Player.mana; }",
+      "expected": "100"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; false ? Player.health : Player.mana; }",
+      "expected": "50"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.health + Player.mana; }",
+      "expected": "150"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.health >= Player.mana; }",
+      "expected": "true"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.mana < Player.health; }",
+      "expected": "true"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; (Player.health + Player.mana) / 2; }",
+      "expected": "75"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.mana = 50; Player.health != Player.mana; }",
+      "expected": "true"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 100; Player.health = 75; }",
+      "expected": "75"
+    },
+    {
+      "category": "MemberAccess",
+      "statement": "{ Player.health = 75; Player.health; }",
+      "expected": "75"
+    },
+    {
+      "category": "Embedded",
+      "statement": "$(1 + 2)",
+      "expected": "3"
+    },
+    {
+      "category": "Embedded",
+      "statement": "$(1 + 2 + 3)",
+      "expected": "6"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Value: $(1 + 2)\"",
+      "expected": "Value: 3"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Sum: $(1 + 2 + 3)\"",
+      "expected": "Sum: 6"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Health: $({ health = 60; health; })\"",
+      "expected": "Health: 60"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"A=$(1), B=$(2)\"",
+      "expected": "A=1, B=2"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Result: $(2 * 5)\"",
+      "expected": "Result: 10"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Bool: $(true)\"",
+      "expected": "Bool: true"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Nested: $((1 + 2) * 3)\"",
+      "expected": "Nested: 9"
+    },
+    {
+      "category": "Embedded",
+      "statement": "\"Player: $({ Player.health = 75; Player.health; })\"",
+      "expected": "Player: 75"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 => 2",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 => 2 => 3",
+      "expected": "3"
+    },
+    {
+      "category": "Arrow",
+      "statement": "x = 1 => x = 2",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "{ x = 0; x = 1 => x = 2; x; }",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "{ health = 50; health => heal(10); }",
+      "expected": "60"
+    },
+    {
+      "category": "Arrow",
+      "statement": "true => false",
+      "expected": "false"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 + 1 => 3 + 4",
+      "expected": "7"
+    },
+    {
+      "category": "Arrow",
+      "statement": "{ x = 1; x = 2 => x; }",
+      "expected": "2"
+    },
+    {
+      "category": "Arrow",
+      "statement": "1 => 2 * 3",
+      "expected": "6"
+    },
+    {
+      "category": "Arrow",
+      "statement": "(1 => 2) => 3",
+      "expected": "3"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(10, 0))",
+      "expected": "Velocity(X=1, Y=0)"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(0, 10))",
+      "expected": "Velocity(X=0, Y=1)"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(10, 10))",
+      "expected": "Velocity(X=1, Y=1)"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(-10, 0))",
+      "expected": "Velocity(X=-1, Y=0)"
+    },
+    {
+      "category": "Physics",
+      "statement": "ApplyForce(\"Player\", Vector(0, 0))",
+      "expected": "Velocity(X=0, Y=0)"
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(\"Player\", 10)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(10, Vector(1, 1))",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(\"Player\")",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "ApplyForce(\"Player\", Vector(1, 1), 3)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "unknownCapability(1)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 +",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "true ? 1",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "(1 + 2",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 + )",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(1 2)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "{ 1 + 2",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "{ 1 + 2 3 + 4; }",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 + 2 garbage",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "true ? : 1",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "( )",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "{ ; }",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 + * 2",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(1,,2)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "Player.",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "10 && true",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "true && 10",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 / 0",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "1 % 0",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "unknownFunction(10)",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "false || 10",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "!10",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "10 < true",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "Player.unknownField",
+      "expected": ""
+    },
+    {
+      "category": "Error",
+      "statement": "heal(\"bad\")",
+      "expected": ""
+    }
+  ]
+}
+
+FILE: C:\Users\jmatt\source\QSL\QSL.Cli\CertificationModels.cs
+--------------------------------------------------------------------------------
+using System.Text.Json.Serialization;
+
+internal sealed class QslCertificationSuite
+{
+    [JsonPropertyName("tests")]
+    public List<QslCertificationTest> Tests { get; set; } =
+        new();
+}
+
+internal sealed class QslCertificationTest
+{
+    [JsonPropertyName("category")]
+    public string Category { get; set; } =
+        string.Empty;
+
+    [JsonPropertyName("statement")]
+    public string Statement { get; set; } =
+        string.Empty;
+
+    [JsonPropertyName("expected")]
+    public string Expected { get; set; } =
+        string.Empty;
+}
+
+internal sealed class QslCertificationReport
+{
+    [JsonPropertyName("total")]
+    public int Total { get; set; }
+
+    [JsonPropertyName("passed")]
+    public int Passed { get; set; }
+
+    [JsonPropertyName("failed")]
+    public int Failed { get; set; }
+
+    [JsonPropertyName("statementTotal")]
+    public int StatementTotal { get; set; }
+
+    [JsonPropertyName("statementPassed")]
+    public int StatementPassed { get; set; }
+
+    [JsonPropertyName("statementFailed")]
+    public int StatementFailed { get; set; }
+
+    [JsonPropertyName("runtimeStateCertification")]
+    public QslRuntimeStateCertificationReport
+        RuntimeStateCertification { get; set; } =
+            new();
+
+    [JsonPropertyName("results")]
+    public List<QslCertificationResult> Results { get; set; } =
+        new();
+}
+
+internal sealed class QslCertificationResult
+{
+    [JsonPropertyName("category")]
+    public string Category { get; set; } =
+        string.Empty;
+
+    [JsonPropertyName("statement")]
+    public string Statement { get; set; } =
+        string.Empty;
+
+    [JsonPropertyName("expected")]
+    public string Expected { get; set; } =
+        string.Empty;
+
+    [JsonPropertyName("output")]
+    public string Output { get; set; } =
+        string.Empty;
+
+    [JsonPropertyName("passed")]
+    public bool Passed { get; set; }
+
+    [JsonPropertyName("succeeded")]
+    public bool Succeeded { get; set; }
+
+    [JsonPropertyName("parseFailed")]
+    public bool ParseFailed { get; set; }
+
+    [JsonPropertyName("evaluationFailed")]
+    public bool EvaluationFailed { get; set; }
+
+    [JsonPropertyName("parserDiagnostics")]
+    public string[] ParserDiagnostics { get; set; } =
+        Array.Empty<string>();
+
+    [JsonPropertyName("runtimeDiagnostics")]
+    public string[] RuntimeDiagnostics { get; set; } =
+        Array.Empty<string>();
+
+    [JsonPropertyName("exception")]
+    public string? Exception { get; set; }
+}
+
+
+FILE: C:\Users\jmatt\source\QSL\QSL.Cli\CertificationRunner.cs
+--------------------------------------------------------------------------------
+using System.Text.Json;
+using QSL.Core;
+using QSL.Core.Provenance;
+
+internal static class CertificationRunner
+{
+    private const string SuiteFileName =
+        "qsl_statement_testing.json";
+
+    private const string ReportFileName =
+        "qsl_statement_testing_output.json";
+
+    public static int Run()
+    {
+        var suitePath =
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "Certification",
+                SuiteFileName
+            );
+
+        if (!File.Exists(suitePath))
+        {
+            Console.Error.WriteLine(
+                "Certification suite was not found:"
+            );
+
+            Console.Error.WriteLine(
+                suitePath
+            );
+
+            return 2;
+        }
+
+        QslCertificationSuite? suite;
+
+        try
+        {
+            var json =
+                File.ReadAllText(
+                    suitePath
+                );
+
+            suite =
+                JsonSerializer.Deserialize
+                    <QslCertificationSuite>(
+                        json,
+                        new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive =
+                                true
+                        }
+                    );
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine(
+                "Certification suite could not be loaded."
+            );
+
+            Console.Error.WriteLine(
+                exception.Message
+            );
+
+            return 2;
+        }
+
+        if (suite is null ||
+            suite.Tests.Count == 0)
+        {
+            Console.Error.WriteLine(
+                "Certification suite contains no tests."
+            );
+
+            return 2;
+        }
+
+        var report =
+            new QslCertificationReport();
+
+        Console.WriteLine(
+            "========================================"
+        );
+
+        Console.WriteLine(
+            "QSL CERTIFICATION"
+        );
+
+        Console.WriteLine(
+            "========================================"
+        );
+
+        Console.WriteLine(
+            "Suite: " +
+            suitePath
+        );
+
+        Console.WriteLine(
+            "Statement tests: " +
+            suite.Tests.Count
+        );
+
+        Console.WriteLine();
+
+        RunStatementCertification(
+            suite,
+            report
+        );
+
+        Console.WriteLine();
+        Console.WriteLine(
+            "Runtime-state tests: 15"
+        );
+
+        report.RuntimeStateCertification =
+            RuntimeStateCertificationRunner.Run();
+
+        WriteRuntimeProgress(
+            report.RuntimeStateCertification
+        );
+
+        report.StatementTotal =
+            report.Results.Count;
+
+        report.StatementPassed =
+            report.Results.Count(
+                result => result.Passed
+            );
+
+        report.StatementFailed =
+            report.StatementTotal -
+            report.StatementPassed;
+
+        report.Total =
+            report.StatementTotal +
+            report.RuntimeStateCertification.Total;
+
+        report.Passed =
+            report.StatementPassed +
+            report.RuntimeStateCertification.Passed;
+
+        report.Failed =
+            report.StatementFailed +
+            report.RuntimeStateCertification.Failed;
+
+        WriteSummary(
+            report
+        );
+
+        if (report.StatementFailed > 0)
+        {
+            WriteStatementFailures(
+                report.Results
+            );
+        }
+
+        if (report.RuntimeStateCertification.Failed > 0)
+        {
+            WriteRuntimeFailures(
+                report.RuntimeStateCertification.Results
+            );
+        }
+
+        var reportPath =
+            Path.Combine(
+                Directory.GetCurrentDirectory(),
+                ReportFileName
+            );
+
+        try
+        {
+            var reportJson =
+                JsonSerializer.Serialize(
+                    report,
+                    new JsonSerializerOptions
+                    {
+                        WriteIndented =
+                            true
+                    }
+                );
+
+            File.WriteAllText(
+                reportPath,
+                reportJson
+            );
+
+            Console.WriteLine();
+            Console.WriteLine(
+                "Report:"
+            );
+
+            Console.WriteLine(
+                reportPath
+            );
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine();
+            Console.Error.WriteLine(
+                "Certification report could not be written."
+            );
+
+            Console.Error.WriteLine(
+                exception.Message
+            );
+
+            return 3;
+        }
+
+        return report.Failed == 0
+            ? 0
+            : 1;
+    }
+
+    private static void RunStatementCertification(
+        QslCertificationSuite suite,
+        QslCertificationReport report)
+    {
+        var host =
+            QslCliHost.Create();
+
+        for (
+            var index = 0;
+            index < suite.Tests.Count;
+            index++)
+        {
+            var test =
+                suite.Tests[index];
+
+            var result =
+                ExecuteStatementTest(
+                    host.Engine,
+                    test
+                );
+
+            report.Results.Add(
+                result
+            );
+
+            Console.Write(
+                result.Passed
+                    ? "."
+                    : "F"
+            );
+
+            if ((index + 1) % 50 == 0)
+            {
+                Console.WriteLine();
+            }
+        }
+
+        if (suite.Tests.Count % 50 != 0)
+        {
+            Console.WriteLine();
+        }
+    }
+
+    private static void WriteRuntimeProgress(
+        QslRuntimeStateCertificationReport report)
+    {
+        for (
+            var index = 0;
+            index < report.Results.Count;
+            index++)
+        {
+            Console.Write(
+                report.Results[index].Passed
+                    ? "."
+                    : "F"
+            );
+        }
+
+        Console.WriteLine();
+    }
+
+    private static QslCertificationResult ExecuteStatementTest(
+        QslEngine engine,
+        QslCertificationTest test)
+    {
+        var processingResult =
+            engine.Evaluate(
+                test.Statement
+            );
+
+        var output =
+            QslValueFormatter.Format(
+                processingResult.Value
+            );
+
+        var expectsError =
+            string.Equals(
+                test.Category,
+                "Error",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+        var passed =
+            expectsError
+                ? !processingResult.Succeeded
+                : processingResult.Succeeded &&
+                  string.Equals(
+                      output,
+                      test.Expected,
+                      StringComparison.Ordinal
+                  );
+
+        var runtimeDiagnostics =
+            new string[
+                processingResult
+                    .RuntimeDiagnostics
+                    .Count
+            ];
+
+        for (
+            var index = 0;
+            index < runtimeDiagnostics.Length;
+            index++)
+        {
+            runtimeDiagnostics[index] =
+                FormatRuntimeDiagnostic(
+                    processingResult
+                        .RuntimeDiagnostics[index]
+                );
+        }
+
+        var parserDiagnostics =
+            new string[
+                processingResult
+                    .ParserDiagnostics
+                    .Count
+            ];
+
+        for (
+            var index = 0;
+            index < parserDiagnostics.Length;
+            index++)
+        {
+            parserDiagnostics[index] =
+                processingResult
+                    .ParserDiagnostics[index];
+        }
+
+        return new QslCertificationResult
+        {
+            Category =
+                test.Category,
+            Statement =
+                test.Statement,
+            Expected =
+                test.Expected,
+            Output =
+                output,
+            Passed =
+                passed,
+            Succeeded =
+                processingResult.Succeeded,
+            ParseFailed =
+                processingResult.ParseFailed,
+            EvaluationFailed =
+                processingResult.EvaluationFailed,
+            ParserDiagnostics =
+                parserDiagnostics,
+            RuntimeDiagnostics =
+                runtimeDiagnostics,
+            Exception =
+                processingResult
+                    .Exception?
+                    .Message
+        };
+    }
+
+    private static string FormatRuntimeDiagnostic(
+        QslProvenanceEntry entry)
+    {
+        return
+            "[" +
+            entry.EntryType +
+            "] " +
+            entry.Source +
+            ": " +
+            entry.Message;
+    }
+
+    private static void WriteSummary(
+        QslCertificationReport report)
+    {
+        Console.WriteLine();
+        Console.WriteLine(
+            "========================================"
+        );
+
+        Console.WriteLine(
+            "Statement total:  " +
+            report.StatementTotal
+        );
+
+        Console.WriteLine(
+            "Statement passed: " +
+            report.StatementPassed
+        );
+
+        Console.WriteLine(
+            "Statement failed: " +
+            report.StatementFailed
+        );
+
+        Console.WriteLine();
+        Console.WriteLine(
+            "Runtime total:    " +
+            report.RuntimeStateCertification.Total
+        );
+
+        Console.WriteLine(
+            "Runtime passed:   " +
+            report.RuntimeStateCertification.Passed
+        );
+
+        Console.WriteLine(
+            "Runtime failed:   " +
+            report.RuntimeStateCertification.Failed
+        );
+
+        Console.WriteLine();
+        Console.WriteLine(
+            "Total:            " +
+            report.Total
+        );
+
+        Console.WriteLine(
+            "Passed:           " +
+            report.Passed
+        );
+
+        Console.WriteLine(
+            "Failed:           " +
+            report.Failed
+        );
+
+        Console.WriteLine(
+            "========================================"
+        );
+    }
+
+    private static void WriteStatementFailures(
+        IReadOnlyList<QslCertificationResult> results)
+    {
+        Console.WriteLine();
+        Console.WriteLine(
+            "Statement failures:"
+        );
+
+        foreach (var result in results)
+        {
+            if (result.Passed)
+            {
+                continue;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine(
+                "[" +
+                result.Category +
+                "] " +
+                result.Statement
+            );
+
+            Console.WriteLine(
+                "  Expected: " +
+                result.Expected
+            );
+
+            Console.WriteLine(
+                "  Actual:   " +
+                (
+                    string.IsNullOrEmpty(
+                        result.Output
+                    )
+                        ? "<null>"
+                        : result.Output
+                )
+            );
+
+            Console.WriteLine(
+                "  Succeeded: " +
+                result.Succeeded
+            );
+
+            foreach (var diagnostic in
+                     result.ParserDiagnostics)
+            {
+                Console.WriteLine(
+                    "  Parser: " +
+                    diagnostic
+                );
+            }
+
+            foreach (var diagnostic in
+                     result.RuntimeDiagnostics)
+            {
+                Console.WriteLine(
+                    "  Runtime: " +
+                    diagnostic
+                );
+            }
+
+            if (!string.IsNullOrEmpty(
+                    result.Exception))
+            {
+                Console.WriteLine(
+                    "  Exception: " +
+                    result.Exception
+                );
+            }
+        }
+    }
+
+    private static void WriteRuntimeFailures(
+        IReadOnlyList<QslRuntimeStateCertificationResult> results)
+    {
+        Console.WriteLine();
+        Console.WriteLine(
+            "Runtime-state failures:"
+        );
+
+        foreach (var result in results)
+        {
+            if (result.Passed)
+            {
+                continue;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine(
+                "[Runtime State] " +
+                result.Name
+            );
+
+            Console.WriteLine(
+                "  Details: " +
+                result.Details
+            );
+
+            if (!string.IsNullOrEmpty(
+                    result.Exception))
+            {
+                Console.WriteLine(
+                    "  Exception: " +
+                    result.Exception
+                );
+            }
+        }
+    }
+}
+
+
+================================================================================
+QSL SUITE SUMMARY
+================================================================================
+Suite: C:\Users\jmatt\source\QSL\QSL.Cli\Certification\qsl_statement_testing.json
+Tests: 200
+
+Suite parse error: The term 'e-Line' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+
+================================================================================
+GIT STATUS
+================================================================================
+ M WildsEngine-Full-Crawl-Latest.txt
+AD ../WildsEngine.Core/Abstractions/IInstructionsProcessor.cs
+AD ../WildsEngine.Core/Abstractions/IObjectPool.cs
+AD ../WildsEngine.Core/Abstractions/IResettablePoolObject.cs
+AD ../WildsEngine.Core/Abstractions/ITaskProcessor.cs
+AD ../WildsEngine.Core/Units/IBaseUnit.cs
+AD ../WildsEngine.Core/Units/IMoment.cs
+AD ../WildsEngine.Core/Units/IPulse.cs
+AD ../WildsEngine.Core/Units/IWorkUnit.cs
+?? Audit/
+?? WildsEngine-Full-Crawl-20261105-143155.txt
+
+================================================================================
+BUILD
+================================================================================
+Build not requested. Run crawler with -RunBuild to include build output.
+
+================================================================================
+CRAWL SUMMARY
+================================================================================
+Projects: 0
+Wilds source files scanned: 0
+Relevant source files captured: 0
+Report: C:\Users\jmatt\source\WildsEngine\Audit\Audit\Wilds-Qsl-Certification-Context-20261105-143325.txt

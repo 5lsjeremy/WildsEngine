@@ -591,96 +591,122 @@ This lets Wilds model coordination, relationships, consequences, causality, and 
 
 ## QSL companion integration
 
-> **Wilds is asking:** *Who owns computation, and who owns the coordination around that computation?*
+**Wilds is asking:** _Who owns the request lifecycle, and where does QSL computation belong inside it?_
 
-Wilds Core remains independent of QSL. Integration belongs in `WildsEngine.Qsl`.
+Wilds is the exposed consumer surface. QSL is computation delegated by Wilds during an active Wilds request. Consumers do not need to treat QSL as the simulation host, and `WildsQslExecutor` is integration machinery rather than the conceptual front door.
 
-The certified route remains:
+The certified request-envelope route is:
 
 ```text
-Consumer / QSL source
-          |
-          v
-    WildsQslExecutor
-          |
-          v
-      WildsEngine
-          |
-          v
-        Pulse
-          |
-          v
-       WorkUnit
-          |
-          v
-    QSL computation
-          |
-          v
-        Moment
-          |
-          v
-       Timeline
-          |
-          v
-         Epoch
+Consumer
+   |
+   v
+Wilds
+   |
+   v
+Pulse
+   |
+   v
+WorkUnit
+   |
+   v
+Wilds/QSL integration
+   |
+   +--> bind exact consumer-owned objects
+   +--> receive attached runtime state
+   `--> evaluate QSL source
+            |
+            v
+       QSL result
+            |
+            v
+      WorkUnit completion
+            |
+            v
+         Moment
+            |
+            v
+        Timeline
+            |
+            v
+          Epoch
 ```
 
-The responsibility split remains:
+That order matters. Wilds creates the Pulse and WorkUnit before QSL evaluates anything. QSL performs delegated computation while the WorkUnit is processing. The QSL result returns to Wilds, and Wilds then completes the WorkUnit, finalizes the Pulse into a Moment, and records that Moment into Timeline and Epoch history.
 
-- **Consumer:** owns game-specific meaning and runtime vocabulary.
-- **QSL:** parses and evaluates computation.
-- **Wilds:** coordinates work, relationships, propagation mechanics, causal boundaries, and history.
-- **WildsEngine.Qsl:** owns the handshake between Wilds and QSL.
+`WildsQslRequest` is the integration request envelope currently used to carry:
 
-Wilds Core therefore does not need QSL parser or evaluator internals, and QSL does not need to own Wilds processing, relationship, or temporal mechanics.
+- QSL source;
+- exact `QslConsumerBinding` instances;
+- `QslStatePackage` instances containing approved attached runtime vocabulary.
 
-The computation source is not what gives Wilds its execution identity. Wilds needs a computed result and the execution facts surrounding it; the source of that computation may remain outside Core.
+The envelope is carried through Wilds as opaque request data. Wilds Core does not need to understand `QslConsumerBinding`, `QslStatePackage`, parser details, evaluator details, or consumer gameplay types.
+
+The responsibility split is:
+
+- **Consumer:** owns game-specific meaning, objects, rules, and vocabulary.
+- **Wilds:** owns the request lifecycle, work coordination, relationships, propagation mechanics, causal boundaries, and history.
+- **QSL:** parses and evaluates the computation Wilds delegates to it.
+- **WildsEngine.Qsl:** bridges Wilds-owned work to QSL without moving QSL concepts into Wilds Core.
+
+QSL processes the valid work it is given. Propagation is a separate Wilds concern. A request may be processed locally through QSL without implying that its outcome must propagate to another participant.
+
+The canonical integration proof is the Space Dust expression:
+
+```qsl
+player.Health = player.Health - (action.Amount * (action.SpaceDustAppetite / 100))
+```
+
+In certification, `player.Health` begins at `50`, native consumer state supplies `action.Amount = 10`, attached runtime state supplies `action.SpaceDustAppetite = 87`, and QSL mutates the exact consumer-owned Player to `41.3`. Wilds then resolves that result into its Moment/Timeline/Epoch history.
 
 ## Certification boundary
 
-> **Wilds is asking:** *Which guarantees belong to the engine itself, and which depend on consumer-provided meaning?*
+**Wilds is asking:** _Which guarantees belong to the engine itself, and which depend on consumer-provided meaning?_
 
-Core certification remains separate from consumer conformance.
+The current certification is intentionally layered.
 
-The current Wilds/QSL core suite is certified at **156/156**, with zero certification failures and zero missing dependencies. The extracted consumer-conformance corpus contains 44 consumer-dependent cases.
+The Wilds/QSL core statement suite remains certified at **156/156**, with zero certification failures and zero missing dependencies. It continues to exercise the source-only QSL route as a regression gate.
 
-Neighbor testing also establishes directional topology, relationship identity, independent memberships, deterministic topology operations, exponential distance attenuation, and inclusive minimum-intensity eligibility behavior.
+The request-envelope certification separately proves that:
 
-The current relational execution boundary therefore reaches:
+- `WildsQslRequest` completes through the Wilds lifecycle;
+- native consumer state and attached runtime vocabulary compose in one QSL expression;
+- `QslConsumerBinding` retains the exact consumer-owned runtime objects;
+- `QslStatePackage` targets the exact consumer-owned object;
+- the Space Dust expression mutates `Player.Health` from `50` to `41.3` on that exact Player instance;
+- the terminal result is preserved through Moment, Timeline, and Epoch history.
 
-```text
-topology -> propagation -> eligibility
-```
+A dedicated Wilds/QSL end-to-end test additionally protects the architectural sequence: Wilds owns the active request lifecycle, QSL performs delegated work inside that lifecycle, and only after QSL returns does Wilds complete the WorkUnit and resolve the terminal Moment.
 
-The next boundary is:
+The full Release Wilds suite currently passes **50/50**. One unrelated nullable warning remains in `NeighborTraversal.cs` (`CS8604`).
 
-```text
-eligible Neighbor -> causal stimulus -> independent Pulse
-```
+The previously extracted consumer-dependent corpus should no longer be treated as evidence that QSL itself must become the consumer-facing simulation host. The certified Wilds request-envelope route now demonstrates the missing integration behavior at the intended boundary: consumer-owned objects and attached vocabulary enter through Wilds, QSL computes against them, and Wilds owns resolution and history.
 
 Runtime outcome and certification outcome remain intentionally different concepts. A certification test can correctly succeed because Wilds produced the failure or cancellation required by the contract. Certification asks whether the engine accurately represented what happened.
 
-## Consumer-facing API proposal
+## Consumer-facing API direction
 
-> **Wilds is asking:** *How can consumers provide meaning without forcing that meaning into Core?*
+**Wilds is asking:** _How can consumers provide meaning while Wilds remains the exposed surface?_
 
-The consumer-facing API remains an architectural proposal rather than a frozen contract. It should be finalized only after the engine-side relationship, propagation, causal execution, and Timeline-routing semantics are stable.
+The ownership decision is now explicit: **Wilds is the front door.** `WildsQslExecutor` and QSL remain behind that boundary as integration and computation machinery.
 
-The intended ownership boundary remains unchanged: consumer vocabulary remains consumer-owned, while Wilds provides certified engine mechanics capable of carrying that vocabulary through processing and history.
+The currently certified `WildsQslRequest` proves the request-envelope mechanics, including exact consumer bindings and attached state. It should not be interpreted as requiring consumers to construct or invoke the executor directly. Certification may instantiate integration machinery in order to prove the boundary, but that is not the intended product-facing usage model.
 
-A consumer should be able to provide its own objects, functions, capabilities, contextual values, and runtime data structures without requiring Wilds Core to redefine them as engine concepts.
+The exposed surface should preserve these rules:
 
-The art gallery should belong to the consumer.
+- consumers submit work to Wilds;
+- Wilds owns Pulse and WorkUnit creation and lifecycle transitions;
+- QSL-backed work is delegated only after Wilds has established that lifecycle;
+- QSL evaluates the source and runtime context it is given;
+- QSL results return to Wilds for WorkUnit completion and Pulse finalization;
+- propagation remains independent of whether local QSL computation occurs;
+- consumer vocabulary remains consumer-owned rather than becoming Wilds Core vocabulary.
 
-The fishing lure should belong to the consumer.
-
-The cranky miner should belong to the consumer.
-
-The simulation mechanics that allow them to matter to one another are where Wilds belongs.
+This keeps the art gallery, fishing lure, cranky miner, Player, Action, and future consumer types outside Wilds Core while still allowing their exact runtime objects and vocabulary to participate in certified processing.
 
 ## Architectural rule
 
-**Wilds owns coordination, relationships, propagation mechanics, causal execution boundaries, and history. QSL owns computation. Consumers own meaning.**
+**Wilds is the exposed surface and owns coordination, the request lifecycle, relationships, propagation mechanics, causal execution boundaries, and history. QSL owns delegated computation. Consumers own meaning.**
 
 Or, stated as the thesis of the engine:
 

@@ -59,57 +59,74 @@ Processor lifetime remains independent of registered work lifetime. Work can the
 
 ## QSL integration
 
-QSL integration lives in the companion `WildsEngine.Qsl` project rather than Wilds Core.
+Wilds is the exposed consumer surface. QSL integration lives in the companion `WildsEngine.Qsl` project rather than Wilds Core, and QSL performs delegated computation inside a Wilds-owned request lifecycle.
 
 ```text
-QSL source
-    |
-    v
-WildsQslExecutor
-    |
-    v
-WildsEngine
-    |
-    v
-  Pulse
-    |
-    v
+Consumer
+   |
+   v
+Wilds
+   |
+   v
+Pulse
+   |
+   v
 WorkUnit
-    |
-    v
-QSL computation
-    |
-    v
- Moment
-    |
-    v
-Timeline
-    |
-    v
- Epoch
+   |
+   v
+Wilds/QSL integration
+   |
+   +--> consumer bindings
+   +--> attached state packages
+   `--> QSL source
+            |
+            v
+       QSL computation
+            |
+            v
+         result
+            |
+            v
+   WorkUnit completion
+            |
+            v
+         Moment
+            |
+            v
+        Timeline
+            |
+            v
+          Epoch
 ```
 
-QSL computes. Wilds coordinates the work and preserves the resulting history. Neither core needs to absorb the other's internal implementation model.
+Wilds creates the Pulse and WorkUnit before QSL evaluates the request. QSL's result returns to Wilds, which completes the WorkUnit and resolves the Pulse into its terminal Moment.
+
+`WildsQslRequest` is the certified request envelope for QSL-backed work. It carries QSL source, exact consumer bindings, and attached state packages through Wilds as opaque request data. `WildsQslExecutor` bridges the Wilds lifecycle to `QslEngine`; it is integration machinery, not the conceptual consumer front door.
+
+QSL processes the valid source and runtime context it is given. Propagation is independent: a QSL-backed request may be processed locally without requiring its outcome to propagate.
+
+The canonical integration proof is:
+
+```qsl
+player.Health = player.Health - (action.Amount * (action.SpaceDustAppetite / 100))
+```
+
+With `player.Health = 50`, native `action.Amount = 10`, and attached `action.SpaceDustAppetite = 87`, the certified route mutates the exact consumer-owned Player to `41.3`, then records the result through Wilds history.
 
 ## Certification
 
-The current Wilds/QSL core certification contains 156 self-contained cases and is clean:
+The certification surfaces are now complementary:
 
-```text
-Total:                 156
-Passed:                156
-Failed:                  0
-Missing Dependencies:    0
-Timeline Moments:      156
-Epoch Timelines:         1
-```
+- **QSL core through Wilds:** 156/156 cases pass with zero failures and zero missing dependencies.
+- **Wilds/QSL request envelope:** passes envelope execution, exact consumer binding, attached-state composition, and the Space Dust `50 -> 41.3` mutation.
+- **Wilds/QSL end-to-end:** proves that Wilds establishes the request lifecycle, delegates QSL-backed work, receives the QSL result, then completes the WorkUnit and resolves the terminal Moment.
+- **Full Release Wilds suite:** 50/50 tests pass.
 
-Expected-error cases still produce failed Moments when failure is the correct runtime outcome. Certification success and runtime outcome are intentionally separate concepts.
+Expected-error QSL cases still produce failed Moments when failure is the correct runtime outcome. Certification success and runtime outcome remain intentionally separate concepts.
 
-The former combined corpus has been split into:
+The older consumer-dependent corpus remains useful as conformance material, but it no longer defines the architectural requirement that QSL itself be the consumer-facing simulation surface. The certified request-envelope path demonstrates that consumer-owned objects and attached vocabulary can be processed through Wilds without moving consumer concepts into Wilds Core.
 
-- **Core certification:** 156 engine-owned cases.
-- **Consumer conformance:** 44 consumer-dependent cases.
+One unrelated Release warning currently remains: `CS8604` in `NeighborTraversal.cs`.
 
 ## Neighbor topology and membership model
 
@@ -336,26 +353,20 @@ The intended invariants are:
 
 Distance propagation and minimum-intensity eligibility are implemented and tested. Causal stimulus delivery and independent Neighbor Pulse creation remain proposed behavior and are the next execution boundary to certify.
 
-## Proposed consumer API
+## Consumer-facing API direction
 
-The consumer-facing API remains deliberately thin and should be frozen only after the engine-side relationship, propagation, causal execution, and Timeline-routing semantics are stable.
+The exposed boundary is now clear even though the final convenience API can continue to evolve:
 
-```csharp
-public interface IWildsQslConsumer
-{
-    void Configure(WildsQslConsumerBuilder builder);
-}
+- **Wilds is the front door.**
+- consumers provide their objects, vocabulary, state, and rules to Wilds;
+- Wilds owns Pulse/WorkUnit creation and lifecycle resolution;
+- QSL-backed computation is delegated behind the Wilds boundary;
+- `WildsQslExecutor` is integration machinery and should not be treated as the intended consumer construction/invocation surface;
+- `WildsQslRequest` is the certified integration envelope carrying source, consumer bindings, and attached state;
+- propagation is a Wilds policy and does not gate whether QSL can process valid delegated work;
+- QSL's result returns to Wilds, where the terminal Moment and history are resolved.
 
-public sealed class WildsQslConsumerBuilder
-{
-    public WildsQslConsumerBuilder AddValue(string name, object? value);
-    public WildsQslConsumerBuilder AddDescriptor(string name, object descriptor);
-    public WildsQslConsumerBuilder AddFunction(string name, object function);
-    public WildsQslConsumerBuilder AddCapability(string name, object capability);
-}
-```
-
-**This API remains a proposal, not a certified contract.**
+Consumer vocabulary remains consumer-owned. Wilds coordinates it; QSL computes against the runtime context it is given.
 
 ## Milestones
 
@@ -413,8 +424,9 @@ Target behaviors include:
 - processors and pools remain independent of temporal-routing decisions;
 - all Timelines remain preserved by the current Epoch.
 
-### Milestone 5: Consumer API and conformance
+### Milestone 5: Wilds-facing API and conformance
 
-Once engine semantics are stable, freeze the consumer-facing integration surface and run the extracted 44-case consumer suite against it without weakening the existing 156/156 core certification baseline.
+Freeze the thin Wilds-facing convenience surface around the now-certified request-envelope boundary without exposing QSL integration machinery as the product front door. Preserve the existing 156/156 QSL core baseline, the request-envelope certification, and the Wilds/QSL end-to-end lifecycle test while determining which older consumer-dependent cases remain meaningful as Wilds-facing conformance cases.
 
-> **Wilds owns coordination, relationships, propagation mechanics, and history. QSL owns computation. The consumer owns meaning.**
+**Wilds is the exposed surface and owns coordination, the request lifecycle, relationships, propagation mechanics, and history. QSL owns delegated computation. The consumer owns meaning.**
+
