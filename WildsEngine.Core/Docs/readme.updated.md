@@ -61,7 +61,7 @@ Processor lifetime remains independent of registered work lifetime. Work can the
 
 ## QSL integration
 
-Wilds is the exposed consumer surface. QSL integration lives in the companion `WildsEngine.Qsl` project rather than Wilds Core, and QSL performs delegated computation inside a Wilds-owned request lifecycle.
+Wilds is the exposed consumer surface. QSL integration lives in the companion WildsEngine.Qsl project rather than Wilds Core, and QSL performs delegated computation inside a Wilds-owned request lifecycle.
 
 ```text
 Consumer
@@ -103,13 +103,13 @@ Wilds/QSL integration
 
 Wilds creates the Pulse and WorkUnit before QSL evaluates the request. QSL's result returns to Wilds, which completes the WorkUnit and resolves the Pulse into its terminal Moment.
 
-`WildsQslRequest` is the certified request envelope for QSL-backed work. It carries QSL source, exact consumer bindings, and attached state packages through Wilds as opaque request data. `WildsQslExecutor` bridges the Wilds lifecycle to `QslEngine`; it is integration machinery, not the conceptual consumer front door.
+WildsQslRequest is the certified request envelope for QSL-backed work. It carries QSL source, exact consumer bindings, and attached state packages through Wilds as opaque request data. WildsQslExecutor bridges the Wilds lifecycle to QslEngine; it is integration machinery, not the conceptual consumer front door.
 
 QSL processes the valid source and runtime context it is given. Propagation is independent: a QSL-backed request may be processed locally without requiring its outcome to propagate.
 
 The canonical integration proof is:
 
-```qsl
+```text
 player.Health = player.Health - (action.Amount * (action.SpaceDustAppetite / 100))
 ```
 
@@ -117,18 +117,18 @@ With `player.Health = 50`, native `action.Amount = 10`, and attached `action.Spa
 
 ## Certification
 
-The certification surfaces are now complementary:
+The certification surfaces are complementary:
 
 - **QSL core through Wilds:** 156/156 cases pass with zero failures and zero missing dependencies.
 - **Wilds/QSL request envelope:** passes envelope execution, exact consumer binding, attached-state composition, and the Space Dust `50 -> 41.3` mutation.
 - **Wilds/QSL end-to-end:** proves that Wilds establishes the request lifecycle, delegates QSL-backed work, receives the QSL result, then completes the WorkUnit and resolves the terminal Moment.
-- **Full Release Wilds suite:** 50/50 tests pass.
+- **Emission Gate 3:** certifies the complete internal emission-resolution route from consumer value through topology-derived context and supplied composition to the authoritative resolved emission scalar.
 
 Expected-error QSL cases still produce failed Moments when failure is the correct runtime outcome. Certification success and runtime outcome remain intentionally separate concepts.
 
 The older consumer-dependent corpus remains useful as conformance material, but it no longer defines the architectural requirement that QSL itself be the consumer-facing simulation surface. The certified request-envelope path demonstrates that consumer-owned objects and attached vocabulary can be processed through Wilds without moving consumer concepts into Wilds Core.
 
-One unrelated Release warning currently remains: `CS8604` in `NeighborTraversal.cs`.
+One unrelated Core warning currently remains: `CS8604` in `NeighborTraversal.cs`.
 
 ## Neighbor topology and membership model
 
@@ -136,7 +136,7 @@ Wilds objects can participate in directional Neighbor relationships.
 
 A Neighbor is not limited to an immediately adjacent object. A Neighbor is another member of a shared relational collection or topology, with distance describing proximity inside that relationship.
 
-> **Membership establishes neighborhood. Distance establishes proximity. Adjacency is the special case where distance is 1.**
+**Membership establishes neighborhood. Distance establishes proximity. Adjacency is the special case where distance is 1.**
 
 Relationship identity is defined by:
 
@@ -227,38 +227,108 @@ intensity = threshold    -> eligible
 intensity > threshold    -> eligible
 ```
 
-For example:
-
-```text
-Source A
-intensity = 1.0
-decay = 0.5
-threshold = 0.25
-
-A -> B : distance 1
-         propagated intensity ~= 0.6065
-         eligible
-
-A -> C : distance 3
-         propagated intensity ~= 0.2231
-         not eligible
-```
-
 The meaning of intensity remains consumer-owned. Wilds only provides the mechanics for carrying an abstract magnitude through relationship and propagation policies.
 
-The currently established boundary is:
+## Emission resolution
+
+Wilds now has a certified emitter model for deriving an abstract magnitude from consumer-owned data and the emitter's current relational context.
+
+Emission resolution intentionally separates four concepts:
 
 ```text
-topology
-   |
-   v
-propagation
-   |
-   v
-eligibility
+consumer-owned value
+        |
+        v
+base emission scalar
+
+current Neighbor topology
+        |
+        v
+topology operators
+        |
+        v
+topology scalar
+
+base scalar + topology scalar
+        |
+        v
+composition policy
+        |
+        v
+resolved emission scalar
 ```
 
-The subsequent transition from an eligible Neighbor into causal execution remains proposed behavior.
+The **base emission scalar** comes from consumer-owned data.
+
+The **topology scalar** comes from current Wilds relational context through the existing Neighbor operator system.
+
+The **composition policy** determines how those independent scalar inputs are combined.
+
+The **resolved emission scalar** is the authoritative output of emission resolution.
+
+For example, the current additive certification fixture proves:
+
+```text
+base emission scalar = 1.6
+topology scalar      = 2
+composition          = additive
+
+resolved emission    = 3.6
+```
+
+The value `2` is not itself the emission. It describes topology-derived context. Changing the selected topology can therefore change the resolved emission without changing the consumer-owned base value.
+
+The certified emission route reuses the existing Neighbor abstractions rather than introducing an emitter-specific topology system:
+
+```text
+Emitter.Neighbors
+       |
+       v
+INeighborSequenceOperator
+       |
+       v
+relationship snapshot
+       |
+       v
+INeighborScalarOperator<TResult>
+       |
+       v
+topology scalar
+```
+
+`NeighborPipeline` can compose topology-selection stages before scalar reduction.
+
+Composition is independently configurable through `IEmissionComposition`. `EmissionCompositionBase` supplies common finite-value invariants while a concrete composition implementation owns its mathematical semantics.
+
+Wilds therefore does not assume that composition must mean addition, multiplication, weighting, normalization, or any other specific operation.
+
+### Certified emission gates
+
+- **Gate 1 - Emitter primitive:** consumer properties and named groups resolve into finite base emission scalars while the emitter remains an ordinary Wilds object with normal Neighbor topology.
+- **Gate 2A - Topology scalar:** current topology can be selected through existing Neighbor operators and reduced into a topology-derived scalar.
+- **Gate 2B - Composition:** base and topology scalars can be combined through a supplied composition policy without hard-coding the mathematics into the emitter.
+- **Gate 3 - Complete resolved emission:** consumer value, current topology, topology scalar reduction, and composition resolve through one complete internal emission operation.
+
+Gate 3 certification proves:
+
+- unrelated memberships remain isolated;
+- membership changes immediately affect the next resolved emission;
+- missing consumer properties stop resolution cleanly;
+- existing Neighbor pipelines can define the topology used by emission;
+- emission resolution does not mutate source topology;
+- the complete certified example resolves base `1.6` and topology scalar `2` to `3.6` under the additive certification policy.
+
+Emission certification reports are written under:
+
+```text
+Certification/
+`-- Reports/
+    `-- Emission/
+        |-- emitter-certification-<timestamp>.log
+        `-- emitter-certification-latest.log
+```
+
+The next boundary is an immutable resolved-emission carrier. Propagation should consume that resolved result rather than recomputing the base or topology scalar.
 
 ## Proposed Timeline routing
 
@@ -266,107 +336,29 @@ Timeline routing follows Neighbor membership because membership may participate 
 
 A Timeline represents one contiguous run of Moments belonging to the same semantic state or processing domain.
 
-```text
-Epoch
-|
-+-- Timeline 1: status.Emotions
-|     +-- Moment: nervous
-|     +-- Moment: afraid
-|     `-- Moment: angry
-|
-+-- Timeline 2: status.Actions
-|     +-- Moment: attack
-|     +-- Moment: retreat
-|     `-- Moment: reload
-|
-`-- Timeline 3: status.Emotions
-      +-- Moment: relieved
-      `-- Moment: calm
-```
-
-The proposed routing rule is:
-
-- if an incoming request continues the active semantic state and applicable membership policy, its resulting Moment remains on the active Timeline;
-- if the semantic state or applicable membership boundary changes, Wilds creates a new Timeline in the current Epoch;
-- returning to a previous semantic state creates a new contiguous Timeline rather than reopening an older Timeline.
-
-Timeline routing occurs at the history-recording boundary. Processors and processor pools remain responsible for performing work, not organizing temporal history.
-
-Routing selects the destination Timeline; it does not redefine ordering within that Timeline. Moments committed concurrently to the same Timeline retain the Timeline's successful-commit ordering contract.
-
 This routing policy remains proposed behavior.
 
 ### Proposed Neighbor-driven Pulse propagation
 
-Established Neighbor topology, propagation, and eligibility provide the foundation for a causal boundary between independently executing Wilds objects.
+Established Neighbor topology, propagation, eligibility, and emission resolution provide the foundation for a causal boundary between independently executing Wilds objects.
 
-The next architecture boundary begins when a Neighbor has received sufficient propagated intensity to qualify for a response.
-
-An eligible Neighbor does not become additional work owned by the originating Pulse. Instead, the intended model allows that Neighbor to receive a causal stimulus and independently originate a new Pulse.
-
-```text
-Source object
-    |
-    v
-Source Pulse
-    |
-    +--> WorkUnits
-    |
-    +--> topology evaluation
-              |
-              v
-        propagation
-              |
-              v
-         eligibility
-              |
-              v
-        causal stimulus
-              |
-              v
-        Neighbor object
-              |
-              v
-        Independent Pulse
-              |
-              +--> WorkUnits
-              |
-              v
-            Moment
-              |
-              v
-           Timeline
-```
-
-The source Pulse and Neighbor Pulse therefore remain separate execution units.
-
-The intended invariants are:
-
-- a Pulse owns only its own required WorkUnits;
-- topology determines which Neighbors are candidates to receive an effect;
-- propagation determines the resulting intensity through relationship state;
-- eligibility determines whether the propagated effect qualifies for response;
-- a Neighbor decides independently whether the received causal stimulus produces work;
-- work caused inside the Neighbor belongs to a new Pulse owned by that Neighbor;
-- the originating Pulse does not wait for Neighbor work merely because it caused the Neighbor stimulus;
-- failure, cancellation, or timeout of a Neighbor Pulse does not silently change the completed outcome of its originating Pulse;
-- causal provenance may connect the resulting Pulse or Moment to the event that stimulated it without merging their execution ownership;
-- each resulting Moment is recorded into the Timeline appropriate to the object that owns the Pulse.
+An eligible Neighbor does not become additional work owned by the originating Pulse. The intended model allows that Neighbor to receive a causal stimulus and independently originate a new Pulse.
 
 **Causal provenance connects execution without merging execution ownership.**
 
-Distance propagation and minimum-intensity eligibility are implemented and tested. Causal stimulus delivery and independent Neighbor Pulse creation remain proposed behavior and are the next execution boundary to certify.
+Causal stimulus delivery and independent Neighbor Pulse creation remain proposed behavior and will be certified only after the resolved-emission handoff and receiver state boundary are stable.
 
 ## Consumer-facing API direction
 
-The exposed boundary is now clear even though the final convenience API can continue to evolve:
+The exposed boundary is clear even though the final convenience API can continue to evolve:
 
 - **Wilds is the front door.**
 - consumers provide their objects, vocabulary, state, and rules to Wilds;
 - Wilds owns Pulse/WorkUnit creation and lifecycle resolution;
+- Wilds owns relationships and emission-resolution mechanics;
 - QSL-backed computation is delegated behind the Wilds boundary;
-- `WildsQslExecutor` is integration machinery and should not be treated as the intended consumer construction/invocation surface;
-- `WildsQslRequest` is the certified integration envelope carrying source, consumer bindings, and attached state;
+- WildsQslExecutor is integration machinery and should not be treated as the intended consumer construction/invocation surface;
+- WildsQslRequest is the certified integration envelope carrying source, consumer bindings, and attached state;
 - propagation is a Wilds policy and does not gate whether QSL can process valid delegated work;
 - QSL's result returns to Wilds, where the terminal Moment and history are resolved.
 
@@ -375,6 +367,8 @@ Consumer vocabulary remains consumer-owned. Wilds coordinates it; QSL computes a
 ## Milestones
 
 ### Milestone 1: Neighbor topology and relationships
+
+**CERTIFIED**
 
 Implemented and tested:
 
@@ -388,6 +382,8 @@ Implemented and tested:
 
 ### Milestone 2: Neighbor propagation and eligibility
 
+**CERTIFIED**
+
 Implemented and tested:
 
 - propagation interprets relationship distance independently of topology;
@@ -399,9 +395,72 @@ Implemented and tested:
 - below-threshold values are rejected;
 - topology, propagation, and eligibility compose without assuming execution ownership.
 
-### Milestone 3: Independent Neighbor Pulse propagation
+### Milestone 3: Emission resolution
 
-Define and certify the causal execution boundary.
+**CERTIFIED THROUGH GATE 3**
+
+Implemented and tested:
+
+- consumer-owned values resolve into base emission scalars;
+- arbitrary Neighbor topology can produce an independent topology scalar;
+- existing Neighbor operators and pipelines are reused for topology selection;
+- topology changes immediately affect subsequent emission resolution;
+- base and topology scalars remain semantically distinct;
+- composition mathematics are supplied through `IEmissionComposition`;
+- `EmissionCompositionBase` owns shared finite-value invariants;
+- the resolved emission scalar is the authoritative output of emission resolution;
+- complete resolution preserves source topology.
+
+### Milestone 4: Resolved emission carrier
+
+**NEXT**
+
+Create and certify the immutable value that carries a resolved emission forward.
+
+Target behaviors:
+
+- exact source/emitter identity is preserved;
+- arbitrary consumer emission identity is preserved;
+- resolved scalar is finite;
+- carrier state is immutable;
+- the carrier does not own propagation behavior;
+- creating the carrier does not change Gate 3 resolution semantics.
+
+### Milestone 5: Resolved emission propagation
+
+**PLANNED**
+
+Connect the resolved-emission carrier to the already-certified Neighbor propagation and eligibility machinery.
+
+Target behaviors:
+
+- propagation consumes the resolved emission rather than recalculating it;
+- relationship distance remains topology state;
+- propagation policy remains independent of topology;
+- eligibility remains independent of attenuation;
+- source emission data remains unchanged by propagation;
+- no consumer-specific vocabulary enters Wilds Core.
+
+### Milestone 6: Receiver state boundary
+
+**PLANNED**
+
+Define the transition from an eligible propagated result into a generic consumer-owned state operation.
+
+Target behaviors:
+
+- exact receiver identity survives;
+- arbitrary state vocabulary survives;
+- resolved values survive without reinterpretation;
+- state add/update/remove semantics are explicit;
+- Wilds remains independent of consumer-specific object types;
+- QSL is not required for the Core state boundary.
+
+### Milestone 7: Independent Neighbor causal execution
+
+**PLANNED**
+
+Certify the causal execution boundary after emission, propagation, eligibility, and receiver state delivery are stable.
 
 Target behaviors include:
 
@@ -414,9 +473,11 @@ Target behaviors include:
 - resulting Moments enter the history belonging to their owning objects;
 - propagation termination is explicit and deterministic.
 
-### Milestone 4: Semantic Timeline routing
+### Milestone 8: Semantic Timeline routing
 
-Use the relationship and causal model as available inputs to temporal organization.
+**PLANNED**
+
+Use the established relationship and causal model as inputs to temporal organization.
 
 Target behaviors include:
 
@@ -428,9 +489,20 @@ Target behaviors include:
 - processors and pools remain independent of temporal-routing decisions;
 - all Timelines remain preserved by the current Epoch.
 
-### Milestone 5: Wilds-facing API and conformance
+### Milestone 9: Wilds-facing API and conformance
 
-Freeze the thin Wilds-facing convenience surface around the now-certified request-envelope boundary without exposing QSL integration machinery as the product front door. Preserve the existing 156/156 QSL core baseline, the request-envelope certification, and the Wilds/QSL end-to-end lifecycle test while determining which older consumer-dependent cases remain meaningful as Wilds-facing conformance cases.
+**PLANNED**
 
-**Wilds is the exposed surface and owns coordination, the request lifecycle, relationships, propagation mechanics, and history. QSL owns delegated computation. The consumer owns meaning.**
+Freeze the thin Wilds-facing convenience surface around the certified architecture without exposing QSL integration machinery as the product front door.
 
+Preserve:
+
+- the existing QSL core certification baseline;
+- Wilds/QSL request-envelope certification;
+- Wilds/QSL provenance continuity;
+- Wilds/QSL end-to-end lifecycle behavior;
+- runtime isolation;
+- exact consumer-object identity;
+- arbitrary runtime-attached vocabulary.
+
+**Wilds is the exposed surface and owns coordination, request lifecycle, relationships, emission resolution, propagation mechanics, and history. QSL owns delegated computation. The consumer owns meaning.**
