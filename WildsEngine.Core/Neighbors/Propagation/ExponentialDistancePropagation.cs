@@ -12,11 +12,9 @@ namespace WildsEngine.Core.Neighbors.Propagation
         public ExponentialDistancePropagation(
             double decay)
         {
-            if (decay < 0.0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(decay));
-            }
+            ValidateNonNegativeFinite(
+                decay,
+                nameof(decay));
 
             _decay =
                 decay;
@@ -32,16 +30,81 @@ namespace WildsEngine.Core.Neighbors.Propagation
                     nameof(relationship));
             }
 
-            if (intensity < 0.0)
+            ValidateNonNegativeFinite(
+                intensity,
+                nameof(intensity));
+
+            var distance =
+                relationship.Distance;
+
+            ValidateNonNegativeFinite(
+                distance,
+                nameof(relationship));
+
+            var exponent =
+                -_decay *
+                distance;
+
+            /*
+             * Very large finite decay and distance values can
+             * overflow their product to negative infinity.
+             *
+             * For non-negative decay and distance, that limit
+             * legitimately represents complete attenuation:
+             *
+             *     Exp(-Infinity) = 0
+             *
+             * NaN remains invalid and must never pass through.
+             */
+            if (double.IsNaN(
+                    exponent))
             {
-                throw new ArgumentOutOfRangeException(
-                    nameof(intensity));
+                throw new ArithmeticException(
+                    "Propagation produced an invalid exponent.");
             }
 
-            return intensity *
-                   Math.Exp(
-                       -_decay *
-                       relationship.Distance);
+            var attenuation =
+                Math.Exp(
+                    exponent);
+
+            if (double.IsNaN(
+                    attenuation) ||
+                double.IsInfinity(
+                    attenuation))
+            {
+                throw new ArithmeticException(
+                    "Propagation produced non-finite attenuation.");
+            }
+
+            var propagated =
+                intensity *
+                attenuation;
+
+            if (double.IsNaN(
+                    propagated) ||
+                double.IsInfinity(
+                    propagated))
+            {
+                throw new ArithmeticException(
+                    "Propagation produced a non-finite result.");
+            }
+
+            return propagated;
+        }
+
+        private static void ValidateNonNegativeFinite(
+            double value,
+            string parameterName)
+        {
+            if (double.IsNaN(
+                    value) ||
+                double.IsInfinity(
+                    value) ||
+                value < 0.0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    parameterName);
+            }
         }
     }
 }

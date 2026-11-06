@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using WildsEngine.Core.Abstractions;
@@ -43,7 +44,8 @@ namespace WildsEngine.Core
             IComponent component,
             WildsEngineOptions options)
         {
-            _component = component ??
+            _component =
+                component ??
                 throw new ArgumentNullException(
                     nameof(component));
 
@@ -149,14 +151,15 @@ namespace WildsEngine.Core
             _instructionRegistry.Initialize();
             _tasksRegistry.Initialize();
 
-            IsInitialized = true;
+            IsInitialized =
+                true;
 
             return true;
         }
 
         /// <summary>
         /// Executes one complete consumer request through the
-        /// certified Pulse lifecycle.
+        /// certified single-WorkUnit Pulse lifecycle.
         ///
         /// Wilds creates and correlates the Pulse and WorkUnit,
         /// owns their lifecycle transitions, finalizes the
@@ -277,6 +280,260 @@ namespace WildsEngine.Core
         }
 
         /// <summary>
+        /// Executes one complete consumer request as multiple
+        /// required internal pieces of work.
+        ///
+        /// Wilds creates and owns the Pulse, every required
+        /// WorkUnit, coordination, terminal outcome, Moment,
+        /// and temporal history.
+        ///
+        /// The result selector explicitly chooses the one
+        /// authoritative Pulse result after every required
+        /// operation has produced its subordinate result.
+        /// </summary>
+        public async ValueTask<IMoment> ExecuteAsync(
+            object? request,
+            IReadOnlyList<
+                Func<
+                    object?,
+                    CancellationToken,
+                    ValueTask<object?>>> operations,
+            Func<
+                IReadOnlyList<object?>,
+                object?> resultSelector,
+            CancellationToken cancellationToken = default)
+        {
+            ThrowIfDisposed();
+            ThrowIfNotInitialized();
+
+            if (operations == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(operations));
+            }
+
+            if (operations.Count == 0)
+            {
+                throw new ArgumentException(
+                    "At least one operation is required.",
+                    nameof(operations));
+            }
+
+            if (resultSelector == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(resultSelector));
+            }
+
+            for (var index = 0;
+                 index < operations.Count;
+                 index++)
+            {
+                if (operations[index] == null)
+                {
+                    throw new ArgumentException(
+                        "Every operation must be non-null.",
+                        nameof(operations));
+                }
+            }
+
+            var pulse =
+                new Pulse(
+                    request);
+
+            var coordinator =
+                new PulseCoordinator(
+                    pulse);
+
+            var workUnits =
+                new WorkUnit[operations.Count];
+
+            var results =
+                new object?[operations.Count];
+
+            BeginDecomposedPulse(
+                pulse,
+                workUnits,
+                coordinator,
+                request);
+
+            for (var index = 0;
+                 index < operations.Count;
+                 index++)
+            {
+                var work =
+                    workUnits[index];
+
+                try
+                {
+                    cancellationToken
+                        .ThrowIfCancellationRequested();
+
+                    if (!work.TryBeginProcessing())
+                    {
+                        throw new InvalidOperationException(
+                            "The WorkUnit could not begin processing.");
+                    }
+
+                    var result =
+                        await operations[index](
+                                request,
+                                cancellationToken)
+                            .ConfigureAwait(false);
+
+                    cancellationToken
+                        .ThrowIfCancellationRequested();
+
+                    results[index] =
+                        result;
+
+                    /*
+                     * The final WorkUnit remains Processing
+                     * until the authoritative Pulselected.
+                     *
+                     * Earlier WorkUnits may complete immediately
+                     * because their results are subordinate.
+                     */
+                    if (index <
+                        operations.Count - 1)
+                    {
+                        if (!work.TryComplete(
+                                result))
+                        {
+                            throw new InvalidOperationException(
+                                "The WorkUnit could not complete.");
+                        }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    if (!work.IsTerminal &&
+                        !work.TryCancel())
+                    {
+                        throw new InvalidOperationException(
+                            "The active WorkUnit could not be cancelled.");
+                    }
+
+                    CancelRemainingWork(
+                        workUnits,
+                        index + 1);
+
+                    var cancelledMoment =
+                        FinalizePulse(
+                            coordinator,
+                            null);
+
+                    RecordMoment(
+                        cancelledMoment);
+
+                    return cancelledMoment;
+                }
+                catch (Exception exception)
+                {
+                    if (!work.IsTerminal &&
+                        !work.TryFail(
+                            exception))
+                    {
+                        throw new InvalidOperationException(
+                            "The active WorkUnit could not record failure.",
+                            exception);
+                    }
+
+                    CancelRemainingWork(
+                        workUnits,
+                        index + 1);
+
+                    var failedMoment =
+                        FinalizePulse(
+                            coordinator,
+                            null);
+
+                    RecordMoment(
+                        failedMoment);
+
+                    return failedMoment;
+                }
+            }
+
+            var finalWork =
+                workUnits[
+                    workUnits.Length - 1];
+
+            object? finalResult;
+
+            try
+            {
+                cancellationToken
+                    .ThrowIfCancellationRequested();
+
+                finalResult =
+                    resultSelector(
+                        results);
+
+                cancellationToken
+                    .ThrowIfCancellationRequested();
+
+                if (!finalWork.TryComplete(
+                        results[
+                            results.Length - 1]))
+                {
+                    throw new InvalidOperationException(
+                        "The final WorkUnit could not complete.");
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                if (!finalWork.IsTerminal &&
+                    !finalWork.TryCancel())
+                {
+                    throw new InvalidOperationException(
+                        "The final WorkUnit could not be cancelled.");
+                }
+
+                var cancelledMoment =
+                    FinalizePulse(
+                        coordinator,
+                        null);
+
+                RecordMoment(
+                    cancelledMoment);
+
+                return cancelledMoment;
+            }
+            catch (Exception exception)
+            {
+                if (!finalWork.IsTerminal &&
+                    !finalWork.TryFail(
+                        exception))
+                {
+                    throw new InvalidOperationException(
+                        "The final WorkUnit could not record failure.",
+                        exception);
+                }
+
+                var failedMoment =
+                    FinalizePulse(
+                        coordinator,
+                        null);
+
+                RecordMoment(
+                    failedMoment);
+
+                return failedMoment;
+            }
+
+            var completedMoment =
+                FinalizePulse(
+                    coordinator,
+                    finalResult);
+
+            RecordMoment(
+                completedMoment);
+
+            return completedMoment;
+        }
+
+        /// <summary>
         /// Preserves the existing certified instruction
         /// processor lease boundary.
         /// </summary>
@@ -320,7 +577,8 @@ namespace WildsEngine.Core
             _tasksRegistry.Shutdown();
             _instructionRegistry.Shutdown();
 
-            IsInitialized = false;
+            IsInitialized =
+                false;
 
             return true;
         }
@@ -339,7 +597,8 @@ namespace WildsEngine.Core
                 _tasksRegistry.Shutdown();
                 _instructionRegistry.Shutdown();
 
-                IsInitialized = false;
+                IsInitialized =
+                    false;
             }
 
             _instructionsProcessors.Dispose();
@@ -393,6 +652,88 @@ namespace WildsEngine.Core
             {
                 throw new InvalidOperationException(
                     "The WorkUnit could not begin processing.");
+            }
+        }
+
+        private static void BeginDecomposedPulse(
+            Pulse pulse,
+            WorkUnit[] workUnits,
+            IPulseCoordinator coordinator,
+            object? request)
+        {
+            if (!pulse.TryBeginDecomposition())
+            {
+                throw new InvalidOperationException(
+                    "The Pulse could not begin decomposition.");
+            }
+
+            for (var index = 0;
+                 index < workUnits.Length;
+                 index++)
+            {
+                var work =
+                    new WorkUnit(
+                        pulse.Id,
+                        request);
+
+                workUnits[index] =
+                    work;
+
+                if (!coordinator.AddWorkUnit(
+                        work))
+                {
+                    throw new InvalidOperationException(
+                        "A WorkUnit could not be correlated " +
+                        "with its Pulse.");
+                }
+
+                if (!work.TryMarkPending())
+                {
+                    throw new InvalidOperationException(
+                        "A WorkUnit could not become pending.");
+                }
+            }
+
+            if (!pulse.TryMarkPending())
+            {
+                throw new InvalidOperationException(
+                    "The Pulse could not become pending.");
+            }
+
+            if (!pulse.TryMarkReady())
+            {
+                throw new InvalidOperationException(
+                    "The Pulse could not become ready.");
+            }
+
+            if (!pulse.TryBeginProcessing())
+            {
+                throw new InvalidOperationException(
+                    "The Pulse could not begin processing.");
+            }
+        }
+
+        private static void CancelRemainingWork(
+            WorkUnit[] workUnits,
+            int startIndex)
+        {
+            for (var index = startIndex;
+                 index < workUnits.Length;
+                 index++)
+            {
+                var work =
+                    workUnits[index];
+
+                if (work.IsTerminal)
+                {
+                    continue;
+                }
+
+                if (!work.TryCancel())
+                {
+                    throw new InvalidOperationException(
+                        "A remaining WorkUnit could not be cancelled.");
+                }
             }
         }
 

@@ -9,11 +9,9 @@ namespace WildsEngine.Core.Neighbors.Propagation
         public MinimumIntensityEligibility(
             double minimumIntensity)
         {
-            if (minimumIntensity < 0.0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(minimumIntensity));
-            }
+            ValidateIntensity(
+                minimumIntensity,
+                nameof(minimumIntensity));
 
             MinimumIntensity =
                 minimumIntensity;
@@ -24,14 +22,27 @@ namespace WildsEngine.Core.Neighbors.Propagation
         public bool IsEligible(
             double intensity)
         {
-            if (intensity < 0.0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(intensity));
-            }
+            ValidateIntensity(
+                intensity,
+                nameof(intensity));
 
             return intensity >=
                    MinimumIntensity;
+        }
+
+        private static void ValidateIntensity(
+            double value,
+            string parameterName)
+        {
+            if (double.IsNaN(
+                    value) ||
+                double.IsInfinity(
+                    value) ||
+                value < 0.0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    parameterName);
+            }
         }
     }
 }

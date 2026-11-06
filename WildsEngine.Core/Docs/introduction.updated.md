@@ -356,6 +356,14 @@ Wilds therefore preserves the distinction between **what was requested** and **w
 
 A `Timeline` collects Moments. An `Epoch` collects Timelines.
 
+#### Concurrent Timeline ordering
+
+Within a Timeline, concurrent terminal Moments are ordered by the serialization order in which they are successfully committed to that Timeline. Wilds does not guarantee request-submission order, Pulse-creation order, operation-completion order, or pre-commit finalization order across concurrent executions.
+
+This preserves one coherent historical sequence without imposing artificial execution ordering on otherwise independent concurrent requests.
+
+Timeline routing and Timeline ordering are separate concerns. Routing selects the destination Timeline. Once a destination Timeline has been chosen, successful commit determines the Moment's position within that Timeline.
+
 ```text
 request              execution             result             history
    |                     |                    |                   |

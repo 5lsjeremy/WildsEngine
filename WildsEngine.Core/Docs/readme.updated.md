@@ -13,7 +13,7 @@ BaseUnit
   |- Pulse      coordinated request
   |- WorkUnit   required work belonging to a Pulse
   |- Moment     resolved Pulse outcome
-  |- Timeline   ordered Moment history
+  |- Timeline   Moment history ordered by successful commit
   `- Epoch      collection of Timelines
 ```
 
@@ -43,6 +43,8 @@ Consumer request
 ```
 
 The route can retain arbitrary consumer runtime-object references. Wilds coordinates the work and history; it does not need to understand the concrete game type carried by the result.
+
+For concurrent executions, Timeline order is the serialized order in which terminal Moments are successfully committed. Wilds does not guarantee request-submission order, Pulse-creation order, operation-completion order, or pre-commit finalization order across concurrent requests.
 
 ## Processing infrastructure
 
@@ -289,6 +291,8 @@ The proposed routing rule is:
 - returning to a previous semantic state creates a new contiguous Timeline rather than reopening an older Timeline.
 
 Timeline routing occurs at the history-recording boundary. Processors and processor pools remain responsible for performing work, not organizing temporal history.
+
+Routing selects the destination Timeline; it does not redefine ordering within that Timeline. Moments committed concurrently to the same Timeline retain the Timeline's successful-commit ordering contract.
 
 This routing policy remains proposed behavior.
 
