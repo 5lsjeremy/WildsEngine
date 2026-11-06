@@ -1,0 +1,2290 @@
+﻿WildsEngine Neighbors Crawl
+Generated: 2026-11-06 09:48:45
+Repository: C:\Users\jmatt\source\WildsEngine
+Core: C:\Users\jmatt\source\WildsEngine\WildsEngine.Core
+Neighbors: C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\Neighbors
+
+============================================================
+NEIGHBORS TREE
+============================================================
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborFilter.cs
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborPredicate.cs
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs
+WildsEngine.Core\Neighbors\Operators\FarthestNeighborOrder.cs
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs
+WildsEngine.Core\Neighbors\Operators\NearestNeighborOrder.cs
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceAscendingComparer.cs
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceDescendingComparer.cs
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceRangeFilter.cs
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipComparer.cs
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs
+WildsEngine.Core\Neighbors\Operators\NeighborWithinDistanceFilter.cs
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs
+
+Neighbor source files: 39
+
+============================================================
+RELEVANT ABSTRACTIONS
+============================================================
+WildsEngine.Core\Abstractions\Base\IBaseObject.cs
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborComparer.cs
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborOperator.cs
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborPredicate.cs
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSequenceOperator.cs
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropagationEligibility.cs
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropogation.cs
+WildsEngine.Core\Abstractions\Topology\INeighborCluster.cs
+WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs
+WildsEngine.Core\Abstractions\Topology\INeighborPropagation.cs
+WildsEngine.Core\Abstractions\Topology\INeighborPropagationRule.cs
+WildsEngine.Core\Abstractions\Topology\INeighborRoute.cs
+WildsEngine.Core\Abstractions\Topology\INeighborRouter.cs
+WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs
+
+Relevant abstraction files: 20
+
+============================================================
+DECLARATION AND CAPABILITY INDEX
+============================================================
+
+------------------------------------------------------------
+PATTERN: class 
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborFilter.cs:3: public sealed class AdjacentNeighborFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborPredicate.cs:6: public sealed class AdjacentNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:10: public abstract class NeighborComparerBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:11: public abstract class NeighborCompositeOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:11: public abstract class NeighborFilterOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:7: /// Base class for operators that group relationships under
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:10: public abstract class NeighborGroupingOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs:11: public abstract class NeighborOperatorBase<TResult> :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs:11: public abstract class NeighborOrderOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs:9: public abstract class NeighborPredicateBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:8: /// Base class for bounded, snapshot-safe Neighbor sampling.
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:10: public abstract class NeighborSamplerBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:7: /// Base class for operators that return relationship
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:10: public abstract class NeighborSequenceOperatorBase :
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:7: public sealed class DeterministicNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:7: public sealed class DistanceRangeNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:6: public sealed class FarthestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\FarthestNeighborOrder.cs:3: public sealed class FarthestNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs:6: public sealed class FarthestNeighbors : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:6: public sealed class MaximumDistanceNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs:3: public sealed class MembershipNeighborFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs:3: public sealed class MembershipNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:6: public sealed class MembershipNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:6: public sealed class MinimumDistanceNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:6: public sealed class NearestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighborOrder.cs:3: public sealed class NearestNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs:6: public sealed class NearestNeighbors : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:6: public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceAscendingComparer.cs:5: public sealed class NeighborDistanceAscendingComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:9: public sealed class NeighborDistanceBandGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceDescendingComparer.cs:5: public sealed class NeighborDistanceDescendingComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceRangeFilter.cs:3: public sealed class NeighborDistanceRangeFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipComparer.cs:6: public sealed class NeighborMembershipComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:6: public sealed class NeighborMembershipGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:7: public sealed class NeighborPipeline : NeighborCompositeOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborWithinDistanceFilter.cs:3: public sealed class NeighborWithinDistanceFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:7: public sealed class RandomNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:7: public sealed class ExponentialDistancePropagation :
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:6: public sealed class MinimumIntensityEligibility :
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:11: public static class NeighborDistance
+
+------------------------------------------------------------
+PATTERN: interface 
+------------------------------------------------------------
+WildsEngine.Core\Abstractions\Base\IBaseObject.cs:5: public interface IBaseObject
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:6: public interface INeighborCollection
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs:10: public interface INeighborRelationship
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborComparer.cs:6: public interface INeighborComparer
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:8: public interface INeighborGroupingOperator :
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborOperator.cs:11: public interface INeighborOperator<TResult>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborPredicate.cs:7: public interface INeighborPredicate
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs:8: public interface INeighborSampler :
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs:6: public interface INeighborScalarOperator<TResult> :
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSequenceOperator.cs:8: public interface INeighborSequenceOperator :
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropagationEligibility.cs:3: public interface INeighborPropagationEligibility
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropogation.cs:3: public interface INeighborPropagation
+WildsEngine.Core\Abstractions\Topology\INeighborCluster.cs:4: public interface INeighborCluster
+WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs:4: public interface INeighborClusterer
+WildsEngine.Core\Abstractions\Topology\INeighborPropagation.cs:4: public interface INeighborPropagation<TResult>
+WildsEngine.Core\Abstractions\Topology\INeighborPropagationRule.cs:3: public interface INeighborPropagationRule<TResult>
+WildsEngine.Core\Abstractions\Topology\INeighborRoute.cs:4: public interface INeighborRoute
+WildsEngine.Core\Abstractions\Topology\INeighborRouter.cs:3: public interface INeighborRouter
+WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs:4: public interface INeighborTraversal
+
+------------------------------------------------------------
+PATTERN: abstract class 
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:10: public abstract class NeighborComparerBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:11: public abstract class NeighborCompositeOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:11: public abstract class NeighborFilterOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:10: public abstract class NeighborGroupingOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs:11: public abstract class NeighborOperatorBase<TResult> :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs:11: public abstract class NeighborOrderOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs:9: public abstract class NeighborPredicateBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:10: public abstract class NeighborSamplerBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:10: public abstract class NeighborSequenceOperatorBase :
+
+------------------------------------------------------------
+PATTERN: sealed class 
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborFilter.cs:3: public sealed class AdjacentNeighborFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborPredicate.cs:6: public sealed class AdjacentNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:7: public sealed class DeterministicNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:7: public sealed class DistanceRangeNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:6: public sealed class FarthestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\FarthestNeighborOrder.cs:3: public sealed class FarthestNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs:6: public sealed class FarthestNeighbors : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:6: public sealed class MaximumDistanceNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs:3: public sealed class MembershipNeighborFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs:3: public sealed class MembershipNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:6: public sealed class MembershipNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:6: public sealed class MinimumDistanceNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:6: public sealed class NearestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighborOrder.cs:3: public sealed class NearestNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs:6: public sealed class NearestNeighbors : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:6: public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceAscendingComparer.cs:5: public sealed class NeighborDistanceAscendingComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:9: public sealed class NeighborDistanceBandGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceDescendingComparer.cs:5: public sealed class NeighborDistanceDescendingComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceRangeFilter.cs:3: public sealed class NeighborDistanceRangeFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipComparer.cs:6: public sealed class NeighborMembershipComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:6: public sealed class NeighborMembershipGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:7: public sealed class NeighborPipeline : NeighborCompositeOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborWithinDistanceFilter.cs:3: public sealed class NeighborWithinDistanceFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:7: public sealed class RandomNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:7: public sealed class ExponentialDistancePropagation :
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:6: public sealed class MinimumIntensityEligibility :
+
+------------------------------------------------------------
+PATTERN: INeighbor
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborPredicate.cs:8: protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:8: protected override double? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:11: INeighborComparer
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:15: INeighborRelationship left,
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:16: INeighborRelationship right)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:63: INeighborRelationship left,
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:64: INeighborRelationship right);
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:14: private readonly IReadOnlyList<INeighborSequenceOperator>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:18: IReadOnlyList<INeighborSequenceOperator> operators)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:27: new INeighborSequenceOperator[operators.Count];
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:44: IReadOnlyList<INeighborRelationship> ApplyCore(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:46: IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:14: private readonly INeighborPredicate _predicate;
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:17: INeighborPredicate predicate)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:26: IReadOnlyList<INeighborRelationship> ApplyCore(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:28: IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:31: new List<INeighborRelationship>();
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:14: IReadOnlyList<INeighborRelationship>>>,
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:15: INeighborGroupingOperator
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:19: IReadOnlyList<INeighborRelationship>> Freeze(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:22: List<INeighborRelationship>> groups)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:27: IReadOnlyList<INeighborRelationship>>(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs:12: INeighborOperator<TResult>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs:16: IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs:37: IReadOnlyList<INeighborRelationship> relationships);
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs:14: private readonly INeighborComparer _comparer;
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs:17: INeighborComparer comparer)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs:26: IReadOnlyList<INeighborRelationship> ApplyCore(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs:28: IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs:31: new List<INeighborRelationship>(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs:10: INeighborPredicate
+WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs:14: INeighborRelationship relationship)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs:35: INeighborRelationship relationship);
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:12: INeighborSampler
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:31: IReadOnlyList<INeighborRelationship> ApplyCore(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:33: IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:52: protected abstract IReadOnlyList<INeighborRelationship>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:55: IReadOnlyList<INeighborRelationship> relationships,
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:12: IReadOnlyList<INeighborRelationship>>,
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:13: INeighborSequenceOperator
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:15: protected static IReadOnlyList<INeighborRelationship>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:18: return new INeighborRelationship[0];
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:21: protected static IReadOnlyList<INeighborRelationship>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:23: List<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:12: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:14: var copy = new List<INeighborRelationship>(relationships.Count);
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:20: protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:6: public sealed class FarthestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:8: protected override INeighborRelationship? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:10: INeighborRelationship? best = null;
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs:11: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs:13: var copy = new List<INeighborRelationship>(relationships.Count);
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:13: protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:8: protected override double? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:19: protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:13: protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:8: protected override double? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:6: public sealed class NearestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:8: protected override INeighborRelationship? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:10: INeighborRelationship? best = null;
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs:11: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs:13: var copy = new List<INeighborRelationship>(relationships.Count);
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:6: public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:8: protected override int ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships) => relationships.Count;
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceAscendingComparer.cs:7: protected override int CompareCore(IBaseObject subject, INeighborRelationship left, INeighborRelationship right) =>
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:18: protected override IReadOnlyDictionary<string, IReadOnlyList<INeighborRelationship>> ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:20: var groups = new Dictionary<string, List<INeighborRelationship>>(StringComparer.Ordinal);
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:28: List<INeighborRelationship> group;
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:29: if (!groups.TryGetValue(key, out group!)) { group = new List<INeighborRelationship>(); groups.Add(key, group); }
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceDescendingComparer.cs:7: protected override int CompareCore(IBaseObject subject, INeighborRelationship left, INeighborRelationship right) =>
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipComparer.cs:8: protected override int CompareCore(IBaseObject subject, INeighborRelationship left, INeighborRelationship right) =>
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:8: protected override IReadOnlyDictionary<string, IReadOnlyList<INeighborRelationship>> ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:10: var groups = new Dictionary<string, List<INeighborRelationship>>(System.StringComparer.Ordinal);
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:14: List<INeighborRelationship> group;
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:17: group = new List<INeighborRelationship>();
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:9: public NeighborPipeline(params INeighborSequenceOperator[] operators)
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:12: public NeighborPipeline(IReadOnlyList<INeighborSequenceOperator> operators)
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:11: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:13: var copy = new List<INeighborRelationship>(relationships.Count);
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:8: INeighborPropagation
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:25: INeighborRelationship relationship)
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:7: INeighborPropagationEligibility
+WildsEngine.Core\Abstractions\Base\IBaseObject.cs:11: INeighborCollection Neighbors { get; }
+WildsEngine.Core\Abstractions\Base\IBaseObject.cs:19: INeighborOperator<TResult> neighborOperator);
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:6: public interface INeighborCollection
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:10: IReadOnlyList<INeighborRelationship> Relationships { get; }
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:24: out INeighborRelationship? relationship);
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs:10: public interface INeighborRelationship
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborComparer.cs:6: public interface INeighborComparer
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborComparer.cs:10: INeighborRelationship left,
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborComparer.cs:11: INeighborRelationship right);
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:8: public interface INeighborGroupingOperator :
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:9: INeighborOperator<
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:12: IReadOnlyList<INeighborRelationship>>>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborOperator.cs:11: public interface INeighborOperator<TResult>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborOperator.cs:15: IReadOnlyList<INeighborRelationship> relationships);
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborPredicate.cs:7: public interface INeighborPredicate
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborPredicate.cs:11: INeighborRelationship relationship);
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs:8: public interface INeighborSampler :
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs:9: INeighborSequenceOperator
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs:6: public interface INeighborScalarOperator<TResult> :
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs:7: INeighborOperator<TResult>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSequenceOperator.cs:8: public interface INeighborSequenceOperator :
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSequenceOperator.cs:9: INeighborOperator<IReadOnlyList<INeighborRelationship>>
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropagationEligibility.cs:3: public interface INeighborPropagationEligibility
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropogation.cs:3: public interface INeighborPropagation
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropogation.cs:7: INeighborRelationship relationship);
+WildsEngine.Core\Abstractions\Topology\INeighborCluster.cs:4: public interface INeighborCluster
+WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs:4: public interface INeighborClusterer
+WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs:6: IReadOnlyList<INeighborCluster> FindClusters(IReadOnlyList<IBaseObject> objects, string membership);
+WildsEngine.Core\Abstractions\Topology\INeighborPropagation.cs:4: public interface INeighborPropagation<TResult>
+WildsEngine.Core\Abstractions\Topology\INeighborPropagationRule.cs:3: public interface INeighborPropagationRule<TResult>
+WildsEngine.Core\Abstractions\Topology\INeighborPropagationRule.cs:5: TResult Apply(IBaseObject origin, IBaseObject current, INeighborRelationship relationship, double accumulatedDistance);
+WildsEngine.Core\Abstractions\Topology\INeighborRoute.cs:4: public interface INeighborRoute
+WildsEngine.Core\Abstractions\Topology\INeighborRouter.cs:3: public interface INeighborRouter
+WildsEngine.Core\Abstractions\Topology\INeighborRouter.cs:5: bool TryFindRoute(IBaseObject origin, IBaseObject target, string membership, out INeighborRoute? route);
+WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs:4: public interface INeighborTraversal
+
+------------------------------------------------------------
+PATTERN: NeighborOperator
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:11: NeighborOperatorBase<
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs:11: public abstract class NeighborOperatorBase<TResult> :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs:12: INeighborOperator<TResult>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:11: NeighborOperatorBase<
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:6: public sealed class FarthestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:6: public sealed class NearestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:6: public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+WildsEngine.Core\Abstractions\Base\IBaseObject.cs:18: TResult ApplyNeighborOperator<TResult>(
+WildsEngine.Core\Abstractions\Base\IBaseObject.cs:19: INeighborOperator<TResult> neighborOperator);
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:9: INeighborOperator<
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborOperator.cs:11: public interface INeighborOperator<TResult>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs:7: INeighborOperator<TResult>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSequenceOperator.cs:9: INeighborOperator<IReadOnlyList<INeighborRelationship>>
+
+------------------------------------------------------------
+PATTERN: NeighborPipeline
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:7: public sealed class NeighborPipeline : NeighborCompositeOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:9: public NeighborPipeline(params INeighborSequenceOperator[] operators)
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:12: public NeighborPipeline(IReadOnlyList<INeighborSequenceOperator> operators)
+
+------------------------------------------------------------
+PATTERN: Membership
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:48: left.Membership,
+WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs:49: right.Membership,
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs:3: public sealed class MembershipNeighborFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs:5: public MembershipNeighborFilter(string membership) : base(new MembershipNeighborPredicate(membership)) { }
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs:3: public sealed class MembershipNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs:5: public MembershipNeighborOrder() : base(new NeighborMembershipComparer()) { }
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:6: public sealed class MembershipNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:8: private readonly string _membership;
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:10: public MembershipNeighborPredicate(string membership)
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:12: if (string.IsNullOrWhiteSpace(membership))
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:13: throw new ArgumentException("Neighbor membership cannot be empty.", nameof(membership));
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:14: _membership = membership.Trim();
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:17: public string Membership => _membership;
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:20: string.Equals(relationship.Membership, _membership, StringComparison.Ordinal);
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipComparer.cs:6: public sealed class NeighborMembershipComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipComparer.cs:9: string.Compare(left.Membership, right.Membership, StringComparison.Ordinal);
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:6: public sealed class NeighborMembershipGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:15: if (!groups.TryGetValue(r.Membership, out group!))
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:18: groups.Add(r.Membership, group);
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:14: string membership,
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:19: string membership);
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:23: string membership,
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:28: string membership,
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:33: string membership,
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:38: string membership);
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs:5: /// object to another within a shared membership.
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs:7: /// Membership establishes neighborhood.
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs:14: string Membership { get; }
+WildsEngine.Core\Abstractions\Topology\INeighborCluster.cs:6: string Membership { get; }
+WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs:6: IReadOnlyList<INeighborCluster> FindClusters(IReadOnlyList<IBaseObject> objects, string membership);
+WildsEngine.Core\Abstractions\Topology\INeighborPropagation.cs:6: IReadOnlyList<TResult> Propagate(IBaseObject origin, string membership, double maximumDistance);
+WildsEngine.Core\Abstractions\Topology\INeighborRoute.cs:6: string Membership { get; }
+WildsEngine.Core\Abstractions\Topology\INeighborRouter.cs:5: bool TryFindRoute(IBaseObject origin, IBaseObject target, string membership, out INeighborRoute? route);
+WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs:6: IReadOnlyList<IBaseObject> Traverse(IBaseObject origin, string membership, double maximumDistance);
+WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs:7: bool IsReachable(IBaseObject origin, IBaseObject target, string membership, double maximumDistance);
+
+------------------------------------------------------------
+PATTERN: Distance
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AdjacentNeighborPredicate.cs:9: NeighborDistance.IsAdjacent(relationship.Distance);
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:12: for (var i = 0; i < relationships.Count; i++) sum += relationships[i].Distance;
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:7: public sealed class DistanceRangeNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:9: public DistanceRangeNeighborPredicate(double minimumDistance, double maximumDistance)
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:11: MinimumDistance = NeighborDistance.Validate(minimumDistance, nameof(minimumDistance));
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:12: MaximumDistance = NeighborDistance.Validate(maximumDistance, nameof(maximumDistance));
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:13: if (MaximumDistance < MinimumDistance)
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:14: throw new ArgumentException("Maximum distance cannot be less than minimum distance.", nameof(maximumDistance));
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:17: public double MinimumDistance { get; }
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:18: public double MaximumDistance { get; }
+WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs:21: relationship.Distance >= MinimumDistance && relationship.Distance <= MaximumDistance;
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:11: var bestDistance = double.MinValue;
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:15: if (best == null || r.Distance > bestDistance ||
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:16: (r.Distance == bestDistance && r.Neighbor.Id.CompareTo(best.Neighbor.Id) < 0))
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:18: best = r; bestDistance = r.Distance;
+WildsEngine.Core\Neighbors\Operators\FarthestNeighborOrder.cs:5: public FarthestNeighborOrder() : base(new NeighborDistanceDescendingComparer()) { }
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs:8: private static readonly NeighborDistanceDescendingComparer Comparer = new NeighborDistanceDescendingComparer();
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:6: public sealed class MaximumDistanceNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:8: public MaximumDistanceNeighborPredicate(double maximumDistance) =>
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:9: MaximumDistance = NeighborDistance.Validate(maximumDistance, nameof(maximumDistance));
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:11: public double MaximumDistance { get; }
+WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs:14: relationship.Distance <= MaximumDistance;
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:15: if (r.Distance > value) value = r.Distance;
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:6: public sealed class MinimumDistanceNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:8: public MinimumDistanceNeighborPredicate(double minimumDistance) =>
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:9: MinimumDistance = NeighborDistance.Validate(minimumDistance, nameof(minimumDistance));
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:11: public double MinimumDistance { get; }
+WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs:14: relationship.Distance >= MinimumDistance;
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:15: if (r.Distance < value) value = r.Distance;
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:11: var bestDistance = double.MaxValue;
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:15: if (best == null || r.Distance < bestDistance ||
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:16: (r.Distance == bestDistance && r.Neighbor.Id.CompareTo(best.Neighbor.Id) < 0))
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:18: best = r; bestDistance = r.Distance;
+WildsEngine.Core\Neighbors\Operators\NearestNeighborOrder.cs:5: public NearestNeighborOrder() : base(new NeighborDistanceAscendingComparer()) { }
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs:8: private static readonly NeighborDistanceAscendingComparer Comparer = new NeighborDistanceAscendingComparer();
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceAscendingComparer.cs:5: public sealed class NeighborDistanceAscendingComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceAscendingComparer.cs:8: left.Distance.CompareTo(right.Distance);
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:9: public sealed class NeighborDistanceBandGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:11: public NeighborDistanceBandGroups(double bandSize)
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:13: BandSize = NeighborDistance.Validate(bandSize, nameof(bandSize));
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:14: if (BandSize == 0d) throw new ArgumentOutOfRangeException(nameof(bandSize), "Distance band size must be greater than zero.");
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:24: var band = Math.Floor(r.Distance / BandSize);
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceDescendingComparer.cs:5: public sealed class NeighborDistanceDescendingComparer : NeighborComparerBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceDescendingComparer.cs:8: right.Distance.CompareTo(left.Distance);
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceRangeFilter.cs:3: public sealed class NeighborDistanceRangeFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceRangeFilter.cs:5: public NeighborDistanceRangeFilter(double minimumDistance, double maximumDistance)
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceRangeFilter.cs:6: : base(new DistanceRangeNeighborPredicate(minimumDistance, maximumDistance)) { }
+WildsEngine.Core\Neighbors\Operators\NeighborWithinDistanceFilter.cs:3: public sealed class NeighborWithinDistanceFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborWithinDistanceFilter.cs:5: public NeighborWithinDistanceFilter(double maximumDistance) : base(new MaximumDistanceNeighborPredicate(maximumDistance)) { }
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:7: public sealed class ExponentialDistancePropagation :
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:12: public ExponentialDistancePropagation(
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:37: var distance =
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:38: relationship.Distance;
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:41: distance,
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:46: distance;
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:49: * Very large finite decay and distance values can
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:52: * For non-negative decay and distance, that limit
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:15: double distance);
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:26: bool SetDistance(
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:29: double distance);
+WildsEngine.Core\Abstractions\Base\INeighborCollection.cs:31: bool UpdateDistance(
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs:8: /// Distance establishes proximity.
+WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs:16: double Distance { get; }
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:6: /// Defines the canonical Wilds rules for relational distance.
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:8: /// Distance is abstract and does not imply a physical
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:11: public static class NeighborDistance
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:14: double distance)
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:17: !double.IsNaN(distance) &&
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:18: !double.IsInfinity(distance) &&
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:19: distance >= 0d;
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:23: double distance,
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:26: if (!IsValid(distance))
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:30: distance,
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:31: "Neighbor distance must be finite and non-negative.");
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:34: return distance;
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:38: double distance)
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:42: distance,
+WildsEngine.Core\Abstractions\Base\NeighborDistance.cs:43: nameof(distance)) == 1d;
+WildsEngine.Core\Abstractions\Topology\INeighborPropagation.cs:6: IReadOnlyList<TResult> Propagate(IBaseObject origin, string membership, double maximumDistance);
+WildsEngine.Core\Abstractions\Topology\INeighborPropagationRule.cs:5: TResult Apply(IBaseObject origin, IBaseObject current, INeighborRelationship relationship, double accumulatedDistance);
+WildsEngine.Core\Abstractions\Topology\INeighborRoute.cs:8: double Distance { get; }
+WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs:6: IReadOnlyList<IBaseObject> Traverse(IBaseObject origin, string membership, double maximumDistance);
+WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs:7: bool IsReachable(IBaseObject origin, IBaseObject target, string membership, double maximumDistance);
+
+------------------------------------------------------------
+PATTERN: Sample
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:10: public abstract class NeighborSamplerBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:12: INeighborSampler
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:14: protected NeighborSamplerBase(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:22: "Neighbor sample count cannot be negative.");
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:46: return SampleCore(
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:53: SampleCore(
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:7: public sealed class DeterministicNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:9: public DeterministicNeighborSample(int count, int seed) : base(count) => Seed = seed;
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:12: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs:6: public sealed class FarthestNeighbors : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs:11: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs:6: public sealed class NearestNeighbors : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs:11: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:7: public sealed class RandomNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:9: public RandomNeighborSample(int count) : base(count) { }
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:11: protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs:6: /// Selects a bounded sample from a relationship snapshot.
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs:8: public interface INeighborSampler :
+
+------------------------------------------------------------
+PATTERN: Group
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:7: /// Base class for operators that group relationships under
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:10: public abstract class NeighborGroupingOperatorBase :
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:15: INeighborGroupingOperator
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:22: List<INeighborRelationship>> groups)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:28: groups.Count,
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:31: foreach (var pair in groups)
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:9: public sealed class NeighborDistanceBandGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:11: public NeighborDistanceBandGroups(double bandSize)
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:20: var groups = new Dictionary<string, List<INeighborRelationship>>(StringComparer.Ordinal);
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:28: List<INeighborRelationship> group;
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:29: if (!groups.TryGetValue(key, out group!)) { group = new List<INeighborRelationship>(); groups.Add(key, group); }
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:30: group.Add(r);
+WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs:32: return Freeze(groups);
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:6: public sealed class NeighborMembershipGroups : NeighborGroupingOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:10: var groups = new Dictionary<string, List<INeighborRelationship>>(System.StringComparer.Ordinal);
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:14: List<INeighborRelationship> group;
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:15: if (!groups.TryGetValue(r.Membership, out group!))
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:17: group = new List<INeighborRelationship>();
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:18: groups.Add(r.Membership, group);
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:20: group.Add(r);
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:22: return Freeze(groups);
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:6: /// Groups Neighbor relationships under stable string keys.
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:8: public interface INeighborGroupingOperator :
+
+------------------------------------------------------------
+PATTERN: Cluster
+------------------------------------------------------------
+WildsEngine.Core\Abstractions\Topology\INeighborCluster.cs:4: public interface INeighborCluster
+WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs:4: public interface INeighborClusterer
+WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs:6: IReadOnlyList<INeighborCluster> FindClusters(IReadOnlyList<IBaseObject> objects, string membership);
+
+------------------------------------------------------------
+PATTERN: Scalar
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:6: public sealed class FarthestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:6: public sealed class NearestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:6: public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs:4: /// Produces one scalar value from a Neighbor snapshot.
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs:6: public interface INeighborScalarOperator<TResult> :
+
+------------------------------------------------------------
+PATTERN: Propagation
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:3: using WildsEngine.Core.Abstractions.Neighbors.Propagation;
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:5: namespace WildsEngine.Core.Neighbors.Propagation
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:7: public sealed class ExponentialDistancePropagation :
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:8: INeighborPropagation
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:12: public ExponentialDistancePropagation(
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:63: "Propagation produced an invalid exponent.");
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:76: "Propagation produced non-finite attenuation.");
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:89: "Propagation produced a non-finite result.");
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:2: using WildsEngine.Core.Abstractions.Neighbors.Propagation;
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:4: namespace WildsEngine.Core.Neighbors.Propagation
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:7: INeighborPropagationEligibility
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropagationEligibility.cs:1: namespace WildsEngine.Core.Abstractions.Neighbors.Propagation
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropagationEligibility.cs:3: public interface INeighborPropagationEligibility
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropogation.cs:1: namespace WildsEngine.Core.Abstractions.Neighbors.Propagation
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropogation.cs:3: public interface INeighborPropagation
+WildsEngine.Core\Abstractions\Topology\INeighborPropagation.cs:4: public interface INeighborPropagation<TResult>
+WildsEngine.Core\Abstractions\Topology\INeighborPropagationRule.cs:3: public interface INeighborPropagationRule<TResult>
+
+------------------------------------------------------------
+PATTERN: Eligibility
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:6: public sealed class MinimumIntensityEligibility :
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:7: INeighborPropagationEligibility
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:9: public MinimumIntensityEligibility(
+WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropagationEligibility.cs:3: public interface INeighborPropagationEligibility
+
+------------------------------------------------------------
+PATTERN: Influence
+------------------------------------------------------------
+<no matches>
+
+============================================================
+GATE 2 FOCUSED INDEX
+============================================================
+
+------------------------------------------------------------
+TYPE: MembershipNeighborFilter
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs:3: public sealed class MembershipNeighborFilter : NeighborFilterOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs:5: public MembershipNeighborFilter(string membership) : base(new MembershipNeighborPredicate(membership)) { }
+
+------------------------------------------------------------
+TYPE: MembershipNeighborPredicate
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs:5: public MembershipNeighborFilter(string membership) : base(new MembershipNeighborPredicate(membership)) { }
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:6: public sealed class MembershipNeighborPredicate : NeighborPredicateBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs:10: public MembershipNeighborPredicate(string membership)
+
+------------------------------------------------------------
+TYPE: MembershipNeighborOrder
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs:3: public sealed class MembershipNeighborOrder : NeighborOrderOperatorBase
+WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs:5: public MembershipNeighborOrder() : base(new NeighborMembershipComparer()) { }
+
+------------------------------------------------------------
+TYPE: NeighborMembershipGroups
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs:6: public sealed class NeighborMembershipGroups : NeighborGroupingOperatorBase
+
+------------------------------------------------------------
+TYPE: NeighborCount
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:6: public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+
+------------------------------------------------------------
+TYPE: AverageNeighborDistance
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+
+------------------------------------------------------------
+TYPE: MinimumNeighborDistance
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+
+------------------------------------------------------------
+TYPE: MaximumNeighborDistance
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+
+------------------------------------------------------------
+TYPE: DeterministicNeighborSample
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:7: public sealed class DeterministicNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs:9: public DeterministicNeighborSample(int count, int seed) : base(count) => Seed = seed;
+
+------------------------------------------------------------
+TYPE: RandomNeighborSample
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:7: public sealed class RandomNeighborSample : NeighborSamplerBase
+WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs:9: public RandomNeighborSample(int count) : base(count) { }
+
+------------------------------------------------------------
+TYPE: NeighborPipeline
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:7: public sealed class NeighborPipeline : NeighborCompositeOperatorBase
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:9: public NeighborPipeline(params INeighborSequenceOperator[] operators)
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:12: public NeighborPipeline(IReadOnlyList<INeighborSequenceOperator> operators)
+
+------------------------------------------------------------
+TYPE: INeighborScalarOperator
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs:6: public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs:6: public sealed class FarthestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs:6: public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs:6: public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs:6: public sealed class NearestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+WildsEngine.Core\Neighbors\Operators\NeighborCount.cs:6: public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs:6: public interface INeighborScalarOperator<TResult> :
+
+------------------------------------------------------------
+TYPE: INeighborGroupingOperator
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs:15: INeighborGroupingOperator
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs:8: public interface INeighborGroupingOperator :
+
+------------------------------------------------------------
+TYPE: INeighborSequenceOperator
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:14: private readonly IReadOnlyList<INeighborSequenceOperator>
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:18: IReadOnlyList<INeighborSequenceOperator> operators)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs:27: new INeighborSequenceOperator[operators.Count];
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs:13: INeighborSequenceOperator
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:9: public NeighborPipeline(params INeighborSequenceOperator[] operators)
+WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs:12: public NeighborPipeline(IReadOnlyList<INeighborSequenceOperator> operators)
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs:9: INeighborSequenceOperator
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSequenceOperator.cs:8: public interface INeighborSequenceOperator :
+
+------------------------------------------------------------
+TYPE: INeighborPredicate
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:14: private readonly INeighborPredicate _predicate;
+WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs:17: INeighborPredicate predicate)
+WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs:10: INeighborPredicate
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborPredicate.cs:7: public interface INeighborPredicate
+
+------------------------------------------------------------
+TYPE: INeighborSampler
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs:12: INeighborSampler
+WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs:8: public interface INeighborSampler :
+
+------------------------------------------------------------
+TYPE: ExponentialDistancePropagation
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:7: public sealed class ExponentialDistancePropagation :
+WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs:12: public ExponentialDistancePropagation(
+
+------------------------------------------------------------
+TYPE: MinimumIntensityEligibility
+------------------------------------------------------------
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:6: public sealed class MinimumIntensityEligibility :
+WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs:9: public MinimumIntensityEligibility(
+
+============================================================
+NEIGHBOR SOURCE CAPTURE
+============================================================
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\AdjacentNeighborFilter.cs
+############################################################
+    1: namespace WildsEngine.Core.Neighbors.Operators
+    2: {
+    3:     public sealed class AdjacentNeighborFilter : NeighborFilterOperatorBase
+    4:     {
+    5:         public AdjacentNeighborFilter() : base(new AdjacentNeighborPredicate()) { }
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\AdjacentNeighborPredicate.cs
+############################################################
+    1: using WildsEngine.Core.Abstractions;
+    2: using WildsEngine.Core.Topology;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class AdjacentNeighborPredicate : NeighborPredicateBase
+    7:     {
+    8:         protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+    9:             NeighborDistance.IsAdjacent(relationship.Distance);
+   10:     }
+   11: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\AverageNeighborDistance.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class AverageNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+    7:     {
+    8:         protected override double? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+    9:         {
+   10:             if (relationships.Count == 0) return null;
+   11:             var sum = 0d;
+   12:             for (var i = 0; i < relationships.Count; i++) sum += relationships[i].Distance;
+   13:             return sum / relationships.Count;
+   14:         }
+   15:     }
+   16: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborComparerBase.cs
+############################################################
+    1: using System;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     /// <summary>
+    7:     /// Supplies validation and deterministic tie handling for
+    8:     /// Neighbor relationship comparers.
+    9:     /// </summary>
+   10:     public abstract class NeighborComparerBase :
+   11:         INeighborComparer
+   12:     {
+   13:         public int Compare(
+   14:             IBaseObject subject,
+   15:             INeighborRelationship left,
+   16:             INeighborRelationship right)
+   17:         {
+   18:             if (subject == null)
+   19:             {
+   20:                 throw new ArgumentNullException(
+   21:                     nameof(subject));
+   22:             }
+   23: 
+   24:             if (left == null)
+   25:             {
+   26:                 throw new ArgumentNullException(
+   27:                     nameof(left));
+   28:             }
+   29: 
+   30:             if (right == null)
+   31:             {
+   32:                 throw new ArgumentNullException(
+   33:                     nameof(right));
+   34:             }
+   35: 
+   36:             var compared =
+   37:                 CompareCore(
+   38:                     subject,
+   39:                     left,
+   40:                     right);
+   41: 
+   42:             if (compared != 0)
+   43:             {
+   44:                 return compared;
+   45:             }
+   46: 
+   47:             compared = string.Compare(
+   48:                 left.Membership,
+   49:                 right.Membership,
+   50:                 StringComparison.Ordinal);
+   51: 
+   52:             if (compared != 0)
+   53:             {
+   54:                 return compared;
+   55:             }
+   56: 
+   57:             return left.Neighbor.Id.CompareTo(
+   58:                 right.Neighbor.Id);
+   59:         }
+   60: 
+   61:         protected abstract int CompareCore(
+   62:             IBaseObject subject,
+   63:             INeighborRelationship left,
+   64:             INeighborRelationship right);
+   65:     }
+   66: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborCompositeOperatorBase.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     /// <summary>
+    8:     /// Applies a deterministic sequence of Neighbor sequence
+    9:     /// operators. Each stage receives the prior stage snapshot.
+   10:     /// </summary>
+   11:     public abstract class NeighborCompositeOperatorBase :
+   12:         NeighborSequenceOperatorBase
+   13:     {
+   14:         private readonly IReadOnlyList<INeighborSequenceOperator>
+   15:             _operators;
+   16: 
+   17:         protected NeighborCompositeOperatorBase(
+   18:             IReadOnlyList<INeighborSequenceOperator> operators)
+   19:         {
+   20:             if (operators == null)
+   21:             {
+   22:                 throw new ArgumentNullException(
+   23:                     nameof(operators));
+   24:             }
+   25: 
+   26:             var snapshot =
+   27:                 new INeighborSequenceOperator[operators.Count];
+   28: 
+   29:             for (var index = 0;
+   30:                  index < operators.Count;
+   31:                  index++)
+   32:             {
+   33:                 snapshot[index] =
+   34:                     operators[index] ??
+   35:                     throw new ArgumentException(
+   36:                         "Neighbor operator pipelines cannot contain null stages.",
+   37:                         nameof(operators));
+   38:             }
+   39: 
+   40:             _operators = snapshot;
+   41:         }
+   42: 
+   43:         protected sealed override
+   44:             IReadOnlyList<INeighborRelationship> ApplyCore(
+   45:                 IBaseObject subject,
+   46:                 IReadOnlyList<INeighborRelationship> relationships)
+   47:         {
+   48:             var current =
+   49:                 relationships;
+   50: 
+   51:             for (var index = 0;
+   52:                  index < _operators.Count;
+   53:                  index++)
+   54:             {
+   55:                 current =
+   56:                     _operators[index].Apply(
+   57:                         subject,
+   58:                         current);
+   59:             }
+   60: 
+   61:             return current;
+   62:         }
+   63:     }
+   64: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborFilterOperatorBase.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     /// <summary>
+    8:     /// Filters a relationship snapshot through one reusable
+    9:     /// predicate while preserving source order.
+   10:     /// </summary>
+   11:     public abstract class NeighborFilterOperatorBase :
+   12:         NeighborSequenceOperatorBase
+   13:     {
+   14:         private readonly INeighborPredicate _predicate;
+   15: 
+   16:         protected NeighborFilterOperatorBase(
+   17:             INeighborPredicate predicate)
+   18:         {
+   19:             _predicate =
+   20:                 predicate ??
+   21:                 throw new ArgumentNullException(
+   22:                     nameof(predicate));
+   23:         }
+   24: 
+   25:         protected sealed override
+   26:             IReadOnlyList<INeighborRelationship> ApplyCore(
+   27:                 IBaseObject subject,
+   28:                 IReadOnlyList<INeighborRelationship> relationships)
+   29:         {
+   30:             var result =
+   31:                 new List<INeighborRelationship>();
+   32: 
+   33:             for (var index = 0;
+   34:                  index < relationships.Count;
+   35:                  index++)
+   36:             {
+   37:                 var relationship =
+   38:                     relationships[index];
+   39: 
+   40:                 if (_predicate.Includes(
+   41:                         subject,
+   42:                         relationship))
+   43:                 {
+   44:                     result.Add(
+   45:                         relationship);
+   46:                 }
+   47:             }
+   48: 
+   49:             return Snapshot(
+   50:                 result);
+   51:         }
+   52:     }
+   53: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborGroupingOperatorBase.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     /// <summary>
+    7:     /// Base class for operators that group relationships under
+    8:     /// deterministic string keys.
+    9:     /// </summary>
+   10:     public abstract class NeighborGroupingOperatorBase :
+   11:         NeighborOperatorBase<
+   12:             IReadOnlyDictionary<
+   13:                 string,
+   14:                 IReadOnlyList<INeighborRelationship>>>,
+   15:         INeighborGroupingOperator
+   16:     {
+   17:         protected static IReadOnlyDictionary<
+   18:             string,
+   19:             IReadOnlyList<INeighborRelationship>> Freeze(
+   20:                 Dictionary<
+   21:                     string,
+   22:                     List<INeighborRelationship>> groups)
+   23:         {
+   24:             var frozen =
+   25:                 new Dictionary<
+   26:                     string,
+   27:                     IReadOnlyList<INeighborRelationship>>(
+   28:                         groups.Count,
+   29:                         System.StringComparer.Ordinal);
+   30: 
+   31:             foreach (var pair in groups)
+   32:             {
+   33:                 frozen.Add(
+   34:                     pair.Key,
+   35:                     pair.Value.ToArray());
+   36:             }
+   37: 
+   38:             return frozen;
+   39:         }
+   40:     }
+   41: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborOperatorBase.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     /// <summary>
+    8:     /// Supplies argument validation and a stable execution
+    9:     /// boundary for Neighbor operators.
+   10:     /// </summary>
+   11:     public abstract class NeighborOperatorBase<TResult> :
+   12:         INeighborOperator<TResult>
+   13:     {
+   14:         public TResult Apply(
+   15:             IBaseObject subject,
+   16:             IReadOnlyList<INeighborRelationship> relationships)
+   17:         {
+   18:             if (subject == null)
+   19:             {
+   20:                 throw new ArgumentNullException(
+   21:                     nameof(subject));
+   22:             }
+   23: 
+   24:             if (relationships == null)
+   25:             {
+   26:                 throw new ArgumentNullException(
+   27:                     nameof(relationships));
+   28:             }
+   29: 
+   30:             return ApplyCore(
+   31:                 subject,
+   32:                 relationships);
+   33:         }
+   34: 
+   35:         protected abstract TResult ApplyCore(
+   36:             IBaseObject subject,
+   37:             IReadOnlyList<INeighborRelationship> relationships);
+   38:     }
+   39: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborOrderOperatorBase.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     /// <summary>
+    8:     /// Orders a copied relationship snapshot through a reusable
+    9:     /// comparer and never mutates the source sequence.
+   10:     /// </summary>
+   11:     public abstract class NeighborOrderOperatorBase :
+   12:         NeighborSequenceOperatorBase
+   13:     {
+   14:         private readonly INeighborComparer _comparer;
+   15: 
+   16:         protected NeighborOrderOperatorBase(
+   17:             INeighborComparer comparer)
+   18:         {
+   19:             _comparer =
+   20:                 comparer ??
+   21:                 throw new ArgumentNullException(
+   22:                     nameof(comparer));
+   23:         }
+   24: 
+   25:         protected sealed override
+   26:             IReadOnlyList<INeighborRelationship> ApplyCore(
+   27:                 IBaseObject subject,
+   28:                 IReadOnlyList<INeighborRelationship> relationships)
+   29:         {
+   30:             var result =
+   31:                 new List<INeighborRelationship>(
+   32:                     relationships.Count);
+   33: 
+   34:             for (var index = 0;
+   35:                  index < relationships.Count;
+   36:                  index++)
+   37:             {
+   38:                 result.Add(
+   39:                     relationships[index]);
+   40:             }
+   41: 
+   42:             result.Sort(
+   43:                 (left, right) =>
+   44:                     _comparer.Compare(
+   45:                         subject,
+   46:                         left,
+   47:                         right));
+   48: 
+   49:             return Snapshot(
+   50:                 result);
+   51:         }
+   52:     }
+   53: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborPredicateBase.cs
+############################################################
+    1: using System;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     /// <summary>
+    7:     /// Supplies validation for reusable Neighbor predicates.
+    8:     /// </summary>
+    9:     public abstract class NeighborPredicateBase :
+   10:         INeighborPredicate
+   11:     {
+   12:         public bool Includes(
+   13:             IBaseObject subject,
+   14:             INeighborRelationship relationship)
+   15:         {
+   16:             if (subject == null)
+   17:             {
+   18:                 throw new ArgumentNullException(
+   19:                     nameof(subject));
+   20:             }
+   21: 
+   22:             if (relationship == null)
+   23:             {
+   24:                 throw new ArgumentNullException(
+   25:                     nameof(relationship));
+   26:             }
+   27: 
+   28:             return IncludesCore(
+   29:                 subject,
+   30:                 relationship);
+   31:         }
+   32: 
+   33:         protected abstract bool IncludesCore(
+   34:             IBaseObject subject,
+   35:             INeighborRelationship relationship);
+   36:     }
+   37: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborSamplerBase.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     /// <summary>
+    8:     /// Base class for bounded, snapshot-safe Neighbor sampling.
+    9:     /// </summary>
+   10:     public abstract class NeighborSamplerBase :
+   11:         NeighborSequenceOperatorBase,
+   12:         INeighborSampler
+   13:     {
+   14:         protected NeighborSamplerBase(
+   15:             int count)
+   16:         {
+   17:             if (count < 0)
+   18:             {
+   19:                 throw new ArgumentOutOfRangeException(
+   20:                     nameof(count),
+   21:                     count,
+   22:                     "Neighbor sample count cannot be negative.");
+   23:             }
+   24: 
+   25:             Count = count;
+   26:         }
+   27: 
+   28:         public int Count { get; }
+   29: 
+   30:         protected sealed override
+   31:             IReadOnlyList<INeighborRelationship> ApplyCore(
+   32:                 IBaseObject subject,
+   33:                 IReadOnlyList<INeighborRelationship> relationships)
+   34:         {
+   35:             if (Count == 0 ||
+   36:                 relationships.Count == 0)
+   37:             {
+   38:                 return Empty();
+   39:             }
+   40: 
+   41:             var boundedCount =
+   42:                 Math.Min(
+   43:                     Count,
+   44:                     relationships.Count);
+   45: 
+   46:             return SampleCore(
+   47:                 subject,
+   48:                 relationships,
+   49:                 boundedCount);
+   50:         }
+   51: 
+   52:         protected abstract IReadOnlyList<INeighborRelationship>
+   53:             SampleCore(
+   54:                 IBaseObject subject,
+   55:                 IReadOnlyList<INeighborRelationship> relationships,
+   56:                 int count);
+   57:     }
+   58: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\Base\NeighborSequenceOperatorBase.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     /// <summary>
+    7:     /// Base class for operators that return relationship
+    8:     /// sequences without mutating the source snapshot.
+    9:     /// </summary>
+   10:     public abstract class NeighborSequenceOperatorBase :
+   11:         NeighborOperatorBase<
+   12:             IReadOnlyList<INeighborRelationship>>,
+   13:         INeighborSequenceOperator
+   14:     {
+   15:         protected static IReadOnlyList<INeighborRelationship>
+   16:             Empty()
+   17:         {
+   18:             return new INeighborRelationship[0];
+   19:         }
+   20: 
+   21:         protected static IReadOnlyList<INeighborRelationship>
+   22:             Snapshot(
+   23:                 List<INeighborRelationship> relationships)
+   24:         {
+   25:             return relationships.ToArray();
+   26:         }
+   27:     }
+   28: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\DeterministicNeighborSample.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     public sealed class DeterministicNeighborSample : NeighborSamplerBase
+    8:     {
+    9:         public DeterministicNeighborSample(int count, int seed) : base(count) => Seed = seed;
+   10:         public int Seed { get; }
+   11: 
+   12:         protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+   13:         {
+   14:             var copy = new List<INeighborRelationship>(relationships.Count);
+   15:             for (var i = 0; i < relationships.Count; i++) copy.Add(relationships[i]);
+   16:             var random = new Random(Seed);
+   17:             for (var i = copy.Count - 1; i > 0; i--)
+   18:             {
+   19:                 var j = random.Next(i + 1);
+   20:                 var temp = copy[i]; copy[i] = copy[j]; copy[j] = temp;
+   21:             }
+   22:             if (copy.Count > count) copy.RemoveRange(count, copy.Count - count);
+   23:             return copy.ToArray();
+   24:         }
+   25:     }
+   26: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\DistanceRangeNeighborPredicate.cs
+############################################################
+    1: using System;
+    2: using WildsEngine.Core.Abstractions;
+    3: using WildsEngine.Core.Topology;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     public sealed class DistanceRangeNeighborPredicate : NeighborPredicateBase
+    8:     {
+    9:         public DistanceRangeNeighborPredicate(double minimumDistance, double maximumDistance)
+   10:         {
+   11:             MinimumDistance = NeighborDistance.Validate(minimumDistance, nameof(minimumDistance));
+   12:             MaximumDistance = NeighborDistance.Validate(maximumDistance, nameof(maximumDistance));
+   13:             if (MaximumDistance < MinimumDistance)
+   14:                 throw new ArgumentException("Maximum distance cannot be less than minimum distance.", nameof(maximumDistance));
+   15:         }
+   16: 
+   17:         public double MinimumDistance { get; }
+   18:         public double MaximumDistance { get; }
+   19: 
+   20:         protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+   21:             relationship.Distance >= MinimumDistance && relationship.Distance <= MaximumDistance;
+   22:     }
+   23: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\FarthestNeighbor.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class FarthestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+    7:     {
+    8:         protected override INeighborRelationship? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+    9:         {
+   10:             INeighborRelationship? best = null;
+   11:             var bestDistance = double.MinValue;
+   12:             for (var i = 0; i < relationships.Count; i++)
+   13:             {
+   14:                 var r = relationships[i];
+   15:                 if (best == null || r.Distance > bestDistance ||
+   16:                     (r.Distance == bestDistance && r.Neighbor.Id.CompareTo(best.Neighbor.Id) < 0))
+   17:                 {
+   18:                     best = r; bestDistance = r.Distance;
+   19:                 }
+   20:             }
+   21:             return best;
+   22:         }
+   23:     }
+   24: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\FarthestNeighborOrder.cs
+############################################################
+    1: namespace WildsEngine.Core.Neighbors.Operators
+    2: {
+    3:     public sealed class FarthestNeighborOrder : NeighborOrderOperatorBase
+    4:     {
+    5:         public FarthestNeighborOrder() : base(new NeighborDistanceDescendingComparer()) { }
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\FarthestNeighbors.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class FarthestNeighbors : NeighborSamplerBase
+    7:     {
+    8:         private static readonly NeighborDistanceDescendingComparer Comparer = new NeighborDistanceDescendingComparer();
+    9:         public FarthestNeighbors(int count) : base(count) { }
+   10: 
+   11:         protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+   12:         {
+   13:             var copy = new List<INeighborRelationship>(relationships.Count);
+   14:             for (var i = 0; i < relationships.Count; i++) copy.Add(relationships[i]);
+   15:             copy.Sort((a, b) => Comparer.Compare(subject, a, b));
+   16:             if (copy.Count > count) copy.RemoveRange(count, copy.Count - count);
+   17:             return copy.ToArray();
+   18:         }
+   19:     }
+   20: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\MaximumDistanceNeighborPredicate.cs
+############################################################
+    1: using WildsEngine.Core.Abstractions;
+    2: using WildsEngine.Core.Topology;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class MaximumDistanceNeighborPredicate : NeighborPredicateBase
+    7:     {
+    8:         public MaximumDistanceNeighborPredicate(double maximumDistance) =>
+    9:             MaximumDistance = NeighborDistance.Validate(maximumDistance, nameof(maximumDistance));
+   10: 
+   11:         public double MaximumDistance { get; }
+   12: 
+   13:         protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+   14:             relationship.Distance <= MaximumDistance;
+   15:     }
+   16: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\MaximumNeighborDistance.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class MaximumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+    7:     {
+    8:         protected override double? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+    9:         {
+   10:             if (relationships.Count == 0) return null;
+   11:             var value = double.MinValue;
+   12:             for (var i = 0; i < relationships.Count; i++)
+   13:             {
+   14:                 var r = relationships[i];
+   15:                 if (r.Distance > value) value = r.Distance;
+   16:             }
+   17:             return value;
+   18:         }
+   19:     }
+   20: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\MembershipNeighborFilter.cs
+############################################################
+    1: namespace WildsEngine.Core.Neighbors.Operators
+    2: {
+    3:     public sealed class MembershipNeighborFilter : NeighborFilterOperatorBase
+    4:     {
+    5:         public MembershipNeighborFilter(string membership) : base(new MembershipNeighborPredicate(membership)) { }
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\MembershipNeighborOrder.cs
+############################################################
+    1: namespace WildsEngine.Core.Neighbors.Operators
+    2: {
+    3:     public sealed class MembershipNeighborOrder : NeighborOrderOperatorBase
+    4:     {
+    5:         public MembershipNeighborOrder() : base(new NeighborMembershipComparer()) { }
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\MembershipNeighborPredicate.cs
+############################################################
+    1: using System;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class MembershipNeighborPredicate : NeighborPredicateBase
+    7:     {
+    8:         private readonly string _membership;
+    9: 
+   10:         public MembershipNeighborPredicate(string membership)
+   11:         {
+   12:             if (string.IsNullOrWhiteSpace(membership))
+   13:                 throw new ArgumentException("Neighbor membership cannot be empty.", nameof(membership));
+   14:             _membership = membership.Trim();
+   15:         }
+   16: 
+   17:         public string Membership => _membership;
+   18: 
+   19:         protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+   20:             string.Equals(relationship.Membership, _membership, StringComparison.Ordinal);
+   21:     }
+   22: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\MinimumDistanceNeighborPredicate.cs
+############################################################
+    1: using WildsEngine.Core.Abstractions;
+    2: using WildsEngine.Core.Topology;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class MinimumDistanceNeighborPredicate : NeighborPredicateBase
+    7:     {
+    8:         public MinimumDistanceNeighborPredicate(double minimumDistance) =>
+    9:             MinimumDistance = NeighborDistance.Validate(minimumDistance, nameof(minimumDistance));
+   10: 
+   11:         public double MinimumDistance { get; }
+   12: 
+   13:         protected override bool IncludesCore(IBaseObject subject, INeighborRelationship relationship) =>
+   14:             relationship.Distance >= MinimumDistance;
+   15:     }
+   16: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\MinimumNeighborDistance.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class MinimumNeighborDistance : NeighborOperatorBase<double?>, INeighborScalarOperator<double?>
+    7:     {
+    8:         protected override double? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+    9:         {
+   10:             if (relationships.Count == 0) return null;
+   11:             var value = double.MaxValue;
+   12:             for (var i = 0; i < relationships.Count; i++)
+   13:             {
+   14:                 var r = relationships[i];
+   15:                 if (r.Distance < value) value = r.Distance;
+   16:             }
+   17:             return value;
+   18:         }
+   19:     }
+   20: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NearestNeighbor.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class NearestNeighbor : NeighborOperatorBase<INeighborRelationship?>, INeighborScalarOperator<INeighborRelationship?>
+    7:     {
+    8:         protected override INeighborRelationship? ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+    9:         {
+   10:             INeighborRelationship? best = null;
+   11:             var bestDistance = double.MaxValue;
+   12:             for (var i = 0; i < relationships.Count; i++)
+   13:             {
+   14:                 var r = relationships[i];
+   15:                 if (best == null || r.Distance < bestDistance ||
+   16:                     (r.Distance == bestDistance && r.Neighbor.Id.CompareTo(best.Neighbor.Id) < 0))
+   17:                 {
+   18:                     best = r; bestDistance = r.Distance;
+   19:                 }
+   20:             }
+   21:             return best;
+   22:         }
+   23:     }
+   24: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NearestNeighborOrder.cs
+############################################################
+    1: namespace WildsEngine.Core.Neighbors.Operators
+    2: {
+    3:     public sealed class NearestNeighborOrder : NeighborOrderOperatorBase
+    4:     {
+    5:         public NearestNeighborOrder() : base(new NeighborDistanceAscendingComparer()) { }
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NearestNeighbors.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class NearestNeighbors : NeighborSamplerBase
+    7:     {
+    8:         private static readonly NeighborDistanceAscendingComparer Comparer = new NeighborDistanceAscendingComparer();
+    9:         public NearestNeighbors(int count) : base(count) { }
+   10: 
+   11:         protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+   12:         {
+   13:             var copy = new List<INeighborRelationship>(relationships.Count);
+   14:             for (var i = 0; i < relationships.Count; i++) copy.Add(relationships[i]);
+   15:             copy.Sort((a, b) => Comparer.Compare(subject, a, b));
+   16:             if (copy.Count > count) copy.RemoveRange(count, copy.Count - count);
+   17:             return copy.ToArray();
+   18:         }
+   19:     }
+   20: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborCount.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class NeighborCount : NeighborOperatorBase<int>, INeighborScalarOperator<int>
+    7:     {
+    8:         protected override int ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships) => relationships.Count;
+    9:     }
+   10: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborDistanceAscendingComparer.cs
+############################################################
+    1: using WildsEngine.Core.Abstractions;
+    2: 
+    3: namespace WildsEngine.Core.Neighbors.Operators
+    4: {
+    5:     public sealed class NeighborDistanceAscendingComparer : NeighborComparerBase
+    6:     {
+    7:         protected override int CompareCore(IBaseObject subject, INeighborRelationship left, INeighborRelationship right) =>
+    8:             left.Distance.CompareTo(right.Distance);
+    9:     }
+   10: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborDistanceBandGroups.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using System.Globalization;
+    4: using WildsEngine.Core.Abstractions;
+    5: using WildsEngine.Core.Topology;
+    6: 
+    7: namespace WildsEngine.Core.Neighbors.Operators
+    8: {
+    9:     public sealed class NeighborDistanceBandGroups : NeighborGroupingOperatorBase
+   10:     {
+   11:         public NeighborDistanceBandGroups(double bandSize)
+   12:         {
+   13:             BandSize = NeighborDistance.Validate(bandSize, nameof(bandSize));
+   14:             if (BandSize == 0d) throw new ArgumentOutOfRangeException(nameof(bandSize), "Distance band size must be greater than zero.");
+   15:         }
+   16:         public double BandSize { get; }
+   17: 
+   18:         protected override IReadOnlyDictionary<string, IReadOnlyList<INeighborRelationship>> ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+   19:         {
+   20:             var groups = new Dictionary<string, List<INeighborRelationship>>(StringComparer.Ordinal);
+   21:             for (var i = 0; i < relationships.Count; i++)
+   22:             {
+   23:                 var r = relationships[i];
+   24:                 var band = Math.Floor(r.Distance / BandSize);
+   25:                 var min = band * BandSize;
+   26:                 var max = min + BandSize;
+   27:                 var key = min.ToString("R", CultureInfo.InvariantCulture) + ".." + max.ToString("R", CultureInfo.InvariantCulture);
+   28:                 List<INeighborRelationship> group;
+   29:                 if (!groups.TryGetValue(key, out group!)) { group = new List<INeighborRelationship>(); groups.Add(key, group); }
+   30:                 group.Add(r);
+   31:             }
+   32:             return Freeze(groups);
+   33:         }
+   34:     }
+   35: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborDistanceDescendingComparer.cs
+############################################################
+    1: using WildsEngine.Core.Abstractions;
+    2: 
+    3: namespace WildsEngine.Core.Neighbors.Operators
+    4: {
+    5:     public sealed class NeighborDistanceDescendingComparer : NeighborComparerBase
+    6:     {
+    7:         protected override int CompareCore(IBaseObject subject, INeighborRelationship left, INeighborRelationship right) =>
+    8:             right.Distance.CompareTo(left.Distance);
+    9:     }
+   10: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborDistanceRangeFilter.cs
+############################################################
+    1: namespace WildsEngine.Core.Neighbors.Operators
+    2: {
+    3:     public sealed class NeighborDistanceRangeFilter : NeighborFilterOperatorBase
+    4:     {
+    5:         public NeighborDistanceRangeFilter(double minimumDistance, double maximumDistance)
+    6:             : base(new DistanceRangeNeighborPredicate(minimumDistance, maximumDistance)) { }
+    7:     }
+    8: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborMembershipComparer.cs
+############################################################
+    1: using System;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class NeighborMembershipComparer : NeighborComparerBase
+    7:     {
+    8:         protected override int CompareCore(IBaseObject subject, INeighborRelationship left, INeighborRelationship right) =>
+    9:             string.Compare(left.Membership, right.Membership, StringComparison.Ordinal);
+   10:     }
+   11: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborMembershipGroups.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Operators
+    5: {
+    6:     public sealed class NeighborMembershipGroups : NeighborGroupingOperatorBase
+    7:     {
+    8:         protected override IReadOnlyDictionary<string, IReadOnlyList<INeighborRelationship>> ApplyCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships)
+    9:         {
+   10:             var groups = new Dictionary<string, List<INeighborRelationship>>(System.StringComparer.Ordinal);
+   11:             for (var i = 0; i < relationships.Count; i++)
+   12:             {
+   13:                 var r = relationships[i];
+   14:                 List<INeighborRelationship> group;
+   15:                 if (!groups.TryGetValue(r.Membership, out group!))
+   16:                 {
+   17:                     group = new List<INeighborRelationship>();
+   18:                     groups.Add(r.Membership, group);
+   19:                 }
+   20:                 group.Add(r);
+   21:             }
+   22:             return Freeze(groups);
+   23:         }
+   24:     }
+   25: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborPipeline.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     public sealed class NeighborPipeline : NeighborCompositeOperatorBase
+    8:     {
+    9:         public NeighborPipeline(params INeighborSequenceOperator[] operators)
+   10:             : base(operators ?? throw new ArgumentNullException(nameof(operators))) { }
+   11: 
+   12:         public NeighborPipeline(IReadOnlyList<INeighborSequenceOperator> operators)
+   13:             : base(operators) { }
+   14:     }
+   15: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\NeighborWithinDistanceFilter.cs
+############################################################
+    1: namespace WildsEngine.Core.Neighbors.Operators
+    2: {
+    3:     public sealed class NeighborWithinDistanceFilter : NeighborFilterOperatorBase
+    4:     {
+    5:         public NeighborWithinDistanceFilter(double maximumDistance) : base(new MaximumDistanceNeighborPredicate(maximumDistance)) { }
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Operators\RandomNeighborSample.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Operators
+    6: {
+    7:     public sealed class RandomNeighborSample : NeighborSamplerBase
+    8:     {
+    9:         public RandomNeighborSample(int count) : base(count) { }
+   10: 
+   11:         protected override IReadOnlyList<INeighborRelationship> SampleCore(IBaseObject subject, IReadOnlyList<INeighborRelationship> relationships, int count)
+   12:         {
+   13:             var copy = new List<INeighborRelationship>(relationships.Count);
+   14:             for (var i = 0; i < relationships.Count; i++) copy.Add(relationships[i]);
+   15:             var random = new Random();
+   16:             for (var i = copy.Count - 1; i > 0; i--)
+   17:             {
+   18:                 var j = random.Next(i + 1);
+   19:                 var temp = copy[i]; copy[i] = copy[j]; copy[j] = temp;
+   20:             }
+   21:             if (copy.Count > count) copy.RemoveRange(count, copy.Count - count);
+   22:             return copy.ToArray();
+   23:         }
+   24:     }
+   25: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Propagation\ExponentialDistancePropagation.cs
+############################################################
+    1: using System;
+    2: using WildsEngine.Core.Abstractions;
+    3: using WildsEngine.Core.Abstractions.Neighbors.Propagation;
+    4: 
+    5: namespace WildsEngine.Core.Neighbors.Propagation
+    6: {
+    7:     public sealed class ExponentialDistancePropagation :
+    8:         INeighborPropagation
+    9:     {
+   10:         private readonly double _decay;
+   11: 
+   12:         public ExponentialDistancePropagation(
+   13:             double decay)
+   14:         {
+   15:             ValidateNonNegativeFinite(
+   16:                 decay,
+   17:                 nameof(decay));
+   18: 
+   19:             _decay =
+   20:                 decay;
+   21:         }
+   22: 
+   23:         public double Propagate(
+   24:             double intensity,
+   25:             INeighborRelationship relationship)
+   26:         {
+   27:             if (relationship == null)
+   28:             {
+   29:                 throw new ArgumentNullException(
+   30:                     nameof(relationship));
+   31:             }
+   32: 
+   33:             ValidateNonNegativeFinite(
+   34:                 intensity,
+   35:                 nameof(intensity));
+   36: 
+   37:             var distance =
+   38:                 relationship.Distance;
+   39: 
+   40:             ValidateNonNegativeFinite(
+   41:                 distance,
+   42:                 nameof(relationship));
+   43: 
+   44:             var exponent =
+   45:                 -_decay *
+   46:                 distance;
+   47: 
+   48:             /*
+   49:              * Very large finite decay and distance values can
+   50:              * overflow their product to negative infinity.
+   51:              *
+   52:              * For non-negative decay and distance, that limit
+   53:              * legitimately represents complete attenuation:
+   54:              *
+   55:              *     Exp(-Infinity) = 0
+   56:              *
+   57:              * NaN remains invalid and must never pass through.
+   58:              */
+   59:             if (double.IsNaN(
+   60:                     exponent))
+   61:             {
+   62:                 throw new ArithmeticException(
+   63:                     "Propagation produced an invalid exponent.");
+   64:             }
+   65: 
+   66:             var attenuation =
+   67:                 Math.Exp(
+   68:                     exponent);
+   69: 
+   70:             if (double.IsNaN(
+   71:                     attenuation) ||
+   72:                 double.IsInfinity(
+   73:                     attenuation))
+   74:             {
+   75:                 throw new ArithmeticException(
+   76:                     "Propagation produced non-finite attenuation.");
+   77:             }
+   78: 
+   79:             var propagated =
+   80:                 intensity *
+   81:                 attenuation;
+   82: 
+   83:             if (double.IsNaN(
+   84:                     propagated) ||
+   85:                 double.IsInfinity(
+   86:                     propagated))
+   87:             {
+   88:                 throw new ArithmeticException(
+   89:                     "Propagation produced a non-finite result.");
+   90:             }
+   91: 
+   92:             return propagated;
+   93:         }
+   94: 
+   95:         private static void ValidateNonNegativeFinite(
+   96:             double value,
+   97:             string parameterName)
+   98:         {
+   99:             if (double.IsNaN(
+  100:                     value) ||
+  101:                 double.IsInfinity(
+  102:                     value) ||
+  103:                 value < 0.0)
+  104:             {
+  105:                 throw new ArgumentOutOfRangeException(
+  106:                     parameterName);
+  107:             }
+  108:         }
+  109:     }
+  110: }
+
+############################################################
+FILE: WildsEngine.Core\Neighbors\Propagation\MinimumIntensityEligibility.cs
+############################################################
+    1: using System;
+    2: using WildsEngine.Core.Abstractions.Neighbors.Propagation;
+    3: 
+    4: namespace WildsEngine.Core.Neighbors.Propagation
+    5: {
+    6:     public sealed class MinimumIntensityEligibility :
+    7:         INeighborPropagationEligibility
+    8:     {
+    9:         public MinimumIntensityEligibility(
+   10:             double minimumIntensity)
+   11:         {
+   12:             ValidateIntensity(
+   13:                 minimumIntensity,
+   14:                 nameof(minimumIntensity));
+   15: 
+   16:             MinimumIntensity =
+   17:                 minimumIntensity;
+   18:         }
+   19: 
+   20:         public double MinimumIntensity { get; }
+   21: 
+   22:         public bool IsEligible(
+   23:             double intensity)
+   24:         {
+   25:             ValidateIntensity(
+   26:                 intensity,
+   27:                 nameof(intensity));
+   28: 
+   29:             return intensity >=
+   30:                    MinimumIntensity;
+   31:         }
+   32: 
+   33:         private static void ValidateIntensity(
+   34:             double value,
+   35:             string parameterName)
+   36:         {
+   37:             if (double.IsNaN(
+   38:                     value) ||
+   39:                 double.IsInfinity(
+   40:                     value) ||
+   41:                 value < 0.0)
+   42:             {
+   43:                 throw new ArgumentOutOfRangeException(
+   44:                     parameterName);
+   45:             }
+   46:         }
+   47:     }
+   48: }
+
+============================================================
+NEIGHBOR AND TOPOLOGY ABSTRACTION SOURCE CAPTURE
+============================================================
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Base\IBaseObject.cs
+############################################################
+    1: using System;
+    2: 
+    3: namespace WildsEngine.Core.Abstractions
+    4: {
+    5:     public interface IBaseObject
+    6:     {
+    7:         Guid Id { get; }
+    8: 
+    9:         string Slug { get; }
+   10: 
+   11:         INeighborCollection Neighbors { get; }
+   12: 
+   13:         IComponent Component { get; }
+   14: 
+   15:         string AppendSlug(
+   16:             string value);
+   17: 
+   18:         TResult ApplyNeighborOperator<TResult>(
+   19:             INeighborOperator<TResult> neighborOperator);
+   20:     }
+   21: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Base\INeighborCollection.cs
+############################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: 
+    4: namespace WildsEngine.Core.Abstractions
+    5: {
+    6:     public interface INeighborCollection
+    7:     {
+    8:         int Count { get; }
+    9: 
+   10:         IReadOnlyList<INeighborRelationship> Relationships { get; }
+   11: 
+   12:         bool Add(
+   13:             IBaseObject neighbor,
+   14:             string membership,
+   15:             double distance);
+   16: 
+   17:         bool Contains(
+   18:             Guid neighborId,
+   19:             string membership);
+   20: 
+   21:         bool TryGet(
+   22:             Guid neighborId,
+   23:             string membership,
+   24:             out INeighborRelationship? relationship);
+   25: 
+   26:         bool SetDistance(
+   27:             Guid neighborId,
+   28:             string membership,
+   29:             double distance);
+   30: 
+   31:         bool UpdateDistance(
+   32:             Guid neighborId,
+   33:             string membership,
+   34:             Func<double, double> update);
+   35: 
+   36:         bool Remove(
+   37:             Guid neighborId,
+   38:             string membership);
+   39: 
+   40:         int Remove(
+   41:             Guid neighborId);
+   42: 
+   43:         void Clear();
+   44:     }
+   45: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Base\INeighborRelationship.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions
+    2: {
+    3:     /// <summary>
+    4:     /// Describes a directional relationship from one Wilds
+    5:     /// object to another within a shared membership.
+    6:     ///
+    7:     /// Membership establishes neighborhood.
+    8:     /// Distance establishes proximity.
+    9:     /// </summary>
+   10:     public interface INeighborRelationship
+   11:     {
+   12:         IBaseObject Neighbor { get; }
+   13: 
+   14:         string Membership { get; }
+   15: 
+   16:         double Distance { get; }
+   17:     }
+   18: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Base\NeighborDistance.cs
+############################################################
+    1: using System;
+    2: 
+    3: namespace WildsEngine.Core.Topology
+    4: {
+    5:     /// <summary>
+    6:     /// Defines the canonical Wilds rules for relational distance.
+    7:     ///
+    8:     /// Distance is abstract and does not imply a physical
+    9:     /// unit of measurement.
+   10:     /// </summary>
+   11:     public static class NeighborDistance
+   12:     {
+   13:         public static bool IsValid(
+   14:             double distance)
+   15:         {
+   16:             return
+   17:                 !double.IsNaN(distance) &&
+   18:                 !double.IsInfinity(distance) &&
+   19:                 distance >= 0d;
+   20:         }
+   21: 
+   22:         public static double Validate(
+   23:             double distance,
+   24:             string parameterName)
+   25:         {
+   26:             if (!IsValid(distance))
+   27:             {
+   28:                 throw new ArgumentOutOfRangeException(
+   29:                     parameterName,
+   30:                     distance,
+   31:                     "Neighbor distance must be finite and non-negative.");
+   32:             }
+   33: 
+   34:             return distance;
+   35:         }
+   36: 
+   37:         public static bool IsAdjacent(
+   38:             double distance)
+   39:         {
+   40:             return
+   41:                 Validate(
+   42:                     distance,
+   43:                     nameof(distance)) == 1d;
+   44:         }
+   45:     }
+   46: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborComparer.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions
+    2: {
+    3:     /// <summary>
+    4:     /// Compares two relationships for deterministic ordering.
+    5:     /// </summary>
+    6:     public interface INeighborComparer
+    7:     {
+    8:         int Compare(
+    9:             IBaseObject subject,
+   10:             INeighborRelationship left,
+   11:             INeighborRelationship right);
+   12:     }
+   13: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborGroupingOperator.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: 
+    3: namespace WildsEngine.Core.Abstractions
+    4: {
+    5:     /// <summary>
+    6:     /// Groups Neighbor relationships under stable string keys.
+    7:     /// </summary>
+    8:     public interface INeighborGroupingOperator :
+    9:         INeighborOperator<
+   10:             IReadOnlyDictionary<
+   11:                 string,
+   12:                 IReadOnlyList<INeighborRelationship>>>
+   13:     {
+   14:     }
+   15: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborOperator.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: 
+    3: namespace WildsEngine.Core.Abstractions
+    4: {
+    5:     /// <summary>
+    6:     /// Observes or transforms a snapshot of Neighbor
+    7:     /// relationships belonging to a Wilds object.
+    8:     ///
+    9:     /// Operators do not own or mutate the source collection.
+   10:     /// </summary>
+   11:     public interface INeighborOperator<TResult>
+   12:     {
+   13:         TResult Apply(
+   14:             IBaseObject subject,
+   15:             IReadOnlyList<INeighborRelationship> relationships);
+   16:     }
+   17: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborPredicate.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions
+    2: {
+    3:     /// <summary>
+    4:     /// Determines whether a relationship belongs in an
+    5:     /// operator result.
+    6:     /// </summary>
+    7:     public interface INeighborPredicate
+    8:     {
+    9:         bool Includes(
+   10:             IBaseObject subject,
+   11:             INeighborRelationship relationship);
+   12:     }
+   13: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSampler.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: 
+    3: namespace WildsEngine.Core.Abstractions
+    4: {
+    5:     /// <summary>
+    6:     /// Selects a bounded sample from a relationship snapshot.
+    7:     /// </summary>
+    8:     public interface INeighborSampler :
+    9:         INeighborSequenceOperator
+   10:     {
+   11:         int Count { get; }
+   12:     }
+   13: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborScalarOperator.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions
+    2: {
+    3:     /// <summary>
+    4:     /// Produces one scalar value from a Neighbor snapshot.
+    5:     /// </summary>
+    6:     public interface INeighborScalarOperator<TResult> :
+    7:         INeighborOperator<TResult>
+    8:     {
+    9:     }
+   10: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Operators\INeighborSequenceOperator.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: 
+    3: namespace WildsEngine.Core.Abstractions
+    4: {
+    5:     /// <summary>
+    6:     /// Produces an ordered or filtered relationship sequence.
+    7:     /// </summary>
+    8:     public interface INeighborSequenceOperator :
+    9:         INeighborOperator<IReadOnlyList<INeighborRelationship>>
+   10:     {
+   11:     }
+   12: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropagationEligibility.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions.Neighbors.Propagation
+    2: {
+    3:     public interface INeighborPropagationEligibility
+    4:     {
+    5:         bool IsEligible(
+    6:             double intensity);
+    7:     }
+    8: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Neighbors\Propagation\INeighborPropogation.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions.Neighbors.Propagation
+    2: {
+    3:     public interface INeighborPropagation
+    4:     {
+    5:         double Propagate(
+    6:             double intensity,
+    7:             INeighborRelationship relationship);
+    8:     }
+    9: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Topology\INeighborCluster.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: namespace WildsEngine.Core.Abstractions
+    3: {
+    4:     public interface INeighborCluster
+    5:     {
+    6:         string Membership { get; }
+    7:         IReadOnlyList<IBaseObject> Members { get; }
+    8:     }
+    9: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Topology\INeighborClusterer.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: namespace WildsEngine.Core.Abstractions
+    3: {
+    4:     public interface INeighborClusterer
+    5:     {
+    6:         IReadOnlyList<INeighborCluster> FindClusters(IReadOnlyList<IBaseObject> objects, string membership);
+    7:     }
+    8: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Topology\INeighborPropagation.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: namespace WildsEngine.Core.Abstractions
+    3: {
+    4:     public interface INeighborPropagation<TResult>
+    5:     {
+    6:         IReadOnlyList<TResult> Propagate(IBaseObject origin, string membership, double maximumDistance);
+    7:     }
+    8: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Topology\INeighborPropagationRule.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions
+    2: {
+    3:     public interface INeighborPropagationRule<TResult>
+    4:     {
+    5:         TResult Apply(IBaseObject origin, IBaseObject current, INeighborRelationship relationship, double accumulatedDistance);
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Topology\INeighborRoute.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: namespace WildsEngine.Core.Abstractions
+    3: {
+    4:     public interface INeighborRoute
+    5:     {
+    6:         string Membership { get; }
+    7:         IReadOnlyList<IBaseObject> Nodes { get; }
+    8:         double Distance { get; }
+    9:         int Hops { get; }
+   10:     }
+   11: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Topology\INeighborRouter.cs
+############################################################
+    1: namespace WildsEngine.Core.Abstractions
+    2: {
+    3:     public interface INeighborRouter
+    4:     {
+    5:         bool TryFindRoute(IBaseObject origin, IBaseObject target, string membership, out INeighborRoute? route);
+    6:     }
+    7: }
+
+############################################################
+FILE: WildsEngine.Core\Abstractions\Topology\INeighborTraversal.cs
+############################################################
+    1: using System.Collections.Generic;
+    2: namespace WildsEngine.Core.Abstractions
+    3: {
+    4:     public interface INeighborTraversal
+    5:     {
+    6:         IReadOnlyList<IBaseObject> Traverse(IBaseObject origin, string membership, double maximumDistance);
+    7:         bool IsReachable(IBaseObject origin, IBaseObject target, string membership, double maximumDistance);
+    8:     }
+    9: }

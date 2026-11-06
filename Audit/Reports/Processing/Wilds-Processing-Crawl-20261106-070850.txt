@@ -1,0 +1,1840 @@
+============================================================
+ WildsEngine.Core Processing Crawl
+============================================================
+Root: C:\Users\jmatt\source\WildsEngine
+Core: C:\Users\jmatt\source\WildsEngine\WildsEngine.Core
+Processing: C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\Processing
+Generated: 2026-11-06 07:08:50
+Processing files: 23
+Relevant abstraction files: 0
+Signal files: 0
+============================================================
+
+PROCESSING TREE
+============================================================
+Folder PATH listing
+Volume serial number is 1264-B3C4
+C:\USERS\JMATT\SOURCE\WILDSENGINE\WILDSENGINE.CORE\PROCESSING
++---Base
+|       ContextVariableInstructionBase.cs
+|       InstructionsRegistryBase.cs
+|       ProcessorBase.cs
+|       RegistryBase.cs
+|       StateInstructionBase.cs
+|       TaskBase.cs
+|       TaskBusBase.cs
+|       TaskRegistryBase.cs
+|       
++---Benchmarks
+|       ProcessorPoolingBenchmark.cs
+|       ProcessorPoolingBenchmarkResult.cs
+|       
++---Bus
+|       TaskBus.cs
+|       
++---Coordinator
+|       PulseCoordinator.cs
+|       
++---Instructions
+|       AddNeighborInstruction.cs
+|       RemoveNeighborInstruction.cs
+|       SetComponentMetadataInstruction.cs
+|       SetContextVariableInstruction.cs
+|       SetNeighborDistanceInstruction.cs
+|       
++---Processor
+|       InstructionsProcessor.cs
+|       TaskProcessor.cs
+|       
++---Registry
+|       DefaultInstructionsRegistry.cs
+|       DefaultTasksRegistry.cs
+|       
++---Signals
+|       WildsSignal.cs
+|       
+\---Tasks
+        SetContextVariable.cs
+        
+
+PROCESSING FILE INVENTORY
+============================================================
+Base\ContextVariableInstructionBase.cs
+Base\InstructionsRegistryBase.cs
+Base\ProcessorBase.cs
+Base\RegistryBase.cs
+Base\StateInstructionBase.cs
+Base\TaskBase.cs
+Base\TaskBusBase.cs
+Base\TaskRegistryBase.cs
+Benchmarks\ProcessorPoolingBenchmark.cs
+Benchmarks\ProcessorPoolingBenchmarkResult.cs
+Bus\TaskBus.cs
+Coordinator\PulseCoordinator.cs
+Instructions\AddNeighborInstruction.cs
+Instructions\RemoveNeighborInstruction.cs
+Instructions\SetComponentMetadataInstruction.cs
+Instructions\SetContextVariableInstruction.cs
+Instructions\SetNeighborDistanceInstruction.cs
+Processor\InstructionsProcessor.cs
+Processor\TaskProcessor.cs
+Registry\DefaultInstructionsRegistry.cs
+Registry\DefaultTasksRegistry.cs
+Signals\WildsSignal.cs
+Tasks\SetContextVariable.cs
+
+PROCESSING SOURCE
+============================================================
+
+############################################################
+# FILE: Base\ContextVariableInstructionBase.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class ContextVariableInstructionBase :
+        StateInstructionBase,
+        ISetContextVariableInstruction
+    {
+        protected ContextVariableInstructionBase(
+            string intent,
+            string key,
+            object? value)
+            : base(
+                intent,
+                value)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Context variable key cannot be empty.",
+                    nameof(key));
+            }
+
+            Key = key.Trim();
+            Value = value;
+
+            SetArgument(
+                "key",
+                Key);
+
+            SetArgument(
+                "value",
+                Value);
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+    }
+}
+
+############################################################
+# FILE: Base\InstructionsRegistryBase.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class InstructionsRegistryBase :
+        RegistryBase<IStateInstruction>,
+        IInstructionsRegistry
+    {
+        protected InstructionsRegistryBase(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer,
+                instruction => instruction.Id)
+        {
+        }
+    }
+}
+
+############################################################
+# FILE: Base\ProcessorBase.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class ProcessorBase :
+        BaseObject,
+        IResettablePoolObject
+    {
+        private readonly IComponent _component;
+
+        protected ProcessorBase(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component ??
+                         throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+
+        public bool TryReset()
+        {
+            return OnReset();
+        }
+
+        protected virtual bool OnReset()
+        {
+            return true;
+        }
+    }
+}
+
+############################################################
+# FILE: Base\RegistryBase.cs
+############################################################
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class RegistryBase<T> :
+        BaseObject,
+        IRegistry<T>
+        where T : class
+    {
+        private readonly ConcurrentDictionary<Guid, T> _items =
+            new ConcurrentDictionary<Guid, T>();
+
+        private readonly IComponent _component;
+        private readonly Func<T, Guid> _identity;
+
+        protected RegistryBase(
+            IComponent component,
+            string layer,
+            Func<T, Guid> identity)
+            : base(layer)
+        {
+            _component = component ??
+                throw new ArgumentNullException(
+                    nameof(component));
+
+            _identity = identity ??
+                throw new ArgumentNullException(
+                    nameof(identity));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+
+        public int Count =>
+            _items.Count;
+
+        public IReadOnlyCollection<T> Items =>
+            _items.Values.ToArray();
+
+        public bool Register(T item)
+        {
+            if (item == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(item));
+            }
+
+            var id =
+                _identity(item);
+
+            if (id == Guid.Empty)
+                return false;
+
+            return _items.TryAdd(
+                id,
+                item);
+        }
+
+        public bool Contains(Guid id)
+        {
+            if (id == Guid.Empty)
+                return false;
+
+            return _items.ContainsKey(
+                id);
+        }
+
+        public T? Get(Guid id)
+        {
+            if (id == Guid.Empty)
+                return null;
+
+            return _items.TryGetValue(
+                id,
+                out var item)
+                    ? item
+                    : null;
+        }
+
+        public bool TryGet(
+            Guid id,
+            out T? item)
+        {
+            if (id == Guid.Empty)
+            {
+                item = null;
+
+                return false;
+            }
+
+            return _items.TryGetValue(
+                id,
+                out item);
+        }
+
+        public bool Remove(Guid id)
+        {
+            if (id == Guid.Empty)
+                return false;
+
+            return _items.TryRemove(
+                id,
+                out _);
+        }
+
+        public void Clear()
+        {
+            _items.Clear();
+        }
+
+        public bool IsInitialized { get; private set; }
+
+        public bool Initialize()
+        {
+            if (IsInitialized)
+                return false;
+
+            OnInitialize();
+
+            IsInitialized = true;
+
+            return true;
+        }
+
+        public bool Shutdown()
+        {
+            if (!IsInitialized)
+                return false;
+
+            OnShutdown();
+
+            IsInitialized = false;
+
+            return true;
+        }
+
+        protected abstract void OnInitialize();
+
+        protected abstract void OnShutdown();
+    }
+}
+
+############################################################
+# FILE: Base\StateInstructionBase.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class StateInstructionBase :
+        IStateInstruction
+    {
+        private readonly Dictionary<string, object?> _arguments;
+        private readonly Dictionary<string, object?> _metadata;
+
+        protected StateInstructionBase(
+            string intent,
+            object? payload = null,
+            IEnumerable<KeyValuePair<string, object?>>? arguments = null,
+            IEnumerable<KeyValuePair<string, object?>>? metadata = null)
+        {
+            if (string.IsNullOrWhiteSpace(intent))
+            {
+                throw new ArgumentException(
+                    "Instruction intent cannot be empty.",
+                    nameof(intent));
+            }
+
+            Id = Guid.NewGuid();
+            Intent = intent;
+            Payload = payload;
+
+            _arguments = CreateDictionary(arguments);
+            _metadata = CreateDictionary(metadata);
+        }
+
+        public Guid Id { get; }
+
+        public string Intent { get; }
+
+        public object? Payload { get; }
+
+        public IReadOnlyDictionary<string, object?> Arguments =>
+            _arguments;
+
+        public IReadOnlyDictionary<string, object?> Metadata =>
+            _metadata;
+
+        protected void SetArgument(
+            string key,
+            object? value)
+        {
+            ValidateKey(key, nameof(key));
+
+            _arguments[key] = value;
+        }
+
+        protected void SetMetadata(
+            string key,
+            object? value)
+        {
+            ValidateKey(key, nameof(key));
+
+            _metadata[key] = value;
+        }
+
+        protected bool RemoveArgument(string key)
+        {
+            ValidateKey(key, nameof(key));
+
+            return _arguments.Remove(key);
+        }
+
+        protected bool RemoveMetadata(string key)
+        {
+            ValidateKey(key, nameof(key));
+
+            return _metadata.Remove(key);
+        }
+
+        private static Dictionary<string, object?> CreateDictionary(
+            IEnumerable<KeyValuePair<string, object?>>? source)
+        {
+            var result =
+                new Dictionary<string, object?>();
+
+            if (source == null)
+            {
+                return result;
+            }
+
+            foreach (var pair in source)
+            {
+                ValidateKey(pair.Key, nameof(source));
+
+                result[pair.Key] = pair.Value;
+            }
+
+            return result;
+        }
+
+        private static void ValidateKey(
+            string key,
+            string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Instruction keys cannot be empty.",
+                    parameterName);
+            }
+        }
+    }
+}
+
+############################################################
+# FILE: Base\TaskBase.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class TaskBase :
+        BaseObject,
+        ITask
+    {
+        private readonly IComponent _component;
+
+        protected TaskBase(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component ??
+                         throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+    }
+}
+
+############################################################
+# FILE: Base\TaskBusBase.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Processing
+{
+    public abstract class TaskBusBase :
+        BaseObject,
+        ITaskBus
+    {
+        private readonly IComponent _component;
+
+        protected TaskBusBase(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        protected TaskBusBase(
+            Guid id,
+            IComponent component,
+            string layer)
+            : base(
+                id,
+                layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+
+        public bool Dispatch(ITask task)
+        {
+            if (task == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(task));
+            }
+
+            return DispatchTaskCore(task);
+        }
+
+        public bool Dispatch(ISignal signal)
+        {
+            if (signal == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(signal));
+            }
+
+            return DispatchSignalCore(signal);
+        }
+
+        protected abstract bool DispatchTaskCore(
+            ITask task);
+
+        protected abstract bool DispatchSignalCore(
+            ISignal signal);
+    }
+}
+
+############################################################
+# FILE: Base\TaskRegistryBase.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    /// <summary>
+    /// Base implementation for task registries.
+    /// </summary>
+    public abstract class TaskRegistryBase :
+        RegistryBase<ITask>,
+        ITaskRegistry
+    {
+        protected TaskRegistryBase(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer,
+                task => task.Id)
+        {
+        }
+    }
+}
+
+############################################################
+# FILE: Benchmarks\ProcessorPoolingBenchmark.cs
+############################################################
+using System;
+using System.Diagnostics;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Pooling;
+using WildsEngine.Core.Processing.Processor;
+
+namespace WildsEngine.Benchmarks
+{
+    /// <summary>
+    /// Compares direct TaskProcessor allocation against
+    /// pooled TaskProcessor leasing.
+    /// </summary>
+    public sealed class ProcessorPoolingBenchmark
+    {
+        private readonly IComponent _component;
+        private readonly ITaskRegistry _registry;
+
+        public ProcessorPoolingBenchmark(
+            IComponent component,
+            ITaskRegistry registry)
+        {
+            _component = component ??
+                throw new ArgumentNullException(
+                    nameof(component));
+
+            _registry = registry ??
+                throw new ArgumentNullException(
+                    nameof(registry));
+        }
+
+        public ProcessorPoolingBenchmarkResult Run(
+            int iterations,
+            int maximumRetained = 64,
+            int maximumConcurrent = 64)
+        {
+            if (iterations <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(iterations));
+            }
+
+            if (maximumRetained < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(maximumRetained));
+            }
+
+            if (maximumConcurrent <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(maximumConcurrent));
+            }
+
+            WarmUp();
+
+            var allocationMeasurementAvailable =
+                IsAllocationMeasurementAvailable();
+
+            var directAllocatedBytesBefore =
+                GetAllocatedBytes();
+
+            var directWatch =
+                Stopwatch.StartNew();
+
+            for (var i = 0; i < iterations; i++)
+            {
+                var processor =
+                    new TaskProcessor(
+                        _component,
+                        "benchmark.direct",
+                        _registry);
+
+                Consume(
+                    processor);
+            }
+
+            directWatch.Stop();
+
+            var directAllocatedBytes =
+                allocationMeasurementAvailable
+                    ? GetAllocatedBytes() -
+                      directAllocatedBytesBefore
+                    : 0;
+
+            using (var pool =
+                new ObjectPool<ITaskProcessor>(
+                    factory: () =>
+                        new TaskProcessor(
+                            _component,
+                            "benchmark.pooled",
+                            _registry),
+                    maximumRetained:
+                        maximumRetained,
+                    maximumConcurrent:
+                        maximumConcurrent))
+            {
+                var pooledAllocatedBytesBefore =
+                    GetAllocatedBytes();
+
+                var pooledWatch =
+                    Stopwatch.StartNew();
+
+                for (var i = 0; i < iterations; i++)
+                {
+                    using (var lease = pool.Rent())
+                    {
+                        Consume(
+                            lease.Instance);
+                    }
+                }
+
+                pooledWatch.Stop();
+
+                var pooledAllocatedBytes =
+                    allocationMeasurementAvailable
+                        ? GetAllocatedBytes() -
+                          pooledAllocatedBytesBefore
+                        : 0;
+
+                return new ProcessorPoolingBenchmarkResult(
+                    iterations,
+                    directWatch.Elapsed,
+                    pooledWatch.Elapsed,
+                    directAllocatedBytes,
+                    pooledAllocatedBytes,
+                    pool.CreatedCount,
+                    allocationMeasurementAvailable);
+            }
+        }
+
+        private void WarmUp()
+        {
+            for (var i = 0; i < 128; i++)
+            {
+                var processor =
+                    new TaskProcessor(
+                        _component,
+                        "benchmark.warmup",
+                        _registry);
+
+                Consume(
+                    processor);
+            }
+        }
+
+        private static bool IsAllocationMeasurementAvailable()
+        {
+#if NETSTANDARD2_1
+            return true;
+#else
+            return false;
+#endif
+        }
+
+        private static long GetAllocatedBytes()
+        {
+#if NETSTANDARD2_1
+            return GC.GetAllocatedBytesForCurrentThread();
+#else
+            return 0;
+#endif
+        }
+
+        private static void Consume(
+            ITaskProcessor processor)
+        {
+            if (processor == null)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+    }
+}
+
+############################################################
+# FILE: Benchmarks\ProcessorPoolingBenchmarkResult.cs
+############################################################
+using System;
+
+namespace WildsEngine.Benchmarks
+{
+    /// <summary>
+    /// Contains the results of a processor pooling benchmark.
+    /// </summary>
+    public sealed class ProcessorPoolingBenchmarkResult
+    {
+        public ProcessorPoolingBenchmarkResult(
+            int iterations,
+            TimeSpan directDuration,
+            TimeSpan pooledDuration,
+            long directAllocatedBytes,
+            long pooledAllocatedBytes,
+            int pooledInstancesCreated,
+            bool allocationMeasurementAvailable)
+        {
+            Iterations = iterations;
+            DirectDuration = directDuration;
+            PooledDuration = pooledDuration;
+            DirectAllocatedBytes =
+                directAllocatedBytes;
+            PooledAllocatedBytes =
+                pooledAllocatedBytes;
+            PooledInstancesCreated =
+                pooledInstancesCreated;
+            AllocationMeasurementAvailable =
+                allocationMeasurementAvailable;
+        }
+
+        public int Iterations { get; }
+
+        public TimeSpan DirectDuration { get; }
+
+        public TimeSpan PooledDuration { get; }
+
+        public long DirectAllocatedBytes { get; }
+
+        public long PooledAllocatedBytes { get; }
+
+        public int PooledInstancesCreated { get; }
+
+        public bool AllocationMeasurementAvailable { get; }
+
+        public override string ToString()
+        {
+            var allocations =
+                AllocationMeasurementAvailable
+                    ? $"Direct allocation: {DirectAllocatedBytes} bytes{Environment.NewLine}" +
+                      $"Pooled allocation: {PooledAllocatedBytes} bytes{Environment.NewLine}"
+                    : $"Allocation measurement: unavailable{Environment.NewLine}";
+
+            return
+                $"Iterations: {Iterations}{Environment.NewLine}" +
+                $"Direct duration: {DirectDuration.TotalMilliseconds:F3} ms{Environment.NewLine}" +
+                $"Pooled duration: {PooledDuration.TotalMilliseconds:F3} ms{Environment.NewLine}" +
+                allocations +
+                $"Pooled processors created: {PooledInstancesCreated}";
+        }
+    }
+}
+
+############################################################
+# FILE: Bus\TaskBus.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing.Bus
+{
+    public sealed class TaskBus :
+        TaskBusBase
+    {
+        public TaskBus(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer)
+        {
+        }
+
+        protected override bool DispatchTaskCore(
+            ITask task)
+        {
+            return false;
+        }
+
+        protected override bool DispatchSignalCore(
+            ISignal signal)
+        {
+            return false;
+        }
+    }
+}
+
+############################################################
+# FILE: Coordinator\PulseCoordinator.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Units;
+
+namespace WildsEngine.Core.Processing.Coordinator
+{
+    /// <summary>
+    /// Coordinates all required WorkUnits for one Pulse.
+    ///
+    /// The coordinator prevents early completion and records
+    /// successful, failed, and cancelled Pulse outcomes.
+    /// </summary>
+    public sealed class PulseCoordinator :
+        IPulseCoordinator
+    {
+        private readonly object _sync =
+            new object();
+
+        private readonly List<IWorkUnit> _workUnits =
+            new List<IWorkUnit>();
+
+        private readonly HashSet<Guid> _workUnitIds =
+            new HashSet<Guid>();
+
+        public PulseCoordinator(
+            IPulse pulse)
+        {
+            Pulse = pulse ??
+                throw new ArgumentNullException(
+                    nameof(pulse));
+        }
+
+        public IPulse Pulse { get; }
+
+        public int WorkUnitCount
+        {
+            get
+            {
+                lock (_sync)
+                {
+                    return _workUnits.Count;
+                }
+            }
+        }
+
+        public IReadOnlyList<IWorkUnit> WorkUnits
+        {
+            get
+            {
+                lock (_sync)
+                {
+                    return _workUnits.ToArray();
+                }
+            }
+        }
+
+        public bool CanResolve
+        {
+            get
+            {
+                lock (_sync)
+                {
+                    return CanResolveCore();
+                }
+            }
+        }
+
+        public bool CanFinalize
+        {
+            get
+            {
+                lock (_sync)
+                {
+                    return CanFinalizeCore();
+                }
+            }
+        }
+
+        public bool AddWorkUnit(
+            IWorkUnit workUnit)
+        {
+            if (workUnit == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(workUnit));
+            }
+
+            if (workUnit.PulseId != Pulse.Id)
+            {
+                return false;
+            }
+
+            lock (_sync)
+            {
+                if (Pulse.IsTerminal)
+                {
+                    return false;
+                }
+
+                if (!_workUnitIds.Add(
+                        workUnit.Id))
+                {
+                    return false;
+                }
+
+                _workUnits.Add(
+                    workUnit);
+
+                return true;
+            }
+        }
+
+        public bool TryResolve(
+            object? result,
+            out IMoment? moment)
+        {
+            lock (_sync)
+            {
+                moment = null;
+
+                if (!CanResolveCore())
+                {
+                    return false;
+                }
+
+                return TryCreateCompletedMoment(
+                    result,
+                    out moment);
+            }
+        }
+
+        public bool TryFinalize(
+            object? result,
+            out IMoment? moment)
+        {
+            lock (_sync)
+            {
+                moment = null;
+
+                if (!CanFinalizeCore())
+                {
+                    return false;
+                }
+
+                var failedWork =
+                    GetFirstFailedWorkUnit();
+
+                if (failedWork != null)
+                {
+                    return TryCreateFailedMoment(
+                        failedWork,
+                        out moment);
+                }
+
+                if (ContainsCancelledWorkUnit())
+                {
+                    return TryCreateCancelledMoment(
+                        out moment);
+                }
+
+                return TryCreateCompletedMoment(
+                    result,
+                    out moment);
+            }
+        }
+
+        private bool TryCreateCompletedMoment(
+            object? result,
+            out IMoment? moment)
+        {
+            moment = null;
+
+            if (!CanResolveCore())
+            {
+                return false;
+            }
+
+            if (!Pulse.TryComplete())
+            {
+                return false;
+            }
+
+            moment =
+                new Moment(
+                    Pulse.Id,
+                    MomentOutcome.Completed,
+                    result,
+                    null,
+                    GetWorkUnitIds());
+
+            return true;
+        }
+
+        private bool TryCreateFailedMoment(
+            IWorkUnit failedWork,
+            out IMoment? moment)
+        {
+            moment = null;
+
+            var exception =
+                failedWork.Exception;
+
+            if (exception == null)
+            {
+                return false;
+            }
+
+            if (!Pulse.TryFail())
+            {
+                return false;
+            }
+
+            moment =
+                new Moment(
+                    Pulse.Id,
+                    MomentOutcome.Failed,
+                    null,
+                    exception,
+                    GetWorkUnitIds());
+
+            return true;
+        }
+
+        private bool TryCreateCancelledMoment(
+            out IMoment? moment)
+        {
+            moment = null;
+
+            if (!Pulse.TryCancel())
+            {
+                return false;
+            }
+
+            moment =
+                new Moment(
+                    Pulse.Id,
+                    MomentOutcome.Cancelled,
+                    null,
+                    null,
+                    GetWorkUnitIds());
+
+            return true;
+        }
+
+        private bool CanResolveCore()
+        {
+            if (Pulse.Status !=
+                PulseStatus.Processing)
+            {
+                return false;
+            }
+
+            if (_workUnits.Count == 0)
+            {
+                return false;
+            }
+
+            for (
+                var index = 0;
+                index < _workUnits.Count;
+                index++)
+            {
+                if (_workUnits[index].Status !=
+                    WorkUnitStatus.Completed)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool CanFinalizeCore()
+        {
+            if (Pulse.Status !=
+                PulseStatus.Processing)
+            {
+                return false;
+            }
+
+            if (_workUnits.Count == 0)
+            {
+                return false;
+            }
+
+            for (
+                var index = 0;
+                index < _workUnits.Count;
+                index++)
+            {
+                if (!_workUnits[index].IsTerminal)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private IWorkUnit? GetFirstFailedWorkUnit()
+        {
+            for (
+                var index = 0;
+                index < _workUnits.Count;
+                index++)
+            {
+                var workUnit =
+                    _workUnits[index];
+
+                if (workUnit.Status ==
+                    WorkUnitStatus.Failed)
+                {
+                    return workUnit;
+                }
+            }
+
+            return null;
+        }
+
+        private bool ContainsCancelledWorkUnit()
+        {
+            for (
+                var index = 0;
+                index < _workUnits.Count;
+                index++)
+            {
+                if (_workUnits[index].Status ==
+                    WorkUnitStatus.Cancelled)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private Guid[] GetWorkUnitIds()
+        {
+            return _workUnits
+                .Select(
+                    workUnit =>
+                        workUnit.Id)
+                .ToArray();
+        }
+    }
+}
+
+############################################################
+# FILE: Instructions\AddNeighborInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Topology;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class AddNeighborInstruction :
+        StateInstructionBase
+    {
+        public const string IntentName =
+            "topology.neighbor.add";
+
+        public AddNeighborInstruction(
+            IBaseObject neighbor,
+            string membership,
+            double distance,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                ValidateNeighbor(
+                    neighbor),
+                CreateArguments(
+                    membership,
+                    distance),
+                metadata)
+        {
+            Neighbor =
+                neighbor;
+
+            Membership =
+                ValidateMembership(
+                    membership);
+
+            Distance =
+                NeighborDistance.Validate(
+                    distance,
+                    nameof(distance));
+        }
+
+        public IBaseObject Neighbor { get; }
+
+        public string Membership { get; }
+
+        public double Distance { get; }
+
+        private static IBaseObject ValidateNeighbor(
+            IBaseObject neighbor)
+        {
+            return neighbor ??
+                throw new ArgumentNullException(
+                    nameof(neighbor));
+        }
+
+        private static IDictionary<string, object?>
+            CreateArguments(
+                string membership,
+                double distance)
+        {
+            return new Dictionary<string, object?>
+            {
+                ["membership"] =
+                    ValidateMembership(
+                        membership),
+
+                ["distance"] =
+                    NeighborDistance.Validate(
+                        distance,
+                        nameof(distance))
+            };
+        }
+
+        private static string ValidateMembership(
+            string membership)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    membership))
+            {
+                throw new ArgumentException(
+                    "Neighbor membership cannot be empty.",
+                    nameof(membership));
+            }
+
+            return membership.Trim();
+        }
+    }
+}
+
+############################################################
+# FILE: Instructions\RemoveNeighborInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class RemoveNeighborInstruction :
+        StateInstructionBase
+    {
+        public const string IntentName =
+            "topology.neighbor.remove";
+
+        public RemoveNeighborInstruction(
+            Guid neighborId,
+            string membership,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                ValidateId(
+                    neighborId),
+                CreateArguments(
+                    membership),
+                metadata)
+        {
+            NeighborId =
+                neighborId;
+
+            Membership =
+                ValidateMembership(
+                    membership);
+        }
+
+        public Guid NeighborId { get; }
+
+        public string Membership { get; }
+
+        private static Guid ValidateId(
+            Guid neighborId)
+        {
+            if (neighborId == Guid.Empty)
+            {
+                throw new ArgumentException(
+                    "Neighbor removal requires a non-empty GUID.",
+                    nameof(neighborId));
+            }
+
+            return neighborId;
+        }
+
+        private static IDictionary<string, object?>
+            CreateArguments(
+                string membership)
+        {
+            return new Dictionary<string, object?>
+            {
+                ["membership"] =
+                    ValidateMembership(
+                        membership)
+            };
+        }
+
+        private static string ValidateMembership(
+            string membership)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    membership))
+            {
+                throw new ArgumentException(
+                    "Neighbor membership cannot be empty.",
+                    nameof(membership));
+            }
+
+            return membership.Trim();
+        }
+    }
+}
+
+############################################################
+# FILE: Instructions\SetComponentMetadataInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetComponentMetadataInstruction :
+        StateInstructionBase
+    {
+        public const string IntentName =
+            "component.metadata.set";
+
+        public SetComponentMetadataInstruction(
+            string key,
+            object? value,
+            IDictionary<string, object?>? metadata = null)
+            : base(
+                IntentName,
+                value,
+                CreateArguments(key),
+                metadata)
+        {
+            Key = ValidateKey(key);
+            Value = value;
+        }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+
+        private static IDictionary<string, object?> CreateArguments(
+            string key)
+        {
+            return new Dictionary<string, object?>
+            {
+                ["key"] = ValidateKey(key)
+            };
+        }
+
+        private static string ValidateKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Component metadata instructions require a key.",
+                    nameof(key));
+            }
+
+            return key.Trim();
+        }
+    }
+}
+
+
+
+############################################################
+# FILE: Instructions\SetContextVariableInstruction.cs
+############################################################
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetContextVariableInstruction :
+        ContextVariableInstructionBase
+    {
+        public const string IntentName =
+            "context.variable.set";
+
+        public SetContextVariableInstruction(
+            string key,
+            object? value)
+            : base(
+                IntentName,
+                key,
+                value)
+        {
+        }
+    }
+}
+
+############################################################
+# FILE: Instructions\SetNeighborDistanceInstruction.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Topology;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetNeighborDistanceInstruction : StateInstructionBase
+    {
+        public const string IntentName = "topology.neighbor.distance.set";
+
+        public SetNeighborDistanceInstruction(
+            Guid neighborId,
+            string membership,
+            double distance,
+            IDictionary<string, object?>? metadata = null)
+            : base(IntentName, ValidateId(neighborId), CreateArguments(membership, distance), metadata)
+        {
+            NeighborId = neighborId;
+            Membership = ValidateMembership(membership);
+            Distance = NeighborDistance.Validate(distance, nameof(distance));
+        }
+
+        public Guid NeighborId { get; }
+        public string Membership { get; }
+        public double Distance { get; }
+
+        private static Guid ValidateId(Guid value)
+        {
+            if (value == Guid.Empty) throw new ArgumentException("Neighbor distance update requires a non-empty GUID.", nameof(value));
+            return value;
+        }
+
+        private static string ValidateMembership(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Neighbor membership cannot be empty.", nameof(value));
+            return value.Trim();
+        }
+
+        private static IDictionary<string, object?> CreateArguments(string membership, double distance) =>
+            new Dictionary<string, object?>
+            {
+                ["membership"] = ValidateMembership(membership),
+                ["distance"] = NeighborDistance.Validate(distance, nameof(distance))
+            };
+    }
+}
+
+
+############################################################
+# FILE: Processor\InstructionsProcessor.cs
+############################################################
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing.Processor
+{
+    /// <summary>
+    /// Processes instructions using the instruction registry
+    /// and delegates task work through the task processor pool.
+    /// </summary>
+    public class InstructionsProcessor :
+        ProcessorBase,
+        IInstructionsProcessor
+    {
+        private readonly IObjectPool<ITaskProcessor> _taskProcessors;
+
+        public InstructionsProcessor(
+            IComponent component,
+            string layer,
+            IInstructionsRegistry registry,
+            IObjectPool<ITaskProcessor> taskProcessors)
+            : base(
+                component,
+                layer)
+        {
+            Registry = registry ??
+                       throw new ArgumentNullException(
+                           nameof(registry));
+
+            _taskProcessors = taskProcessors ??
+                              throw new ArgumentNullException(
+                                  nameof(taskProcessors));
+        }
+
+        public IInstructionsRegistry Registry { get; }
+
+        /// <summary>
+        /// Rents a task processor for delegated task processing.
+        /// The caller owns the returned lease and must dispose it.
+        /// </summary>
+        public ValueTask<ObjectLease<ITaskProcessor>>
+            RentTaskProcessorAsync(
+                CancellationToken cancellationToken = default)
+        {
+            return _taskProcessors.RentAsync(
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Clears transient processor state before this processor
+        /// is returned to its pool.
+        /// </summary>
+        protected override bool OnReset()
+        {
+            return true;
+        }
+    }
+}
+
+############################################################
+# FILE: Processor\TaskProcessor.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing.Processor
+{
+    /// <summary>
+    /// Processes task work using a task registry.
+    /// Provides the task lifecycle boundary used by
+    /// pooled task processors.
+    /// </summary>
+    public class TaskProcessor :
+        ProcessorBase,
+        ITaskProcessor
+    {
+        public TaskProcessor(
+            IComponent component,
+            string layer,
+            ITaskRegistry registry)
+            : base(
+                component,
+                layer)
+        {
+            Registry = registry ??
+                throw new ArgumentNullException(
+                    nameof(registry));
+        }
+
+        public ITaskRegistry Registry { get; }
+
+        /// <summary>
+        /// Parks a task for processing.
+        /// </summary>
+        public bool RegisterTask(
+            ITask task)
+        {
+            if (task == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(task));
+            }
+
+            return Registry.Register(
+                task);
+        }
+
+        /// <summary>
+        /// Determines whether a task is currently parked.
+        /// </summary>
+        public bool ContainsTask(
+            Guid id)
+        {
+            return Registry.Contains(
+                id);
+        }
+
+        /// <summary>
+        /// Retrieves a parked task by identity.
+        /// </summary>
+        public ITask? GetTask(
+            Guid id)
+        {
+            return Registry.Get(
+                id);
+        }
+
+        /// <summary>
+        /// Attempts to retrieve a parked task by identity.
+        /// </summary>
+        public bool TryGetTask(
+            Guid id,
+            out ITask? task)
+        {
+            return Registry.TryGet(
+                id,
+                out task);
+        }
+
+        /// <summary>
+        /// Removes a parked task after processing completes.
+        /// </summary>
+        public bool RemoveTask(
+            Guid id)
+        {
+            return Registry.Remove(
+                id);
+        }
+
+        /// <summary>
+        /// Clears transient processor state before this
+        /// processor is returned to its pool.
+        ///
+        /// Registry contents intentionally survive processor
+        /// reuse because task lifetime is independent from
+        /// processor lifetime.
+        /// </summary>
+        protected override bool OnReset()
+        {
+            return true;
+        }
+    }
+}
+
+############################################################
+# FILE: Registry\DefaultInstructionsRegistry.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing.Registry
+{
+    public sealed class DefaultInstructionsRegistry :
+        InstructionsRegistryBase
+    {
+        public DefaultInstructionsRegistry(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer)
+        {
+        }
+
+        protected override void OnInitialize()
+        {
+        }
+
+        protected override void OnShutdown()
+        {
+            Clear();
+        }
+    }
+}
+
+############################################################
+# FILE: Registry\DefaultTasksRegistry.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing.Registry
+{
+    public sealed class DefaultTasksRegistry :
+        TaskRegistryBase
+    {
+        public DefaultTasksRegistry(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer)
+        {
+        }
+
+        protected override void OnInitialize()
+        {
+        }
+
+        protected override void OnShutdown()
+        {
+            Clear();
+        }
+    }
+}
+
+############################################################
+# FILE: Signals\WildsSignal.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Signals
+{
+    public abstract class WildsSignal :
+        BaseObject,
+        ISignal
+    {
+        private readonly IComponent _component;
+
+        protected WildsSignal(
+            IComponent component,
+            string layer)
+            : base(layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        protected WildsSignal(
+            Guid id,
+            IComponent component,
+            string layer)
+            : base(id, layer)
+        {
+            _component = component
+                         ?? throw new ArgumentNullException(
+                             nameof(component));
+        }
+
+        public sealed override IComponent Component =>
+            _component;
+    }
+}
+
+############################################################
+# FILE: Tasks\SetContextVariable.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Processing
+{
+    public sealed class SetContextVariable :
+        TaskBase
+    {
+        public SetContextVariable(
+            IComponent component,
+            IContext context,
+            string key,
+            object? value)
+            : base(
+                component,
+                "task.context.variable.set")
+        {
+            Context = context ??
+                      throw new ArgumentNullException(
+                          nameof(context));
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new ArgumentException(
+                    "Context variable key cannot be empty.",
+                    nameof(key));
+            }
+
+            Key = key.Trim();
+            Value = value;
+        }
+
+        public IContext Context { get; }
+
+        public string Key { get; }
+
+        public object? Value { get; }
+    }
+}
+
+RELATED ABSTRACTIONS
+============================================================
+<no related abstraction files found>
+
+SIGNAL SOURCE
+============================================================
+<no Signals C# files found>
+
+============================================================
+ Crawl complete
+============================================================
