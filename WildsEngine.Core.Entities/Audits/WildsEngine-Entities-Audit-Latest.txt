@@ -1,0 +1,914 @@
+﻿
+========================================================================
+WILDSENGINE CORE.ENTITIES AUDIT
+========================================================================
+Generated: 2026-11-10T15:43:27.6520156-05:00
+Repository: C:\Users\jmatt\source\WildsEngine
+Entities:   C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Entities
+Core:       C:\Users\jmatt\source\WildsEngine\WildsEngine.Core
+QSL:        C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl
+
+Entities C# files: 11
+Core C# files:     170
+
+========================================================================
+PROJECT FILE
+========================================================================
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Discoveries\" />
+      <Folder Include="Docs\" />
+      <Folder Include="Entities\" />
+      <Folder Include="Facts\" />
+      <Folder Include="Helpers\" />
+      <Folder Include="Services\" />
+    </ItemGroup>
+
+</Project>
+
+========================================================================
+PROJECT REFERENCES
+========================================================================
+<ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+
+========================================================================
+ENTITIES SOURCE TREE
+========================================================================
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs
+WildsEngine.Core.Entities\Abstractions\IEntity.cs
+WildsEngine.Core.Entities\Abstractions\IFact.cs
+WildsEngine.Core.Entities\Abstractions\IIdentifier.cs
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs
+WildsEngine.Core.Entities\Base\EntityBase.cs
+WildsEngine.Core.Entities\Base\FactBase.cs
+WildsEngine.Core.Entities\Base\IdentifierBase.cs
+WildsEngine.Core.Entities\Base\WildsDiscoveryBase.cs
+WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs
+
+========================================================================
+ENTITY CONTRACT AUDIT
+========================================================================
+
+Pattern: \bIIdentifier\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:10: IIdentifier
+WildsEngine.Core.Entities\Abstractions\IEntity.cs:5: IIdentifier
+WildsEngine.Core.Entities\Abstractions\IFact.cs:5: IIdentifier
+WildsEngine.Core.Entities\Abstractions\IIdentifier.cs:12: public interface IIdentifier
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:7: IIdentifier
+
+Pattern: \bIEntity\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IEntity.cs:4: public interface IEntity :
+WildsEngine.Core.Entities\Abstractions\IFact.cs:7: IEntity Entity { get; }
+WildsEngine.Core.Entities\Base\EntityBase.cs:9: IEntity
+WildsEngine.Core.Entities\Base\FactBase.cs:16: IEntity entity,
+WildsEngine.Core.Entities\Base\FactBase.cs:43: IEntity entity,
+WildsEngine.Core.Entities\Base\FactBase.cs:69: public IEntity Entity { get; }
+
+Pattern: \bIFact\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:12: IFact Fact { get; }
+WildsEngine.Core.Entities\Abstractions\IEntity.cs:7: IReadOnlyList<IFact> Facts { get; }
+WildsEngine.Core.Entities\Abstractions\IFact.cs:4: public interface IFact :
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:12: IFact fact)
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:24: IFact fact)
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:35: public IFact Fact { get; }
+WildsEngine.Core.Entities\Base\EntityBase.cs:11: private readonly List<IFact> _facts =
+WildsEngine.Core.Entities\Base\EntityBase.cs:12: new List<IFact>();
+WildsEngine.Core.Entities\Base\EntityBase.cs:29: public IReadOnlyList<IFact> Facts =>
+WildsEngine.Core.Entities\Base\EntityBase.cs:33: IFact fact)
+WildsEngine.Core.Entities\Base\EntityBase.cs:62: IFact fact)
+WildsEngine.Core.Entities\Base\FactBase.cs:9: IFact
+
+Pattern: \bIDiscovery\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:9: public interface IDiscovery :
+WildsEngine.Core.Entities\Abstractions\IFact.cs:13: IReadOnlyList<IDiscovery> Discoveries { get; }
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:15: IDiscovery Discovery { get; }
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:8: IDiscovery
+WildsEngine.Core.Entities\Base\FactBase.cs:11: private readonly List<IDiscovery> _discoveries =
+WildsEngine.Core.Entities\Base\FactBase.cs:12: new List<IDiscovery>();
+WildsEngine.Core.Entities\Base\FactBase.cs:75: public IReadOnlyList<IDiscovery> Discoveries =>
+WildsEngine.Core.Entities\Base\FactBase.cs:86: IDiscovery discovery)
+WildsEngine.Core.Entities\Base\FactBase.cs:116: IDiscovery discovery)
+
+Pattern: \bIWildsDiscovery\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:12: public interface IWildsDiscovery :
+WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs:6: RegistryBase<IWildsDiscovery>
+
+Pattern: \bIBaseObject\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:13: IBaseObject
+
+Pattern: \bBaseObject\b
+------------------------------------------------------------------------
+<no matches>
+
+========================================================================
+CORE FUNDAMENTAL USAGE AUDIT
+========================================================================
+
+Pattern: \bIComponent\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs:9: IComponent component,
+
+Pattern: \bIState\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bIContext\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bIStateInstruction\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bIRegistry\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bRegistryBase\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs:6: RegistryBase<IWildsDiscovery>
+
+Pattern: \bINeighborCollection\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bINeighborOperator\b
+------------------------------------------------------------------------
+<no matches>
+
+========================================================================
+BOUNDARY LEAK AUDIT
+========================================================================
+
+Pattern: \bQSL\.
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bQslEngine\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bQslRuntimeContext\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bQslConsumerBinding\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bQslStatePackage\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bWildsQslRequest\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bWildsQslExecutor\b
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: \bWildsEngine\.Qsl\b
+------------------------------------------------------------------------
+<no matches>
+
+========================================================================
+IMPLEMENTATION RISK AUDIT
+========================================================================
+
+Pattern: TODO
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: FIXME
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: NotImplementedException
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: NotSupportedException
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: null!
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: throw new Exception
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: Guid\.Empty
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:21: if (id == Guid.Empty)
+
+Pattern: Guid\.NewGuid
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:12: Guid.NewGuid(),
+
+Pattern: new Dictionary
+------------------------------------------------------------------------
+<no matches>
+
+Pattern: new ConcurrentDictionary
+------------------------------------------------------------------------
+<no matches>
+
+========================================================================
+IDENTITY AND PROVENANCE AUDIT
+========================================================================
+
+Pattern: \bGuid\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IIdentifier.cs:14: Guid Id { get; }
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:22: Guid id,
+WildsEngine.Core.Entities\Base\EntityBase.cs:21: Guid id,
+WildsEngine.Core.Entities\Base\FactBase.cs:41: Guid id,
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:12: Guid.NewGuid(),
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:18: Guid id,
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:21: if (id == Guid.Empty)
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:24: "Identifiers require a non-empty GUID.",
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:42: public Guid Id { get; }
+
+Pattern: \bId\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IIdentifier.cs:14: Guid Id { get; }
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:22: Guid id,
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:26: id,
+WildsEngine.Core.Entities\Base\EntityBase.cs:21: Guid id,
+WildsEngine.Core.Entities\Base\EntityBase.cs:24: id,
+WildsEngine.Core.Entities\Base\FactBase.cs:41: Guid id,
+WildsEngine.Core.Entities\Base\FactBase.cs:47: id,
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:18: Guid id,
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:21: if (id == Guid.Empty)
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:25: nameof(id));
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:35: Id =
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:36: id;
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:42: public Guid Id { get; }
+WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs:14: discovery => discovery.Id)
+
+Pattern: \bSlug\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IIdentifier.cs:16: string Slug { get; }
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:11: string slug,
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:13: : base(slug)
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:23: string slug,
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:27: slug)
+WildsEngine.Core.Entities\Base\EntityBase.cs:15: string slug)
+WildsEngine.Core.Entities\Base\EntityBase.cs:16: : base(slug)
+WildsEngine.Core.Entities\Base\EntityBase.cs:22: string slug)
+WildsEngine.Core.Entities\Base\EntityBase.cs:25: slug)
+WildsEngine.Core.Entities\Base\FactBase.cs:15: string slug,
+WildsEngine.Core.Entities\Base\FactBase.cs:19: : base(slug)
+WildsEngine.Core.Entities\Base\FactBase.cs:42: string slug,
+WildsEngine.Core.Entities\Base\FactBase.cs:48: slug)
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:10: string slug)
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:13: slug)
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:19: string slug)
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:28: if (string.IsNullOrWhiteSpace(slug))
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:31: "Identifiers require a slug.",
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:32: nameof(slug));
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:38: Slug =
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:39: slug.Trim();
+WildsEngine.Core.Entities\Base\IdentifierBase.cs:44: public string Slug { get; }
+
+Pattern: \bPath\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IFact.cs:9: string Path { get; }
+WildsEngine.Core.Entities\Base\FactBase.cs:17: string path,
+WildsEngine.Core.Entities\Base\FactBase.cs:26: if (string.IsNullOrWhiteSpace(path))
+WildsEngine.Core.Entities\Base\FactBase.cs:29: "A Fact requires a path.",
+WildsEngine.Core.Entities\Base\FactBase.cs:30: nameof(path));
+WildsEngine.Core.Entities\Base\FactBase.cs:33: Path =
+WildsEngine.Core.Entities\Base\FactBase.cs:34: path.Trim();
+WildsEngine.Core.Entities\Base\FactBase.cs:44: string path,
+WildsEngine.Core.Entities\Base\FactBase.cs:55: if (string.IsNullOrWhiteSpace(path))
+WildsEngine.Core.Entities\Base\FactBase.cs:58: "A Fact requires a path.",
+WildsEngine.Core.Entities\Base\FactBase.cs:59: nameof(path));
+WildsEngine.Core.Entities\Base\FactBase.cs:62: Path =
+WildsEngine.Core.Entities\Base\FactBase.cs:63: path.Trim();
+WildsEngine.Core.Entities\Base\FactBase.cs:71: public string Path { get; }
+
+Pattern: \bEntity\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:6: /// A Discovery remains Entity-owned knowledge until Surface
+WildsEngine.Core.Entities\Abstractions\IFact.cs:7: IEntity Entity { get; }
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:7: /// Entity-owned Discovery.
+WildsEngine.Core.Entities\Base\EntityBase.cs:42: fact.Entity,
+WildsEngine.Core.Entities\Base\EntityBase.cs:46: "A Fact must belong to this exact Entity.",
+WildsEngine.Core.Entities\Base\FactBase.cs:16: IEntity entity,
+WildsEngine.Core.Entities\Base\FactBase.cs:21: Entity =
+WildsEngine.Core.Entities\Base\FactBase.cs:22: entity ??
+WildsEngine.Core.Entities\Base\FactBase.cs:24: nameof(entity));
+WildsEngine.Core.Entities\Base\FactBase.cs:43: IEntity entity,
+WildsEngine.Core.Entities\Base\FactBase.cs:50: Entity =
+WildsEngine.Core.Entities\Base\FactBase.cs:51: entity ??
+WildsEngine.Core.Entities\Base\FactBase.cs:53: nameof(entity));
+WildsEngine.Core.Entities\Base\FactBase.cs:69: public IEntity Entity { get; }
+
+Pattern: \bFact\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:4: /// Represents one interpretation derived from an exact Fact.
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:12: IFact Fact { get; }
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:12: IFact fact)
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:15: Fact =
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:16: fact ??
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:18: nameof(fact));
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:24: IFact fact)
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:29: Fact =
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:30: fact ??
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:32: nameof(fact));
+WildsEngine.Core.Entities\Base\DiscoveryBase.cs:35: public IFact Fact { get; }
+WildsEngine.Core.Entities\Base\EntityBase.cs:33: IFact fact)
+WildsEngine.Core.Entities\Base\EntityBase.cs:35: if (fact == null)
+WildsEngine.Core.Entities\Base\EntityBase.cs:38: nameof(fact));
+WildsEngine.Core.Entities\Base\EntityBase.cs:42: fact.Entity,
+WildsEngine.Core.Entities\Base\EntityBase.cs:46: "A Fact must belong to this exact Entity.",
+WildsEngine.Core.Entities\Base\EntityBase.cs:47: nameof(fact));
+WildsEngine.Core.Entities\Base\EntityBase.cs:50: if (_facts.Contains(fact))
+WildsEngine.Core.Entities\Base\EntityBase.cs:56: fact);
+WildsEngine.Core.Entities\Base\EntityBase.cs:62: IFact fact)
+WildsEngine.Core.Entities\Base\EntityBase.cs:64: if (fact == null)
+WildsEngine.Core.Entities\Base\EntityBase.cs:67: nameof(fact));
+WildsEngine.Core.Entities\Base\EntityBase.cs:71: fact);
+WildsEngine.Core.Entities\Base\FactBase.cs:29: "A Fact requires a path.",
+WildsEngine.Core.Entities\Base\FactBase.cs:58: "A Fact requires a path.",
+WildsEngine.Core.Entities\Base\FactBase.cs:95: discovery.Fact,
+WildsEngine.Core.Entities\Base\FactBase.cs:99: "A Discovery must belong to this exact Fact.",
+
+Pattern: \bDiscovery\b
+------------------------------------------------------------------------
+WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:6: /// A Discovery remains Entity-owned knowledge until Surface
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:7: /// Entity-owned Discovery.
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:9: /// The original Discovery remains available as authoritative
+WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:15: IDiscovery Discovery { get; }
+WildsEngine.Core.Entities\Base\FactBase.cs:86: IDiscovery discovery)
+WildsEngine.Core.Entities\Base\FactBase.cs:88: if (discovery == null)
+WildsEngine.Core.Entities\Base\FactBase.cs:91: nameof(discovery));
+WildsEngine.Core.Entities\Base\FactBase.cs:95: discovery.Fact,
+WildsEngine.Core.Entities\Base\FactBase.cs:99: "A Discovery must belong to this exact Fact.",
+WildsEngine.Core.Entities\Base\FactBase.cs:100: nameof(discovery));
+WildsEngine.Core.Entities\Base\FactBase.cs:104: discovery))
+WildsEngine.Core.Entities\Base\FactBase.cs:110: discovery);
+WildsEngine.Core.Entities\Base\FactBase.cs:116: IDiscovery discovery)
+WildsEngine.Core.Entities\Base\FactBase.cs:118: if (discovery == null)
+WildsEngine.Core.Entities\Base\FactBase.cs:121: nameof(discovery));
+WildsEngine.Core.Entities\Base\FactBase.cs:125: discovery);
+WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs:14: discovery => discovery.Id)
+
+========================================================================
+TYPE DECLARATION AUDIT
+========================================================================
+class      DiscoveryBase                            WildsEngine.Core.Entities\Base\DiscoveryBase.cs:6
+class      EntityBase                               WildsEngine.Core.Entities\Base\EntityBase.cs:7
+class      FactBase                                 WildsEngine.Core.Entities\Base\FactBase.cs:7
+class      IdentifierBase                           WildsEngine.Core.Entities\Base\IdentifierBase.cs:6
+interface  IDiscovery                               WildsEngine.Core.Entities\Abstractions\IDiscovery.cs:9
+interface  IEntity                                  WildsEngine.Core.Entities\Abstractions\IEntity.cs:4
+interface  IFact                                    WildsEngine.Core.Entities\Abstractions\IFact.cs:4
+interface  IIdentifier                              WildsEngine.Core.Entities\Abstractions\IIdentifier.cs:12
+interface  IWildsDiscovery                          WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs:12
+class      WildsDiscoveryBase                       WildsEngine.Core.Entities\Base\WildsDiscoveryBase.cs:3
+class      WildsDiscoveryRegistry                   WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs:5
+
+========================================================================
+DUPLICATE TYPE DECLARATIONS
+========================================================================
+[PASS] No duplicate type names found.
+
+========================================================================
+RELEVANT CORE CONTRACT LOCATIONS
+========================================================================
+
+Pattern: interface IBaseObject
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Base\IBaseObject.cs:5: public interface IBaseObject
+
+Pattern: abstract class BaseObject
+------------------------------------------------------------------------
+WildsEngine.Core\Objects\BaseObject.cs:7: public abstract class BaseObject :
+
+Pattern: interface IComponent
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Base\IComponent.cs:5: public interface IComponent : IBaseObject
+
+Pattern: abstract class BaseComponent
+------------------------------------------------------------------------
+WildsEngine.Core\Components\BaseComponent.cs:8: public abstract class BaseComponent : BaseObject, IComponent
+
+Pattern: interface IContext
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Base\IContext.cs:5: public interface IContext : IBaseObject
+
+Pattern: class WildsContext
+------------------------------------------------------------------------
+WildsEngine.Core\Contexts\WildsContext.cs:8: public abstract class WildsContext :
+
+Pattern: interface IState
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Base\IState.cs:3: public interface IState : IBaseObject
+WildsEngine.Core\Abstractions\Instructions\IStateInstruction.cs:6: public interface IStateInstruction
+
+Pattern: interface IStateInstruction
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Instructions\IStateInstruction.cs:6: public interface IStateInstruction
+
+Pattern: interface IRegistry
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Registry\IRegistry.cs:6: public interface IRegistry<T> :
+
+Pattern: class RegistryBase
+------------------------------------------------------------------------
+WildsEngine.Core\Processing\Base\RegistryBase.cs:10: public abstract class RegistryBase<T> :
+
+Pattern: interface IEmitter
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Emissions\IEmitter.cs:12: public interface IEmitter :
+
+Pattern: interface IEmissionStateInstruction
+------------------------------------------------------------------------
+WildsEngine.Core\Abstractions\Emissions\IEmissionStateInstruction.cs:11: public interface IEmissionStateInstruction :
+
+========================================================================
+FULL ENTITIES SOURCE
+========================================================================
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Abstractions\IDiscovery.cs
+########################################################################
+    1: namespace WildsEngine.Core.Entities.Abstractions
+    2: {
+    3:     /// <summary>
+    4:     /// Represents one interpretation derived from an exact Fact.
+    5:     ///
+    6:     /// A Discovery remains Entity-owned knowledge until Surface
+    7:     /// deliberately promotes it into a Wilds-compatible form.
+    8:     /// </summary>
+    9:     public interface IDiscovery :
+   10:         IIdentifier
+   11:     {
+   12:         IFact Fact { get; }
+   13:     }
+   14: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Abstractions\IEntity.cs
+########################################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Entities.Abstractions;
+    3: 
+    4: public interface IEntity :
+    5:     IIdentifier
+    6: {
+    7:     IReadOnlyList<IFact> Facts { get; }
+    8: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Abstractions\IFact.cs
+########################################################################
+    1: using System.Collections.Generic;
+    2: using WildsEngine.Core.Entities.Abstractions;
+    3: 
+    4: public interface IFact :
+    5:     IIdentifier
+    6: {
+    7:     IEntity Entity { get; }
+    8: 
+    9:     string Path { get; }
+   10: 
+   11:     object? Value { get; }
+   12: 
+   13:     IReadOnlyList<IDiscovery> Discoveries { get; }
+   14: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Abstractions\IIdentifier.cs
+########################################################################
+    1: using System;
+    2: 
+    3: namespace WildsEngine.Core.Entities.Abstractions
+    4: {
+    5:     /// <summary>
+    6:     /// Represents stable identity established outside
+    7:     /// the Wilds processing boundary.
+    8:     ///
+    9:     /// Identity does not imply Wilds registration,
+   10:     /// promotion, topology participation, or processing.
+   11:     /// </summary>
+   12:     public interface IIdentifier
+   13:     {
+   14:         Guid Id { get; }
+   15: 
+   16:         string Slug { get; }
+   17:     }
+   18: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Abstractions\IWildsDiscovery.cs
+########################################################################
+    1: using WildsEngine.Core.Abstractions;
+    2: 
+    3: namespace WildsEngine.Core.Entities.Abstractions
+    4: {
+    5:     /// <summary>
+    6:     /// Represents the Wilds-compatible projection of one
+    7:     /// Entity-owned Discovery.
+    8:     ///
+    9:     /// The original Discovery remains available as authoritative
+   10:     /// provenance.
+   11:     /// </summary>
+   12:     public interface IWildsDiscovery :
+   13:         IBaseObject
+   14:     {
+   15:         IDiscovery Discovery { get; }
+   16:     }
+   17: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Base\DiscoveryBase.cs
+########################################################################
+    1: using System;
+    2: using WildsEngine.Core.Entities.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Entities.Base
+    5: {
+    6:     public abstract class DiscoveryBase :
+    7:         IdentifierBase,
+    8:         IDiscovery
+    9:     {
+   10:         protected DiscoveryBase(
+   11:             string slug,
+   12:             IFact fact)
+   13:             : base(slug)
+   14:         {
+   15:             Fact =
+   16:                 fact ??
+   17:                 throw new ArgumentNullException(
+   18:                     nameof(fact));
+   19:         }
+   20: 
+   21:         protected DiscoveryBase(
+   22:             Guid id,
+   23:             string slug,
+   24:             IFact fact)
+   25:             : base(
+   26:                 id,
+   27:                 slug)
+   28:         {
+   29:             Fact =
+   30:                 fact ??
+   31:                 throw new ArgumentNullException(
+   32:                     nameof(fact));
+   33:         }
+   34: 
+   35:         public IFact Fact { get; }
+   36:     }
+   37: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Base\EntityBase.cs
+########################################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Entities.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Entities.Base
+    6: {
+    7:     public abstract class EntityBase :
+    8:         IdentifierBase,
+    9:         IEntity
+   10:     {
+   11:         private readonly List<IFact> _facts =
+   12:             new List<IFact>();
+   13: 
+   14:         protected EntityBase(
+   15:             string slug)
+   16:             : base(slug)
+   17:         {
+   18:         }
+   19: 
+   20:         protected EntityBase(
+   21:             Guid id,
+   22:             string slug)
+   23:             : base(
+   24:                 id,
+   25:                 slug)
+   26:         {
+   27:         }
+   28: 
+   29:         public IReadOnlyList<IFact> Facts =>
+   30:             _facts;
+   31: 
+   32:         protected bool AddFact(
+   33:             IFact fact)
+   34:         {
+   35:             if (fact == null)
+   36:             {
+   37:                 throw new ArgumentNullException(
+   38:                     nameof(fact));
+   39:             }
+   40: 
+   41:             if (!ReferenceEquals(
+   42:                     fact.Entity,
+   43:                     this))
+   44:             {
+   45:                 throw new ArgumentException(
+   46:                     "A Fact must belong to this exact Entity.",
+   47:                     nameof(fact));
+   48:             }
+   49: 
+   50:             if (_facts.Contains(fact))
+   51:             {
+   52:                 return false;
+   53:             }
+   54: 
+   55:             _facts.Add(
+   56:                 fact);
+   57: 
+   58:             return true;
+   59:         }
+   60: 
+   61:         protected bool RemoveFact(
+   62:             IFact fact)
+   63:         {
+   64:             if (fact == null)
+   65:             {
+   66:                 throw new ArgumentNullException(
+   67:                     nameof(fact));
+   68:             }
+   69: 
+   70:             return _facts.Remove(
+   71:                 fact);
+   72:         }
+   73:     }
+   74: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Base\FactBase.cs
+########################################################################
+    1: using System;
+    2: using System.Collections.Generic;
+    3: using WildsEngine.Core.Entities.Abstractions;
+    4: 
+    5: namespace WildsEngine.Core.Entities.Base
+    6: {
+    7:     public abstract class FactBase :
+    8:         IdentifierBase,
+    9:         IFact
+   10:     {
+   11:         private readonly List<IDiscovery> _discoveries =
+   12:             new List<IDiscovery>();
+   13: 
+   14:         protected FactBase(
+   15:             string slug,
+   16:             IEntity entity,
+   17:             string path,
+   18:             object? value)
+   19:             : base(slug)
+   20:         {
+   21:             Entity =
+   22:                 entity ??
+   23:                 throw new ArgumentNullException(
+   24:                     nameof(entity));
+   25: 
+   26:             if (string.IsNullOrWhiteSpace(path))
+   27:             {
+   28:                 throw new ArgumentException(
+   29:                     "A Fact requires a path.",
+   30:                     nameof(path));
+   31:             }
+   32: 
+   33:             Path =
+   34:                 path.Trim();
+   35: 
+   36:             Value =
+   37:                 value;
+   38:         }
+   39: 
+   40:         protected FactBase(
+   41:             Guid id,
+   42:             string slug,
+   43:             IEntity entity,
+   44:             string path,
+   45:             object? value)
+   46:             : base(
+   47:                 id,
+   48:                 slug)
+   49:         {
+   50:             Entity =
+   51:                 entity ??
+   52:                 throw new ArgumentNullException(
+   53:                     nameof(entity));
+   54: 
+   55:             if (string.IsNullOrWhiteSpace(path))
+   56:             {
+   57:                 throw new ArgumentException(
+   58:                     "A Fact requires a path.",
+   59:                     nameof(path));
+   60:             }
+   61: 
+   62:             Path =
+   63:                 path.Trim();
+   64: 
+   65:             Value =
+   66:                 value;
+   67:         }
+   68: 
+   69:         public IEntity Entity { get; }
+   70: 
+   71:         public string Path { get; }
+   72: 
+   73:         public object? Value { get; private set; }
+   74: 
+   75:         public IReadOnlyList<IDiscovery> Discoveries =>
+   76:             _discoveries;
+   77: 
+   78:         protected void SetValue(
+   79:             object? value)
+   80:         {
+   81:             Value =
+   82:                 value;
+   83:         }
+   84: 
+   85:         protected bool AddDiscovery(
+   86:             IDiscovery discovery)
+   87:         {
+   88:             if (discovery == null)
+   89:             {
+   90:                 throw new ArgumentNullException(
+   91:                     nameof(discovery));
+   92:             }
+   93: 
+   94:             if (!ReferenceEquals(
+   95:                     discovery.Fact,
+   96:                     this))
+   97:             {
+   98:                 throw new ArgumentException(
+   99:                     "A Discovery must belong to this exact Fact.",
+  100:                     nameof(discovery));
+  101:             }
+  102: 
+  103:             if (_discoveries.Contains(
+  104:                     discovery))
+  105:             {
+  106:                 return false;
+  107:             }
+  108: 
+  109:             _discoveries.Add(
+  110:                 discovery);
+  111: 
+  112:             return true;
+  113:         }
+  114: 
+  115:         protected bool RemoveDiscovery(
+  116:             IDiscovery discovery)
+  117:         {
+  118:             if (discovery == null)
+  119:             {
+  120:                 throw new ArgumentNullException(
+  121:                     nameof(discovery));
+  122:             }
+  123: 
+  124:             return _discoveries.Remove(
+  125:                 discovery);
+  126:         }
+  127:     }
+  128: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Base\IdentifierBase.cs
+########################################################################
+    1: using System;
+    2: using WildsEngine.Core.Entities.Abstractions;
+    3: 
+    4: namespace WildsEngine.Core.Entities.Base
+    5: {
+    6:     public abstract class IdentifierBase :
+    7:         IIdentifier
+    8:     {
+    9:         protected IdentifierBase(
+   10:             string slug)
+   11:             : this(
+   12:                 Guid.NewGuid(),
+   13:                 slug)
+   14:         {
+   15:         }
+   16: 
+   17:         protected IdentifierBase(
+   18:             Guid id,
+   19:             string slug)
+   20:         {
+   21:             if (id == Guid.Empty)
+   22:             {
+   23:                 throw new ArgumentException(
+   24:                     "Identifiers require a non-empty GUID.",
+   25:                     nameof(id));
+   26:             }
+   27: 
+   28:             if (string.IsNullOrWhiteSpace(slug))
+   29:             {
+   30:                 throw new ArgumentException(
+   31:                     "Identifiers require a slug.",
+   32:                     nameof(slug));
+   33:             }
+   34: 
+   35:             Id =
+   36:                 id;
+   37: 
+   38:             Slug =
+   39:                 slug.Trim();
+   40:         }
+   41: 
+   42:         public Guid Id { get; }
+   43: 
+   44:         public string Slug { get; }
+   45:     }
+   46: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Base\WildsDiscoveryBase.cs
+########################################################################
+    1: namespace WildsEngine.Core.Entities.Base
+    2: {
+    3:     public class WildsDiscoveryBase
+    4:     {
+    5:         
+    6:     }
+    7: }
+
+########################################################################
+FILE: WildsEngine.Core.Entities\Registries\WildsDiscoveryRegistry.cs
+########################################################################
+    1: using WildsEngine.Core.Abstractions;
+    2: using WildsEngine.Core.Entities.Abstractions;
+    3: using WildsEngine.Core.Processing;
+    4: 
+    5: public sealed class WildsDiscoveryRegistry :
+    6:     RegistryBase<IWildsDiscovery>
+    7: {
+    8:     public WildsDiscoveryRegistry(
+    9:         IComponent component,
+   10:         string layer)
+   11:         : base(
+   12:             component,
+   13:             layer,
+   14:             discovery => discovery.Id)
+   15:     {
+   16:     }
+   17: 
+   18:     protected override void OnInitialize()
+   19:     {
+   20:     }
+   21: 
+   22:     protected override void OnShutdown()
+   23:     {
+   24:         Clear();
+   25:     }
+   26: }
+
+========================================================================
+BUILD
+========================================================================
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Debug\netstandard2.1\WildsEngine.Core.dll
+  WildsEngine.Core.Entities -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Entities\bin\Debug\netstandard2.1\WildsEngine.Core.Entities.dll
+  WildsEngine.Console -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Console\bin\Debug\net10.0\WildsEngine.Console.dll
+  QSL -> C:\Users\jmatt\source\QSL\bin\Debug\netstandard2.1\QSL.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Debug\netstandard2.1\WildsEngine.Qsl.dll
+  WildsEngine.Core.Tests -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Debug\net10.0\WildsEngine.Core.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.72
+
+[PASS] Solution build succeeded.
+
+========================================================================
+AUDIT SUMMARY
+========================================================================
+Entities files: 11
+[PASS] No direct QSL integration references found in Core.Entities.
+[INFO] Wilds base-object references found: 1
+
+Report: C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Entities\Audits\WildsEngine-Entities-Audit-20261110-154327.txt
+
