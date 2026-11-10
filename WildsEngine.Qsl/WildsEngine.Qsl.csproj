@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+    <ProjectReference Include="..\WildsEngine.Core.Entities\WildsEngine.Core.Entities.csproj" />
     <ProjectReference Include="..\..\QSL\QSL.csproj" />
   </ItemGroup>
 

@@ -5,6 +5,13 @@ using WildsEngine.Core.Objects;
 
 namespace WildsEngine.Core.Entities.Base
 {
+    /// <summary>
+    /// Represents the Wilds-compatible projection of an
+    /// Entity-owned Discovery.
+    ///
+    /// Promotion preserves the exact Discovery identity
+    /// while adding normal Wilds runtime semantics.
+    /// </summary>
     public abstract class WildsDiscoveryBase :
         BaseObject,
         IWildsDiscovery
