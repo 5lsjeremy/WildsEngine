@@ -120,15 +120,16 @@ With `player.Health = 50`, native `action.Amount = 10`, and attached `action.Spa
 The certification surfaces are complementary:
 
 - **QSL core through Wilds:** 156/156 cases pass with zero failures and zero missing dependencies.
-- **Wilds/QSL request envelope:** passes envelope execution, exact consumer binding, attached-state composition, and the Space Dust `50 -> 41.3` mutation.
+- **Wilds/QSL request envelope:** passes envelope execution, exact consumer binding, attached-state composition, and the Space Dust 50 -> 41.3 mutation.
 - **Wilds/QSL end-to-end:** proves that Wilds establishes the request lifecycle, delegates QSL-backed work, receives the QSL result, then completes the WorkUnit and resolves the terminal Moment.
-- **Emission Gate 3:** certifies the complete internal emission-resolution route from consumer value through topology-derived context and supplied composition to the authoritative resolved emission scalar.
+- **Emission Gates 1-6:** focused emitter regression passes 67/67 before the final Gate 6 topology-snapshot additions; the final Gate 6 suite passes 13/13. Gates 4-6 certify immutable resolved carriers, arbitrary N-dimensional normalized propagation, received-value eligibility, complete provenance continuity, and historical stability after topology changes.
+- **Full Core regression:** 165/165 passes when run serialized. The Wilds/QSL end-to-end lifecycle also passes 20/20 in isolated repetition. One earlier parallel full-suite run produced a single intermittent Wilds/QSL end-to-end failure; this is tracked as test-suite parallel-isolation behavior rather than an emission semantic failure.
 
 Expected-error QSL cases still produce failed Moments when failure is the correct runtime outcome. Certification success and runtime outcome remain intentionally separate concepts.
 
 The older consumer-dependent corpus remains useful as conformance material, but it no longer defines the architectural requirement that QSL itself be the consumer-facing simulation surface. The certified request-envelope path demonstrates that consumer-owned objects and attached vocabulary can be processed through Wilds without moving consumer concepts into Wilds Core.
 
-One unrelated Core warning currently remains: `CS8604` in `NeighborTraversal.cs`.
+Known unrelated warnings remain separate from the emission gates: CS8604 in `NeighborTraversal.cs` and existing xUnit analyzer warnings for `ConfigureAwait(false)` in test methods.
 
 ## Neighbor topology and membership model
 
@@ -197,126 +198,133 @@ where:
 
 Propagation remains separate from topology. Neighbor topology owns relationship distance; propagation policy determines how that distance affects an intensity.
 
-Eligibility is evaluated separately from attenuation. A minimum-intensity eligibility policy determines whether the propagated value is sufficient for a Neighbor to qualify for a subsequent response.
+Direct scalar propagation preserves the authoritative resolved magnitude and does not claim normalization. Vector propagation first groups an ordered set of same-source resolved emissions into an immutable `IResolvedEmissionVector`, normalizes that set into an immutable `INormalizedEmissionVector`, and then produces an immutable `IPropagatedEmissionVector`.
 
 ```text
-source intensity
-       |
-       v
-Neighbor topology
-       |
-       v
-distance propagation
-       |
-       v
-received intensity
-       |
-       v
-eligibility threshold
-       |
-       +---- eligible
-       |
-       `---- not eligible
+resolved emissions
+        |
+        v
+IResolvedEmissionVector
+        |
+        v
+normalization policy
+        |
+        v
+INormalizedEmissionVector
+        |
+        v
+Neighbor propagation
+        |
+        v
+IPropagatedEmissionVector
 ```
 
-The minimum-intensity boundary is inclusive:
+The vector route supports arbitrary dimension `N`. It preserves exact emitter identity, component identity and ordering, consumer-owned channel names, resolved magnitudes, normalized magnitudes, received magnitudes, exact relationship identity, and the propagation distance used during evaluation. Duplicate channel names and mixed-source vectors are rejected. Caller-owned collections are snapshotted and exposed through read-only wrappers.
+
+Eligibility is evaluated separately from attenuation. Gate 6 evaluates the received propagated `Value`, never the stronger resolved magnitude or the pre-attenuation normalized magnitude. The minimum-intensity boundary remains inclusive:
 
 ```text
-intensity < threshold    -> not eligible
-intensity = threshold    -> eligible
-intensity > threshold    -> eligible
+received value < threshold    -> not eligible
+received value = threshold    -> eligible
+received value > threshold    -> eligible
 ```
 
-The meaning of intensity remains consumer-owned. Wilds only provides the mechanics for carrying an abstract magnitude through relationship and propagation policies.
+Scalar eligibility produces an immutable decision over one exact propagated emission. Vector eligibility evaluates every received component independently and preserves both eligible and ineligible channels. `EligibleCount`, `AnyEligible`, and `AllEligible` are descriptive summaries, not execution policy.
+
+```text
+IPropagatedEmissionVector
+        |
+        v
+eligibility policy
+        |
+        v
+IEmissionEligibilityVector
+        |
+        +-- eligible component decisions
+        `-- ineligible component decisions retained
+```
+
+Eligibility results remain historical facts. If live topology changes after propagation and eligibility, the exact propagated source, evaluated value, decision, original relationship reference, and frozen propagation distance remain unchanged. Eligibility does not mean that a receiver accepted the value, that state changed, or that an effect must occur.
+
+The meaning of every channel and value remains consumer-owned. Wilds provides the mechanics for resolution, grouping, normalization, propagation, and qualification without interpreting consumer vocabulary.
 
 ## Emission resolution
 
-Wilds now has a certified emitter model for deriving an abstract magnitude from consumer-owned data and the emitter's current relational context.
-
-Emission resolution intentionally separates four concepts:
+Wilds has a certified emitter model for deriving abstract magnitudes from consumer-owned data and the emitter's current relational context. Emission processing now has six certified gates:
 
 ```text
 consumer-owned value
         |
         v
 base emission scalar
-
-current Neighbor topology
         |
-        v
-topology operators
-        |
-        v
-topology scalar
-
-base scalar + topology scalar
+        +---- current Neighbor topology
+        |              |
+        |              v
+        |       topology operators
+        |              |
+        |              v
+        |       topology scalar
+        |              |
+        +--------------+
         |
         v
 composition policy
         |
         v
-resolved emission scalar
+resolved emission
+        |
+        v
+immutable carrier / vector
+        |
+        v
+normalization when vectorized
+        |
+        v
+relationship propagation
+        |
+        v
+received propagated fact
+        |
+        v
+eligibility decision
 ```
 
-The **base emission scalar** comes from consumer-owned data.
+The **base emission scalar** comes from consumer-owned data. The **topology scalar** comes from current Wilds relational context through the existing Neighbor operator system. The **composition policy** determines how those independent scalar inputs are combined. The **resolved emission scalar** is the authoritative output of emission resolution.
 
-The **topology scalar** comes from current Wilds relational context through the existing Neighbor operator system.
-
-The **composition policy** determines how those independent scalar inputs are combined.
-
-The **resolved emission scalar** is the authoritative output of emission resolution.
-
-For example, the current additive certification fixture proves:
+The current additive certification fixture proves:
 
 ```text
 base emission scalar = 1.6
 topology scalar      = 2
 composition          = additive
-
 resolved emission    = 3.6
 ```
 
 The value `2` is not itself the emission. It describes topology-derived context. Changing the selected topology can therefore change the resolved emission without changing the consumer-owned base value.
 
-The certified emission route reuses the existing Neighbor abstractions rather than introducing an emitter-specific topology system:
-
-```text
-Emitter.Neighbors
-       |
-       v
-INeighborSequenceOperator
-       |
-       v
-relationship snapshot
-       |
-       v
-INeighborScalarOperator<TResult>
-       |
-       v
-topology scalar
-```
-
-`NeighborPipeline` can compose topology-selection stages before scalar reduction.
-
-Composition is independently configurable through `IEmissionComposition`. `EmissionCompositionBase` supplies common finite-value invariants while a concrete composition implementation owns its mathematical semantics.
-
-Wilds therefore does not assume that composition must mean addition, multiplication, weighting, normalization, or any other specific operation.
+The certified route reuses the existing Neighbor abstractions rather than introducing an emitter-specific topology system. `NeighborPipeline` can compose topology-selection stages before scalar reduction, while `IEmissionComposition` keeps composition mathematics consumer-supplied.
 
 ### Certified emission gates
 
 - **Gate 1 - Emitter primitive:** consumer properties and named groups resolve into finite base emission scalars while the emitter remains an ordinary Wilds object with normal Neighbor topology.
 - **Gate 2A - Topology scalar:** current topology can be selected through existing Neighbor operators and reduced into a topology-derived scalar.
-- **Gate 2B - Composition:** base and topology scalars can be combined through a supplied composition policy without hard-coding the mathematics into the emitter.
-- **Gate 3 - Complete resolved emission:** consumer value, current topology, topology scalar reduction, and composition resolve through one complete internal emission operation.
+- **Gate 2B - Composition:** base and topology scalars combine through a supplied composition policy without hard-coding mathematics into the emitter.
+- **Gate 3 - Complete resolved emission:** consumer value, current topology, scalar reduction, and composition resolve through one source-safe internal operation.
+- **Gate 4 - Resolved emission carrier:** exact emitter identity, arbitrary consumer vocabulary, finite resolved magnitude, and snapshot stability survive in an immutable carrier.
+- **Gate 5 - Propagation and vectors:** direct scalar propagation and arbitrary N-dimensional named-vector propagation preserve exact source/component/relationship provenance. Vector propagation requires normalization, keeps extreme resolved magnitudes, freezes the evaluated distance, and returns immutable carriers.
+- **Gate 6 - Eligibility:** scalar and vector eligibility evaluate the exact received propagated value. Eligible and ineligible facts remain present, ordering and dimensions remain authoritative, and decisions survive later topology changes without state mutation or consumer interpretation.
 
-Gate 3 certification proves:
+Gate 6 certification specifically proves:
 
-- unrelated memberships remain isolated;
-- membership changes immediately affect the next resolved emission;
-- missing consumer properties stop resolution cleanly;
-- existing Neighbor pipelines can define the topology used by emission;
-- emission resolution does not mutate source topology;
-- the complete certified example resolves base `1.6` and topology scalar `2` to `3.6` under the additive certification policy.
+- received value is the authoritative eligibility input;
+- exact-threshold inclusion is preserved;
+- arbitrary `N` survives through eligibility;
+- zero, partial, and all-component eligibility are represented honestly;
+- vector dimensions and component ordering cannot be rewritten;
+- eligibility vectors snapshot caller-owned decision collections;
+- complete Gate 5 provenance survives into Gate 6;
+- scalar and vector decisions remain stable after live topology changes.
 
 Emission certification reports are written under:
 
@@ -328,7 +336,7 @@ Certification/
         `-- emitter-certification-latest.log
 ```
 
-The next boundary is an immutable resolved-emission carrier. Propagation should consume that resolved result rather than recomputing the base or topology scalar.
+The next boundary is Gate 7: translate an eligible propagated fact into an immutable generic state operation against the exact consumer-owned target. Gate 7 must preserve target identity, arbitrary state vocabulary, value provenance, and explicit add/update/remove semantics without performing consumer interpretation inside Wilds Core.
 
 ## Proposed Timeline routing
 
@@ -370,139 +378,66 @@ Consumer vocabulary remains consumer-owned. Wilds coordinates it; QSL computes a
 
 **CERTIFIED**
 
-Implemented and tested:
+Membership participates in relationship identity; distance is mutable relationship state; duplicate relationships are rejected; relationships are directional; the same Neighbor may participate through multiple memberships; and topology operators are deterministic and source-safe.
 
-- membership participates in Neighbor relationship identity;
-- distance represents mutable relationship state;
-- duplicate relationships are rejected deterministically;
-- the same Neighbor can participate through distinct memberships;
-- relationships are directional and independently mutable;
-- topology mutation flows through state processing;
-- topology operators are deterministic and preserve source topology.
-
-### Milestone 2: Neighbor propagation and eligibility
+### Milestone 2: Neighbor propagation and eligibility mechanics
 
 **CERTIFIED**
 
-Implemented and tested:
-
-- propagation interprets relationship distance independently of topology;
-- exponential distance attenuation is supported;
-- zero distance preserves intensity;
-- zero decay preserves intensity;
-- invalid negative propagation values are rejected;
-- minimum-intensity eligibility uses an inclusive threshold;
-- below-threshold values are rejected;
-- topology, propagation, and eligibility compose without assuming execution ownership.
+Exponential attenuation, zero-distance and zero-decay behavior, inclusive minimum-intensity eligibility, invalid-input rejection, and topology-to-propagation-to-eligibility composition are certified.
 
 ### Milestone 3: Emission resolution
 
 **CERTIFIED THROUGH GATE 3**
 
-Implemented and tested:
-
-- consumer-owned values resolve into base emission scalars;
-- arbitrary Neighbor topology can produce an independent topology scalar;
-- existing Neighbor operators and pipelines are reused for topology selection;
-- topology changes immediately affect subsequent emission resolution;
-- base and topology scalars remain semantically distinct;
-- composition mathematics are supplied through `IEmissionComposition`;
-- `EmissionCompositionBase` owns shared finite-value invariants;
-- the resolved emission scalar is the authoritative output of emission resolution;
-- complete resolution preserves source topology.
+Consumer-owned values, current Neighbor topology, topology scalar reduction, and supplied composition resolve into one authoritative source-safe emission scalar.
 
 ### Milestone 4: Resolved emission carrier
 
+**CERTIFIED**
+
+The immutable carrier preserves exact source identity, arbitrary consumer emission identity, finite resolved magnitude, and snapshot stability without owning propagation behavior.
+
+### Milestone 5: Resolved emission propagation and vector carriers
+
+**CERTIFIED**
+
+Direct scalar propagation and arbitrary N-dimensional vector propagation preserve resolved, normalized, and received values. Vector grouping, normalization, dimension/order invariants, exact relationship identity, frozen propagation distance, and collection immutability are certified.
+
+### Milestone 6: Receiver eligibility
+
+**CERTIFIED**
+
+Eligibility evaluates received propagated values, retains eligible and ineligible facts, supports arbitrary N-dimensional vectors, preserves exact provenance, exposes descriptive count/any/all summaries, and remains historically stable after live topology changes. No receiver mutation or consumer interpretation occurs.
+
+### Milestone 7: Receiver state boundary
+
 **NEXT**
 
-Create and certify the immutable value that carries a resolved emission forward.
+Translate an eligible propagated fact into a generic immutable state operation against the exact consumer-owned target.
 
 Target behaviors:
 
-- exact source/emitter identity is preserved;
-- arbitrary consumer emission identity is preserved;
-- resolved scalar is finite;
-- carrier state is immutable;
-- the carrier does not own propagation behavior;
-- creating the carrier does not change Gate 3 resolution semantics.
-
-### Milestone 5: Resolved emission propagation
-
-**PLANNED**
-
-Connect the resolved-emission carrier to the already-certified Neighbor propagation and eligibility machinery.
-
-Target behaviors:
-
-- propagation consumes the resolved emission rather than recalculating it;
-- relationship distance remains topology state;
-- propagation policy remains independent of topology;
-- eligibility remains independent of attenuation;
-- source emission data remains unchanged by propagation;
-- no consumer-specific vocabulary enters Wilds Core.
-
-### Milestone 6: Receiver state boundary
-
-**PLANNED**
-
-Define the transition from an eligible propagated result into a generic consumer-owned state operation.
-
-Target behaviors:
-
-- exact receiver identity survives;
+- exact receiver/target identity survives;
 - arbitrary state vocabulary survives;
-- resolved values survive without reinterpretation;
-- state add/update/remove semantics are explicit;
+- source eligibility and propagated provenance remain reachable;
+- state add, update, set, or remove semantics are explicit rather than inferred;
+- operation creation does not immediately mutate consumer state;
 - Wilds remains independent of consumer-specific object types;
-- QSL is not required for the Core state boundary.
+- QSL is not required for the Core state-operation boundary.
 
-### Milestone 7: Independent Neighbor causal execution
-
-**PLANNED**
-
-Certify the causal execution boundary after emission, propagation, eligibility, and receiver state delivery are stable.
-
-Target behaviors include:
-
-- an eligible Neighbor may receive a causal stimulus;
-- the receiving Neighbor independently determines its response;
-- resulting work belongs to a new Pulse owned by the receiving Neighbor;
-- originating and receiving Pulses retain independent WorkUnits and lifecycles;
-- failure or cancellation of the receiving Pulse cannot retroactively corrupt the originating Pulse;
-- causal provenance connects executions without merging execution ownership;
-- resulting Moments enter the history belonging to their owning objects;
-- propagation termination is explicit and deterministic.
-
-### Milestone 8: Semantic Timeline routing
+### Milestone 8: Wilds-facing end-to-end emission vertical slice
 
 **PLANNED**
 
-Use the established relationship and causal model as inputs to temporal organization.
+Certify one authoritative Wilds route from consumer-owned values and topology through resolution, immutable carriers, vector normalization, propagation, eligibility, and resolved state output. Topology may change between evaluations, unfamiliar consumer vocabulary remains valid, and Wilds remains the public coordination surface.
 
-Target behaviors include:
-
-- repeated Moments in the same semantic state continue the active Timeline;
-- a semantic-state transition creates a new Timeline;
-- returning to an earlier semantic state creates another Timeline instead of reopening historical state;
-- membership boundaries can participate in routing policy where appropriate;
-- Timeline creation remains Wilds-owned;
-- processors and pools remain independent of temporal-routing decisions;
-- all Timelines remain preserved by the current Epoch.
-
-### Milestone 9: Wilds-facing API and conformance
+### Milestone 9: QSL downstream integration and conformance
 
 **PLANNED**
 
-Freeze the thin Wilds-facing convenience surface around the certified architecture without exposing QSL integration machinery as the product front door.
+Where scripting is requested, hand already-valid Wilds state operations through the existing internal QSL integration boundary without making QSL the simulation authority. Preserve the QSL core baseline, request-envelope certification, provenance continuity, runtime isolation, exact consumer-object identity, and arbitrary runtime-attached vocabulary.
 
-Preserve:
+Future causal Neighbor execution, semantic Timeline routing, and final convenience API freezing remain follow-on milestones after the receiver state boundary and full emission vertical slice are stable.
 
-- the existing QSL core certification baseline;
-- Wilds/QSL request-envelope certification;
-- Wilds/QSL provenance continuity;
-- Wilds/QSL end-to-end lifecycle behavior;
-- runtime isolation;
-- exact consumer-object identity;
-- arbitrary runtime-attached vocabulary.
-
-**Wilds is the exposed surface and owns coordination, request lifecycle, relationships, emission resolution, propagation mechanics, and history. QSL owns delegated computation. The consumer owns meaning.**
+**Wilds is the exposed surface and owns coordination, request lifecycle, relationships, emission resolution, propagation, eligibility, and history. QSL owns delegated computation. The consumer owns meaning.**
