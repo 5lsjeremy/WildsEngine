@@ -41,7 +41,7 @@ namespace WildsEngine.Core.Tests.Fixtures
                 topology,
                 composition);
         }
-        
+
         public bool TryResolveTestEmission<TResult>(
             string propertyName,
             INeighborSequenceOperator topology,
@@ -57,6 +57,23 @@ namespace WildsEngine.Core.Tests.Fixtures
                 conversion,
                 composition,
                 out value);
+        }
+
+        public bool TryResolveTestEmissionResult<TResult>(
+            string emissionName,
+            INeighborSequenceOperator topology,
+            INeighborScalarOperator<TResult> topologyScalar,
+            Func<TResult, double> conversion,
+            IEmissionComposition composition,
+            out IResolvedEmission? result)
+        {
+            return TryResolveEmissionResult(
+                emissionName,
+                topology,
+                topologyScalar,
+                conversion,
+                composition,
+                out result);
         }
     }
 }

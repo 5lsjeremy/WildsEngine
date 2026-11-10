@@ -134,10 +134,11 @@ namespace WildsEngine.Core.Emission
             return _scalar.Resolve(
                 value);
         }
+
         protected double ResolveTopologyScalar<TResult>(
             INeighborSequenceOperator topology,
             INeighborScalarOperator<TResult> scalar,
-            System.Func<TResult, double> conversion)
+            Func<TResult, double> conversion)
         {
             if (topology == null)
             {
@@ -179,7 +180,7 @@ namespace WildsEngine.Core.Emission
 
             return value;
         }
-        
+
         protected double ComposeEmission(
             double emission,
             double topology,
@@ -195,7 +196,14 @@ namespace WildsEngine.Core.Emission
                 emission,
                 topology);
         }
-        
+
+        /// <summary>
+        /// Resolves one consumer-owned emission through the
+        /// emitter's current topology and supplied composition
+        /// policy.
+        ///
+        /// This is the Gate 3 scalar-resolution boundary.
+        /// </summary>
         protected bool TryResolveEmission<TResult>(
             string propertyName,
             INeighborSequenceOperator topology,
@@ -249,6 +257,47 @@ namespace WildsEngine.Core.Emission
                     emission,
                     resolvedTopology,
                     composition);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Resolves one consumer-owned emission and packages
+        /// the certified scalar result into an immutable
+        /// resolved-emission carrier.
+        ///
+        /// This operation adds no new emission mathematics.
+        /// It preserves the Gate 3 result together with the
+        /// exact source emitter and consumer-owned emission
+        /// identity.
+        /// </summary>
+        protected bool TryResolveEmissionResult<TResult>(
+            string emissionName,
+            INeighborSequenceOperator topology,
+            INeighborScalarOperator<TResult> topologyScalar,
+            Func<TResult, double> conversion,
+            IEmissionComposition composition,
+            out IResolvedEmission? result)
+        {
+            result =
+                null;
+
+            if (!TryResolveEmission(
+                    emissionName,
+                    topology,
+                    topologyScalar,
+                    conversion,
+                    composition,
+                    out var value))
+            {
+                return false;
+            }
+
+            result =
+                new ResolvedEmission(
+                    this,
+                    emissionName,
+                    value);
 
             return true;
         }

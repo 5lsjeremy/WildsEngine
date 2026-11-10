@@ -1,0 +1,2833 @@
+﻿============================================================
+ WILDS EMISSION - GATE 4 CONTEXT
+============================================================
+
+Generated: 2026-11-09 17:40:16
+Root:      C:\Users\jmatt\source\WildsEngine
+Files:     17
+
+############################################################
+FILE: WildsEngine.Core.Tests\Emission\EmitterGate2BTests.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Neighbors.Operators;
+using WildsEngine.Core.Tests.Fixtures;
+using WildsEngine.Tests.Registry;
+using Xunit;
+
+namespace WildsEngine.Core.Tests.Emission
+{
+    /// <summary>
+    /// Gate 2B certification for emission composition.
+    ///
+    /// This gate proves:
+    ///
+    /// consumer data
+    ///     -> base emission scalar
+    ///
+    /// topology
+    ///     -> membership selection
+    ///     -> topology scalar
+    ///
+    /// base scalar + topology scalar
+    ///     -> supplied composition policy
+    ///     -> resolved emission scalar
+    ///
+    /// The emitter does not own the mathematical semantics
+    /// of composition.
+    /// </summary>
+    public sealed class EmitterGate2BTests
+    {
+        [Fact]
+        public void Base_and_topology_scalars_are_composed_by_supplied_policy()
+        {
+            var component =
+                new TestComponent(
+                    "gate2b.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 1.6
+                        });
+
+            var alphaA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2b.alpha.a");
+
+            var alphaB =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2b.alpha.b");
+
+            var beta =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2b.beta");
+
+            emitter.Neighbors.Add(
+                alphaA,
+                "alpha",
+                1.0);
+
+            emitter.Neighbors.Add(
+                alphaB,
+                "alpha",
+                2.0);
+
+            emitter.Neighbors.Add(
+                beta,
+                "beta",
+                1.0);
+
+            Assert.True(
+                emitter.TryEmit(
+                    "signal",
+                    out var baseEmission));
+
+            var topologyScalar =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count);
+
+            var resolved =
+                emitter.ComposeTestEmission(
+                    baseEmission,
+                    topologyScalar,
+                    new TestAdditiveEmissionComposition());
+
+            Assert.Equal(
+                1.6,
+                baseEmission,
+                10);
+
+            Assert.Equal(
+                2.0,
+                topologyScalar,
+                10);
+
+            Assert.Equal(
+                3.6,
+                resolved,
+                10);
+        }
+
+        [Fact]
+        public void Membership_change_changes_composed_emission()
+        {
+            var component =
+                new TestComponent(
+                    "gate2b.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 1.6
+                        });
+
+            var objectA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2b.object.a");
+
+            var objectB =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2b.object.b");
+
+            emitter.Neighbors.Add(
+                objectA,
+                "active",
+                1.0);
+
+            emitter.Neighbors.Add(
+                objectB,
+                "active",
+                1.0);
+
+            Assert.True(
+                emitter.TryEmit(
+                    "signal",
+                    out var baseEmission));
+
+            var composition =
+                new TestAdditiveEmissionComposition();
+
+            var topologyBefore =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "active"),
+                    new NeighborCount(),
+                    count => count);
+
+            var resolvedBefore =
+                emitter.ComposeTestEmission(
+                    baseEmission,
+                    topologyBefore,
+                    composition);
+
+            Assert.True(
+                emitter.Neighbors.Remove(
+                    objectB.Id,
+                    "active"));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    objectB,
+                    "inactive",
+                    1.0));
+
+            var topologyAfter =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "active"),
+                    new NeighborCount(),
+                    count => count);
+
+            var resolvedAfter =
+                emitter.ComposeTestEmission(
+                    baseEmission,
+                    topologyAfter,
+                    composition);
+
+            Assert.Equal(
+                2.0,
+                topologyBefore,
+                10);
+
+            Assert.Equal(
+                1.0,
+                topologyAfter,
+                10);
+
+            Assert.Equal(
+                3.6,
+                resolvedBefore,
+                10);
+
+            Assert.Equal(
+                2.6,
+                resolvedAfter,
+                10);
+        }
+
+        [Theory]
+        [InlineData(double.NaN)]
+        [InlineData(double.PositiveInfinity)]
+        [InlineData(double.NegativeInfinity)]
+        public void Non_finite_base_emission_is_rejected(
+            double emission)
+        {
+            var component =
+                new TestComponent(
+                    "gate2b.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () =>
+                {
+                    emitter.ComposeTestEmission(
+                        emission,
+                        1.0,
+                        new TestAdditiveEmissionComposition());
+                });
+        }
+
+        [Theory]
+        [InlineData(double.NaN)]
+        [InlineData(double.PositiveInfinity)]
+        [InlineData(double.NegativeInfinity)]
+        public void Non_finite_topology_scalar_is_rejected(
+            double topology)
+        {
+            var component =
+                new TestComponent(
+                    "gate2b.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            Assert.Throws<ArgumentOutOfRangeException>(
+                () =>
+                {
+                    emitter.ComposeTestEmission(
+                        1.0,
+                        topology,
+                        new TestAdditiveEmissionComposition());
+                });
+        }
+
+        [Fact]
+        public void Non_finite_composition_result_is_rejected()
+        {
+            var component =
+                new TestComponent(
+                    "gate2b.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            Assert.Throws<ArithmeticException>(
+                () =>
+                {
+                    emitter.ComposeTestEmission(
+                        double.MaxValue,
+                        double.MaxValue,
+                        new TestAdditiveEmissionComposition());
+                });
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Emission\EmitterGate2Tests.cs
+############################################################
+using System.Collections.Generic;
+using WildsEngine.Core.Neighbors.Operators;
+using WildsEngine.Core.Tests.Fixtures;
+using WildsEngine.Tests.Registry;
+using Xunit;
+
+namespace WildsEngine.Core.Tests.Emission
+{
+    /// <summary>
+    /// Gate 2 certification for topology-derived emission input.
+    ///
+    /// This gate proves:
+    ///
+    /// consumer data
+    ///     -> base emission scalar
+    ///
+    /// current Neighbor topology
+    ///     -> membership selection
+    ///     -> scalar operator
+    ///     -> topology scalar
+    ///
+    /// Composition between those scalars is intentionally
+    /// outside this gate.
+    /// </summary>
+    public sealed class EmitterGate2Tests
+    {
+        [Fact]
+        public void Membership_topology_resolves_to_scalar()
+        {
+            var component =
+                new TestComponent(
+                    "gate2.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 1.6
+                        });
+
+            var alphaA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.alpha.a");
+
+            var alphaB =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.alpha.b");
+
+            var beta =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.beta");
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    alphaA,
+                    "alpha",
+                    1.0));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    alphaB,
+                    "alpha",
+                    2.0));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    beta,
+                    "beta",
+                    1.0));
+
+            Assert.True(
+                emitter.TryEmit(
+                    "signal",
+                    out var baseEmission));
+
+            var topologyScalar =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count);
+
+            Assert.Equal(
+                1.6,
+                baseEmission,
+                10);
+
+            Assert.Equal(
+                2.0,
+                topologyScalar,
+                10);
+        }
+
+        [Fact]
+        public void Different_memberships_resolve_independently()
+        {
+            var component =
+                new TestComponent(
+                    "gate2.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var first =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.first");
+
+            var second =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.second");
+
+            var third =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.third");
+
+            emitter.Neighbors.Add(
+                first,
+                "alpha",
+                1.0);
+
+            emitter.Neighbors.Add(
+                second,
+                "alpha",
+                2.0);
+
+            emitter.Neighbors.Add(
+                third,
+                "beta",
+                3.0);
+
+            var alphaScalar =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count);
+
+            var betaScalar =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "beta"),
+                    new NeighborCount(),
+                    count => count);
+
+            Assert.Equal(
+                2.0,
+                alphaScalar,
+                10);
+
+            Assert.Equal(
+                1.0,
+                betaScalar,
+                10);
+        }
+
+        [Fact]
+        public void Missing_membership_resolves_to_zero_count()
+        {
+            var component =
+                new TestComponent(
+                    "gate2.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var neighbor =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.neighbor");
+
+            emitter.Neighbors.Add(
+                neighbor,
+                "alpha",
+                1.0);
+
+            var topologyScalar =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "unknown"),
+                    new NeighborCount(),
+                    count => count);
+
+            Assert.Equal(
+                0.0,
+                topologyScalar,
+                10);
+        }
+
+        [Fact]
+        public void Membership_change_changes_topology_scalar()
+        {
+            var component =
+                new TestComponent(
+                    "gate2.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var objectA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.object.a");
+
+            var objectB =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.object.b");
+
+            emitter.Neighbors.Add(
+                objectA,
+                "stock",
+                1.0);
+
+            emitter.Neighbors.Add(
+                objectB,
+                "stock",
+                1.0);
+
+            var before =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "stock"),
+                    new NeighborCount(),
+                    count => count);
+
+            Assert.True(
+                emitter.Neighbors.Remove(
+                    objectB.Id,
+                    "stock"));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    objectB,
+                    "reduced",
+                    1.0));
+
+            var stockAfter =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "stock"),
+                    new NeighborCount(),
+                    count => count);
+
+            var reducedAfter =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "reduced"),
+                    new NeighborCount(),
+                    count => count);
+
+            Assert.Equal(
+                2.0,
+                before,
+                10);
+
+            Assert.Equal(
+                1.0,
+                stockAfter,
+                10);
+
+            Assert.Equal(
+                1.0,
+                reducedAfter,
+                10);
+        }
+
+        [Fact]
+        public void Same_object_can_contribute_through_multiple_memberships()
+        {
+            var component =
+                new TestComponent(
+                    "gate2.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var objectA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.object.a");
+
+            emitter.Neighbors.Add(
+                objectA,
+                "stock",
+                1.0);
+
+            emitter.Neighbors.Add(
+                objectA,
+                "sale",
+                2.0);
+
+            emitter.Neighbors.Add(
+                objectA,
+                "reduced",
+                3.0);
+
+            var stock =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "stock"),
+                    new NeighborCount(),
+                    count => count);
+
+            var sale =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "sale"),
+                    new NeighborCount(),
+                    count => count);
+
+            var reduced =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "reduced"),
+                    new NeighborCount(),
+                    count => count);
+
+            Assert.Equal(
+                1.0,
+                stock,
+                10);
+
+            Assert.Equal(
+                1.0,
+                sale,
+                10);
+
+            Assert.Equal(
+                1.0,
+                reduced,
+                10);
+        }
+
+        [Fact]
+        public void Topology_scalar_resolution_does_not_mutate_neighbors()
+        {
+            var component =
+                new TestComponent(
+                    "gate2.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var alpha =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.alpha");
+
+            var beta =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate2.beta");
+
+            emitter.Neighbors.Add(
+                alpha,
+                "alpha",
+                1.0);
+
+            emitter.Neighbors.Add(
+                beta,
+                "beta",
+                2.0);
+
+            var before =
+                emitter.Neighbors.Relationships;
+
+            var topologyScalar =
+                emitter.ResolveTestTopologyScalar(
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count);
+
+            var after =
+                emitter.Neighbors.Relationships;
+
+            Assert.Equal(
+                1.0,
+                topologyScalar,
+                10);
+
+            Assert.Equal(
+                2,
+                before.Count);
+
+            Assert.Equal(
+                2,
+                after.Count);
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    alpha.Id,
+                    "alpha"));
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    beta.Id,
+                    "beta"));
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Emission\EmitterGate3Tests.cs
+############################################################
+using WildsEngine.Core.Neighbors.Operators;
+using WildsEngine.Core.Tests.Fixtures;
+using WildsEngine.Tests.Logging;
+using WildsEngine.Tests.Registry;
+using Xunit.Abstractions;
+
+namespace WildsEngine.Core.Tests.Emission
+{
+    /// <summary>
+    /// Gate 3 certification for complete scalar emission
+    /// resolution.
+    ///
+    /// This gate proves the complete internal route:
+    ///
+    /// consumer value
+    ///     -> base scalar
+    ///     -> current topology
+    ///     -> topology selection
+    ///     -> topology scalar
+    ///     -> supplied composition
+    ///     -> resolved emission
+    ///
+    /// Propagation, receiver eligibility, and state operations
+    /// remain outside this gate.
+    /// </summary>
+    public sealed class EmitterGate3Tests
+    {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public EmitterGate3Tests(
+            ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper =
+                testOutputHelper;
+        }
+
+        [Fact]
+        public void Complete_emission_route_resolves_in_one_operation()
+        {
+            InitializeEmissionReport();
+
+            TestLog.Section(
+                "EMITTER GATE 3 - COMPLETE EMISSION RESOLUTION");
+
+            TestLog.Test(
+                "Consumer value and current topology resolve into one emission.");
+
+            var component =
+                new TestComponent(
+                    "gate3.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 1.6
+                        });
+
+            var alphaA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.alpha.a");
+
+            var alphaB =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.alpha.b");
+
+            var beta =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.beta");
+
+            TestLog.Task(
+                "Building emitter topology.");
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    alphaA,
+                    "alpha",
+                    1.0));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    alphaB,
+                    "alpha",
+                    2.0));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    beta,
+                    "beta",
+                    1.0));
+
+            TestLog.State(
+                $"Neighbor relationships = {emitter.Neighbors.Count}");
+
+            TestLog.Task(
+                "Resolving base emission through alpha topology.");
+
+            var alphaRelationships =
+                emitter.ApplyNeighborOperator(
+                    new MembershipNeighborFilter(
+                        "alpha"));
+
+            var topologyScalar =
+                new NeighborCount().Apply(
+                    emitter,
+                    alphaRelationships);
+
+            var resolved =
+                emitter.TryResolveTestEmission(
+                    "signal",
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count,
+                    new TestAdditiveEmissionComposition(),
+                    out var value);
+
+            TestLog.State(
+                "Base emission = 1.6");
+
+            TestLog.State(
+                "Selected membership = alpha");
+
+            TestLog.State(
+                $"Topology scalar = {topologyScalar}");
+
+            TestLog.State(
+                $"Resolved emission = {value}");
+
+            Assert.True(
+                resolved);
+
+            Assert.Equal(
+                2,
+                topologyScalar);
+
+            Assert.Equal(
+                3.6,
+                value,
+                10);
+
+            TestLog.Pass(
+                "Complete emission route resolved successfully.");
+
+            PublishLatestReport();
+
+            WriteFinished(
+                "COMPLETE EMISSION RESOLUTION");
+        }
+
+        [Fact]
+        public void Unrelated_memberships_do_not_contribute()
+        {
+            InitializeEmissionReport();
+
+            TestLog.Section(
+                "EMITTER GATE 3 - MEMBERSHIP ISOLATION");
+
+            TestLog.Test(
+                "Unrelated memberships do not contribute to the selected topology.");
+
+            var component =
+                new TestComponent(
+                    "gate3.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 10.0
+                        });
+
+            var alpha =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.alpha");
+
+            var betaA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.beta.a");
+
+            var betaB =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.beta.b");
+
+            emitter.Neighbors.Add(
+                alpha,
+                "alpha",
+                1.0);
+
+            emitter.Neighbors.Add(
+                betaA,
+                "beta",
+                1.0);
+
+            emitter.Neighbors.Add(
+                betaB,
+                "beta",
+                1.0);
+
+            TestLog.State(
+                $"Total relationships = {emitter.Neighbors.Count}");
+
+            var resolved =
+                emitter.TryResolveTestEmission(
+                    "signal",
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count,
+                    new TestAdditiveEmissionComposition(),
+                    out var value);
+
+            TestLog.State(
+                $"Resolved alpha emission = {value}");
+
+            Assert.True(
+                resolved);
+
+            Assert.Equal(
+                11.0,
+                value,
+                10);
+
+            TestLog.Pass(
+                "Unrelated beta memberships did not contribute.");
+
+            WriteFinished(
+                "MEMBERSHIP ISOLATION");
+        }
+
+        [Fact]
+        public void Membership_changes_immediately_change_resolved_emission()
+        {
+            InitializeEmissionReport();
+
+            TestLog.Section(
+                "EMITTER GATE 3 - DYNAMIC MEMBERSHIP");
+
+            TestLog.Test(
+                "Changing topology membership changes the next resolved emission.");
+
+            var component =
+                new TestComponent(
+                    "gate3.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 5.0
+                        });
+
+            var objectA =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.object.a");
+
+            var objectB =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.object.b");
+
+            emitter.Neighbors.Add(
+                objectA,
+                "active",
+                1.0);
+
+            emitter.Neighbors.Add(
+                objectB,
+                "active",
+                1.0);
+
+            Assert.True(
+                emitter.TryResolveTestEmission(
+                    "signal",
+                    new MembershipNeighborFilter(
+                        "active"),
+                    new NeighborCount(),
+                    count => count,
+                    new TestAdditiveEmissionComposition(),
+                    out var before));
+
+            TestLog.State(
+                $"Resolved active emission before topology change = {before}");
+
+            TestLog.Task(
+                "Moving one object from active to inactive membership.");
+
+            Assert.True(
+                emitter.Neighbors.Remove(
+                    objectB.Id,
+                    "active"));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    objectB,
+                    "inactive",
+                    1.0));
+
+            Assert.True(
+                emitter.TryResolveTestEmission(
+                    "signal",
+                    new MembershipNeighborFilter(
+                        "active"),
+                    new NeighborCount(),
+                    count => count,
+                    new TestAdditiveEmissionComposition(),
+                    out var after));
+
+            TestLog.State(
+                $"Resolved active emission after topology change = {after}");
+
+            Assert.Equal(
+                7.0,
+                before,
+                10);
+
+            Assert.Equal(
+                6.0,
+                after,
+                10);
+
+            TestLog.Pass(
+                "Dynamic membership change immediately affected emission resolution.");
+
+            WriteFinished(
+                "DYNAMIC MEMBERSHIP");
+        }
+
+        [Fact]
+        public void Missing_consumer_property_stops_resolution()
+        {
+            InitializeEmissionReport();
+
+            TestLog.Section(
+                "EMITTER GATE 3 - MISSING PROPERTY");
+
+            TestLog.Test(
+                "Missing consumer vocabulary stops emission resolution cleanly.");
+
+            var component =
+                new TestComponent(
+                    "gate3.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var neighbor =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.neighbor");
+
+            emitter.Neighbors.Add(
+                neighbor,
+                "alpha",
+                1.0);
+
+            var resolved =
+                emitter.TryResolveTestEmission(
+                    "missing",
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count,
+                    new TestAdditiveEmissionComposition(),
+                    out var value);
+
+            TestLog.State(
+                $"Resolution succeeded = {resolved}");
+
+            TestLog.State(
+                $"Returned value = {value}");
+
+            Assert.False(
+                resolved);
+
+            Assert.Equal(
+                0.0,
+                value);
+
+            TestLog.Pass(
+                "Missing consumer property produced no resolved emission.");
+
+            WriteFinished(
+                "MISSING PROPERTY");
+        }
+
+        [Fact]
+        public void Pipeline_can_define_topology_before_scalar_resolution()
+        {
+            InitializeEmissionReport();
+
+            TestLog.Section(
+                "EMITTER GATE 3 - TOPOLOGY PIPELINE");
+
+            TestLog.Test(
+                "Existing Neighbor pipeline stages define topology before scalar reduction.");
+
+            var component =
+                new TestComponent(
+                    "gate3.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 1.0
+                        });
+
+            var near =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.near");
+
+            var middle =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.middle");
+
+            var far =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.far");
+
+            var unrelated =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.unrelated");
+
+            emitter.Neighbors.Add(
+                near,
+                "alpha",
+                1.0);
+
+            emitter.Neighbors.Add(
+                middle,
+                "alpha",
+                2.0);
+
+            emitter.Neighbors.Add(
+                far,
+                "alpha",
+                10.0);
+
+            emitter.Neighbors.Add(
+                unrelated,
+                "beta",
+                1.0);
+
+            var pipeline =
+                new NeighborPipeline(
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborWithinDistanceFilter(
+                        2.0));
+
+            var selected =
+                emitter.ApplyNeighborOperator(
+                    pipeline);
+
+            TestLog.State(
+                $"Source relationships = {emitter.Neighbors.Count}");
+
+            TestLog.State(
+                $"Pipeline relationships = {selected.Count}");
+
+            Assert.True(
+                emitter.TryResolveTestEmission(
+                    "signal",
+                    pipeline,
+                    new NeighborCount(),
+                    count => count,
+                    new TestAdditiveEmissionComposition(),
+                    out var value));
+
+            TestLog.State(
+                $"Resolved emission = {value}");
+
+            Assert.Equal(
+                2,
+                selected.Count);
+
+            Assert.Equal(
+                3.0,
+                value,
+                10);
+
+            TestLog.Pass(
+                "Neighbor pipeline successfully defined emission topology.");
+
+            WriteFinished(
+                "TOPOLOGY PIPELINE");
+        }
+
+        [Fact]
+        public void Complete_resolution_does_not_mutate_source_topology()
+        {
+            InitializeEmissionReport();
+
+            TestLog.Section(
+                "EMITTER GATE 3 - TOPOLOGY PRESERVATION");
+
+            TestLog.Test(
+                "Complete emission resolution preserves source Neighbor topology.");
+
+            var component =
+                new TestComponent(
+                    "gate3.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["signal"] = 2.0
+                        });
+
+            var alpha =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.alpha");
+
+            var beta =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate3.beta");
+
+            emitter.Neighbors.Add(
+                alpha,
+                "alpha",
+                1.0);
+
+            emitter.Neighbors.Add(
+                beta,
+                "beta",
+                2.0);
+
+            var countBefore =
+                emitter.Neighbors.Count;
+
+            Assert.True(
+                emitter.TryResolveTestEmission(
+                    "signal",
+                    new MembershipNeighborFilter(
+                        "alpha"),
+                    new NeighborCount(),
+                    count => count,
+                    new TestAdditiveEmissionComposition(),
+                    out var value));
+
+            var countAfter =
+                emitter.Neighbors.Count;
+
+            TestLog.State(
+                $"Relationships before resolution = {countBefore}");
+
+            TestLog.State(
+                $"Relationships after resolution = {countAfter}");
+
+            TestLog.State(
+                $"Resolved emission = {value}");
+
+            Assert.Equal(
+                3.0,
+                value,
+                10);
+
+            Assert.Equal(
+                2,
+                countAfter);
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    alpha.Id,
+                    "alpha"));
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    beta.Id,
+                    "beta"));
+
+            TestLog.Pass(
+                "Complete resolution preserved source topology.");
+
+            WriteFinished(
+                "TOPOLOGY PRESERVATION");
+        }
+
+        private static void InitializeEmissionReport()
+        {
+            TestLog.Initialize(
+                $"emitter-certification-{DateTime.Now:yyyyMMdd-HHmmss}.log",
+                "Emission");
+        }
+
+        private static void PublishLatestReport()
+        {
+            TestLog.State(
+                $"Emission certification report = {TestLog.Path}");
+
+            TestLog.WriteLatest(
+                "emitter-certification-latest.log");
+        }
+
+        private void WriteFinished(
+            string certification)
+        {
+            _testOutputHelper.WriteLine("");
+            _testOutputHelper.WriteLine(
+                "============================================");
+
+            _testOutputHelper.WriteLine(
+                $" EMITTER GATE 3 FINISHED - {certification}");
+
+            _testOutputHelper.WriteLine(
+                "============================================");
+
+            _testOutputHelper.WriteLine(
+                $" Report: {TestLog.Path}");
+
+            _testOutputHelper.WriteLine("");
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Emission\EmitterGateTests.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Tests.Fixtures;
+using WildsEngine.Tests.Registry;
+using Xunit;
+
+namespace WildsEngine.Core.Tests.Emission
+{
+    /// <summary>
+    /// Gate 1 certification for the Wilds emitter surface.
+    ///
+    /// This gate proves:
+    ///
+    /// consumer data
+    ///     -> emitter
+    ///     -> scalar emission
+    ///
+    /// while preserving ordinary Wilds identity and topology.
+    ///
+    /// Propagation, topology-derived scalar influence,
+    /// receiver eligibility, and state emission are intentionally
+    /// outside this gate.
+    /// </summary>
+    public sealed class EmitterGate1Tests
+    {
+        [Fact]
+        public void Single_numeric_property_resolves_to_scalar()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["appetite"] = 1.6
+                        });
+
+            var emitted =
+                emitter.TryEmit(
+                    "appetite",
+                    out var value);
+
+            Assert.True(
+                emitted);
+
+            Assert.Equal(
+                1.6,
+                value,
+                10);
+        }
+
+        [Fact]
+        public void Named_group_resolves_to_scalar_dictionary()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    groups:
+                        new Dictionary<
+                            string,
+                            IReadOnlyDictionary<
+                                string,
+                                object?>>
+                        {
+                            ["food"] =
+                                new Dictionary<
+                                    string,
+                                    object?>
+                                {
+                                    ["appetite"] = 1.6,
+                                    ["hunger-reducer"] = 1.4
+                                }
+                        });
+
+            var emitted =
+                emitter.TryEmitGroup(
+                    "food",
+                    out var values);
+
+            Assert.True(
+                emitted);
+
+            Assert.Equal(
+                2,
+                values.Count);
+
+            Assert.Equal(
+                1.6,
+                values["appetite"],
+                10);
+
+            Assert.Equal(
+                1.4,
+                values["hunger-reducer"],
+                10);
+        }
+
+        [Fact]
+        public void Missing_property_does_not_emit()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var emitted =
+                emitter.TryEmit(
+                    "unknown",
+                    out var value);
+
+            Assert.False(
+                emitted);
+
+            Assert.Equal(
+                0.0,
+                value);
+        }
+
+        [Fact]
+        public void Missing_group_does_not_emit()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var emitted =
+                emitter.TryEmitGroup(
+                    "unknown",
+                    out var values);
+
+            Assert.False(
+                emitted);
+
+            Assert.Empty(
+                values);
+        }
+
+        [Theory]
+        [InlineData(double.NaN)]
+        [InlineData(double.PositiveInfinity)]
+        [InlineData(double.NegativeInfinity)]
+        public void Non_finite_scalar_is_rejected(
+            double rawValue)
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["value"] = rawValue
+                        });
+
+            Assert.Throws<
+                ArgumentOutOfRangeException>(
+                () =>
+                {
+                    emitter.TryEmit(
+                        "value",
+                        out _);
+                });
+        }
+
+        [Fact]
+        public void Non_numeric_property_is_not_silently_converted()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["value"] = "not-a-number"
+                        });
+
+            Assert.Throws<
+                ArgumentException>(
+                () =>
+                {
+                    emitter.TryEmit(
+                        "value",
+                        out _);
+                });
+        }
+
+        [Fact]
+        public void Emitter_has_wilds_identity()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            Assert.NotEqual(
+                Guid.Empty,
+                emitter.Id);
+
+            Assert.False(
+                string.IsNullOrWhiteSpace(
+                    emitter.Slug));
+
+            Assert.Same(
+                component,
+                emitter.Component);
+        }
+
+        [Fact]
+        public void Emitter_owns_ordinary_neighbor_topology()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var neighbor =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate1.neighbor");
+
+            var added =
+                emitter.Neighbors.Add(
+                    neighbor,
+                    "alpha",
+                    1.0);
+
+            Assert.True(
+                added);
+
+            Assert.Equal(
+                1,
+                emitter.Neighbors.Count);
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    neighbor.Id,
+                    "alpha"));
+        }
+
+        [Fact]
+        public void Same_neighbor_can_participate_in_multiple_memberships()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var neighbor =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate1.neighbor");
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    neighbor,
+                    "alpha",
+                    1.0));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    neighbor,
+                    "beta",
+                    2.0));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    neighbor,
+                    "gamma",
+                    3.0));
+
+            Assert.Equal(
+                3,
+                emitter.Neighbors.Count);
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    neighbor.Id,
+                    "alpha"));
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    neighbor.Id,
+                    "beta"));
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    neighbor.Id,
+                    "gamma"));
+        }
+
+        [Fact]
+        public void Membership_can_be_removed_without_affecting_others()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var neighbor =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate1.neighbor");
+
+            emitter.Neighbors.Add(
+                neighbor,
+                "alpha",
+                1.0);
+
+            emitter.Neighbors.Add(
+                neighbor,
+                "beta",
+                2.0);
+
+            emitter.Neighbors.Add(
+                neighbor,
+                "gamma",
+                3.0);
+
+            var removed =
+                emitter.Neighbors.Remove(
+                    neighbor.Id,
+                    "beta");
+
+            Assert.True(
+                removed);
+
+            Assert.Equal(
+                2,
+                emitter.Neighbors.Count);
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    neighbor.Id,
+                    "alpha"));
+
+            Assert.False(
+                emitter.Neighbors.Contains(
+                    neighbor.Id,
+                    "beta"));
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    neighbor.Id,
+                    "gamma"));
+        }
+
+        [Fact]
+        public void Relationship_snapshot_matches_current_topology()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var neighbor =
+                WildsFixtureFactory.CreateTopologyObject(
+                    component,
+                    "gate1.neighbor");
+
+            emitter.Neighbors.Add(
+                neighbor,
+                "alpha",
+                1.0);
+
+            var snapshot =
+                emitter.Neighbors.Relationships;
+
+            Assert.Single(
+                snapshot);
+
+            Assert.Equal(
+                "alpha",
+                snapshot[0].Membership);
+
+            Assert.Same(
+                neighbor,
+                snapshot[0].Neighbor);
+
+            Assert.Equal(
+                1.0,
+                snapshot[0].Distance,
+                10);
+        }
+
+        [Fact]
+        public void Reading_emission_does_not_change_consumer_data()
+        {
+            var properties =
+                new Dictionary<string, object?>
+                {
+                    ["appetite"] = 1.6
+                };
+
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        properties);
+
+            Assert.True(
+                emitter.TryEmit(
+                    "appetite",
+                    out var value));
+
+            Assert.Equal(
+                1.6,
+                value,
+                10);
+
+            Assert.Equal(
+                1.6,
+                properties["appetite"]);
+        }
+
+        [Fact]
+        public void Arbitrary_consumer_vocabulary_requires_no_wilds_types()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component,
+                    properties:
+                        new Dictionary<string, object?>
+                        {
+                            ["nocturnal-fungal-fissure"] = 7.25
+                        });
+
+            Assert.True(
+                emitter.TryEmit(
+                    "nocturnal-fungal-fissure",
+                    out var value));
+
+            Assert.Equal(
+                7.25,
+                value,
+                10);
+        }
+
+        [Fact]
+        public void Cheese_can_participate_in_multiple_memberships()
+        {
+            var component =
+                new TestComponent(
+                    "gate1.component");
+
+            var emitter =
+                WildsFixtureFactory.CreateEmitter(
+                    component);
+
+            var cheese =
+                WildsFixtureFactory.CreateCheese(
+                    component);
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    cheese,
+                    "delicious",
+                    1.0));
+
+            Assert.True(
+                emitter.Neighbors.Add(
+                    cheese,
+                    "reduced",
+                    2.0));
+
+            Assert.Equal(
+                2,
+                emitter.Neighbors.Count);
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    cheese.Id,
+                    "delicious"));
+
+            Assert.True(
+                emitter.Neighbors.Contains(
+                    cheese.Id,
+                    "reduced"));
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestAdditiveEmissionComposition.cs
+############################################################
+using WildsEngine.Core.Emission;
+
+namespace WildsEngine.Core.Tests.Fixtures
+{
+    internal sealed class TestAdditiveEmissionComposition :
+        EmissionCompositionBase
+    {
+        protected override double ComposeCore(
+            double emission,
+            double topology)
+        {
+            return emission +
+                   topology;
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestComponent.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Components;
+
+namespace WildsEngine.Tests.Registry
+{
+    public sealed class TestComponent :
+        BaseComponent
+    {
+        private readonly IState _state;
+        private readonly ISignal _signal;
+
+        public TestComponent(
+            string layer)
+            : base(layer)
+        {
+            var context =
+                new TestContext(
+                    this,
+                    $"{layer}.context");
+
+            _state =
+                new TestState(
+                    this,
+                    context,
+                    $"{layer}.state");
+
+            _signal =
+                new TestSignal(
+                    this,
+                    $"{layer}.signal");
+        }
+
+        public override IState State =>
+            _state;
+
+        public override ISignal Signal =>
+            _signal;
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestContext.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Contexts;
+
+namespace WildsEngine.Tests.Registry
+{
+    internal sealed class TestContext :
+        WildsContext
+    {
+        public TestContext(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer)
+        {
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestEmissionDataSource.cs
+############################################################
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Tests.Fixtures
+{
+    internal sealed class TestEmissionDataSource :
+        IEmissionDataSource
+    {
+        private readonly IReadOnlyDictionary<
+            string,
+            object?> _properties;
+
+        private readonly IReadOnlyDictionary<
+            string,
+            IReadOnlyDictionary<
+                string,
+                object?>> _groups;
+
+        public TestEmissionDataSource(
+            IReadOnlyDictionary<
+                string,
+                object?>? properties = null,
+            IReadOnlyDictionary<
+                string,
+                IReadOnlyDictionary<
+                    string,
+                    object?>>? groups = null)
+        {
+            _properties =
+                properties ??
+                new Dictionary<
+                    string,
+                    object?>();
+
+            _groups =
+                groups ??
+                new Dictionary<
+                    string,
+                    IReadOnlyDictionary<
+                        string,
+                        object?>>();
+        }
+
+        public bool TryGetProperty(
+            string propertyName,
+            out object? value)
+        {
+            return _properties.TryGetValue(
+                propertyName,
+                out value);
+        }
+
+        public bool TryGetGroup(
+            string groupName,
+            out IReadOnlyDictionary<
+                string,
+                object?> values)
+        {
+            if (_groups.TryGetValue(
+                    groupName,
+                    out var resolved))
+            {
+                values =
+                    resolved;
+
+                return true;
+            }
+
+            values =
+                new Dictionary<
+                    string,
+                    object?>();
+
+            return false;
+        }
+    }
+}
+
+
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestEmitter.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Emission;
+
+namespace WildsEngine.Core.Tests.Fixtures
+{
+    internal sealed class TestEmitter :
+        EmitterBase
+    {
+        public TestEmitter(
+            IComponent component,
+            string layer,
+            IEmissionDataSource dataSource,
+            IEmissionScalar scalar)
+            : base(
+                component,
+                layer,
+                dataSource,
+                scalar)
+        {
+        }
+
+        public double ResolveTestTopologyScalar<TResult>(
+            INeighborSequenceOperator topology,
+            INeighborScalarOperator<TResult> scalar,
+            Func<TResult, double> conversion)
+        {
+            return ResolveTopologyScalar(
+                topology,
+                scalar,
+                conversion);
+        }
+
+        public double ComposeTestEmission(
+            double emission,
+            double topology,
+            IEmissionComposition composition)
+        {
+            return ComposeEmission(
+                emission,
+                topology,
+                composition);
+        }
+        
+        public bool TryResolveTestEmission<TResult>(
+            string propertyName,
+            INeighborSequenceOperator topology,
+            INeighborScalarOperator<TResult> topologyScalar,
+            Func<TResult, double> conversion,
+            IEmissionComposition composition,
+            out double value)
+        {
+            return TryResolveEmission(
+                propertyName,
+                topology,
+                topologyScalar,
+                conversion,
+                composition,
+                out value);
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestLog.cs
+############################################################
+using System;
+using System.Globalization;
+using System.IO;
+using System.Text;
+
+namespace WildsEngine.Tests.Logging
+{
+    public static class TestLog
+    {
+        private static readonly object Sync = new object();
+        private static string? _path;
+
+        public static string Path => _path ?? string.Empty;
+
+        public static void Initialize(
+            string? fileName = null,
+            string? reportArea = null)
+        {
+            lock (Sync)
+            {
+                if (_path != null)
+                    return;
+
+                var reports =
+                    System.IO.Path.Combine(
+                        AppContext.BaseDirectory,
+                        "Certification",
+                        "Reports");
+
+                if (!string.IsNullOrWhiteSpace(
+                        reportArea))
+                {
+                    reports =
+                        System.IO.Path.Combine(
+                            reports,
+                            reportArea);
+                }
+
+                Directory.CreateDirectory(
+                    reports);
+
+                var name =
+                    fileName ??
+                    $"wildsengine-tests-{DateTime.Now:yyyyMMdd-HHmmss}.log";
+
+                _path =
+                    System.IO.Path.Combine(
+                        reports,
+                        name);
+
+                File.WriteAllText(
+                    _path,
+                    $"WildsEngine test log{Environment.NewLine}",
+                    Encoding.UTF8);
+            }
+        }
+
+        public static void Section(string title)
+        {
+            Write("");
+            Write("============================================");
+            Write($" {title}");
+            Write("============================================");
+        }
+
+        public static void Write(string message)
+        {
+            lock (Sync)
+            {
+                if (_path == null)
+                    Initialize();
+
+                Console.WriteLine(message);
+                File.AppendAllText(_path!,
+                    $"{DateTime.Now.ToString("O", CultureInfo.InvariantCulture)} {message}{Environment.NewLine}",
+                    Encoding.UTF8);
+            }
+        }
+
+        public static void Test(string message) => Write($"[TEST] {message}");
+        public static void Pass(string message) => Write($"[PASS] {message}");
+        public static void Task(string message) => Write($"    [TASK] {message}");
+        public static void State(string message) => Write($"    [STATE] {message}");
+        public static void Expected(string message) => Write($"    [EXPECTED] {message}");
+        public static void Fail(string message, Exception ex) =>
+            Write($"[FAIL] {message}: {ex.GetType().Name}: {ex.Message}");
+        
+        public static void WriteLatest(
+            string fileName)
+        {
+            lock (Sync)
+            {
+                if (_path == null)
+                {
+                    throw new InvalidOperationException(
+                        "TestLog has not been initialized.");
+                }
+
+                var directory =
+                    System.IO.Path.GetDirectoryName(
+                        _path);
+
+                if (string.IsNullOrWhiteSpace(
+                        directory))
+                {
+                    throw new InvalidOperationException(
+                        "TestLog report directory could not be resolved.");
+                }
+
+                var latest =
+                    System.IO.Path.Combine(
+                        directory,
+                        fileName);
+
+                File.Copy(
+                    _path,
+                    latest,
+                    true);
+            }
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestSignal.cs
+############################################################
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Signals;
+
+namespace WildsEngine.Tests.Registry
+{
+    internal sealed class TestSignal :
+        WildsSignal
+    {
+        public TestSignal(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer)
+        {
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestState.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.States;
+
+namespace WildsEngine.Tests.Registry;
+
+internal sealed class TestState :
+    WildsState
+{
+    public TestState(
+        IComponent component,
+        IContext context,
+        string layer)
+        : base(
+            component,
+            context,
+            layer)
+    {
+    }
+
+    public override bool Process(
+        IStateInstruction instruction)
+    {
+        if (instruction == null)
+        {
+            throw new ArgumentNullException(
+                nameof(instruction));
+        }
+
+        if (TryProcessNeighborInstruction(
+                instruction))
+        {
+            return true;
+        }
+
+        if (instruction is
+            ISetContextVariableInstruction
+            setContextVariable)
+        {
+            Context.SetVariable(
+                setContextVariable.Key,
+                setContextVariable.Value);
+
+            return true;
+        }
+
+        return false;
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\TestTopologyObject.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Tests.Fixtures
+{
+    internal sealed class TestTopologyObject :
+        BaseObject
+    {
+        private readonly IComponent _component;
+
+        public TestTopologyObject(
+            IComponent component,
+            string layer)
+            : base(
+                layer)
+        {
+            _component =
+                component ??
+                throw new ArgumentNullException(
+                    nameof(component));
+        }
+
+        public override IComponent Component =>
+            _component;
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core.Tests\Fixtures\WildsFixturesFactory.cs
+############################################################
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Emission;
+
+namespace WildsEngine.Core.Tests.Fixtures
+{
+    internal static class WildsFixtureFactory
+    {
+        public static TestEmitter CreateEmitter(
+            IComponent component,
+            string layer = "test.emitter",
+            IReadOnlyDictionary<
+                string,
+                object?>? properties = null,
+            IReadOnlyDictionary<
+                string,
+                IReadOnlyDictionary<
+                    string,
+                    object?>>? groups = null,
+            IEmissionScalar? scalar = null)
+        {
+            var dataSource =
+                new TestEmissionDataSource(
+                    properties,
+                    groups);
+
+            return new TestEmitter(
+                component,
+                layer,
+                dataSource,
+                scalar ??
+                new EmissionScalar());
+        }
+
+        public static TestTopologyObject CreateTopologyObject(
+            IComponent component,
+            string layer = "test.topology")
+        {
+            return new TestTopologyObject(
+                component,
+                layer);
+        }
+
+        public static TestTopologyObject CreateCheese(
+            IComponent component)
+        {
+            return CreateTopologyObject(
+                component,
+                "test.cheese");
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core\Emission\EmissionCompositionBase.cs
+############################################################
+using System;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Emission
+{
+    /// <summary>
+    /// Base implementation for emission composition policies.
+    ///
+    /// Supplies finite-value validation around the composition
+    /// operation while leaving the mathematical relationship
+    /// between emission and topology to derived implementations.
+    /// </summary>
+    public abstract class EmissionCompositionBase :
+        IEmissionComposition
+    {
+        public double Compose(
+            double emission,
+            double topology)
+        {
+            ValidateFinite(
+                emission,
+                nameof(emission));
+
+            ValidateFinite(
+                topology,
+                nameof(topology));
+
+            var resolved =
+                ComposeCore(
+                    emission,
+                    topology);
+
+            if (double.IsNaN(resolved) ||
+                double.IsInfinity(resolved))
+            {
+                throw new ArithmeticException(
+                    "Emission composition must produce a finite scalar.");
+            }
+
+            return resolved;
+        }
+
+        protected abstract double ComposeCore(
+            double emission,
+            double topology);
+
+        private static void ValidateFinite(
+            double value,
+            string parameterName)
+        {
+            if (double.IsNaN(value) ||
+                double.IsInfinity(value))
+            {
+                throw new ArgumentOutOfRangeException(
+                    parameterName,
+                    value,
+                    "Emission composition values must be finite.");
+            }
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core\Emission\EmissionScalar.cs
+############################################################
+using System;
+using System.Globalization;
+using WildsEngine.Core.Abstractions;
+
+namespace WildsEngine.Core.Emission
+{
+    /// <summary>
+    /// Resolves ordinary finite numeric consumer values into
+    /// Wilds emission scalars.
+    ///
+    /// No semantic conversion is performed for non-numeric
+    /// consumer values.
+    /// </summary>
+    public sealed class EmissionScalar :
+        IEmissionScalar
+    {
+        public double Resolve(
+            object? value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(value));
+            }
+
+            double scalar;
+
+            switch (value)
+            {
+                case byte number:
+                    scalar = number;
+                    break;
+
+                case sbyte number:
+                    scalar = number;
+                    break;
+
+                case short number:
+                    scalar = number;
+                    break;
+
+                case ushort number:
+                    scalar = number;
+                    break;
+
+                case int number:
+                    scalar = number;
+                    break;
+
+                case uint number:
+                    scalar = number;
+                    break;
+
+                case long number:
+                    scalar = number;
+                    break;
+
+                case ulong number:
+                    scalar = number;
+                    break;
+
+                case float number:
+                    scalar = number;
+                    break;
+
+                case double number:
+                    scalar = number;
+                    break;
+
+                case decimal number:
+                    scalar =
+                        Convert.ToDouble(
+                            number,
+                            CultureInfo.InvariantCulture);
+                    break;
+
+                default:
+                    throw new ArgumentException(
+                        "Emission scalar values must be numeric.",
+                        nameof(value));
+            }
+
+            if (double.IsNaN(scalar) ||
+                double.IsInfinity(scalar))
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(value),
+                    scalar,
+                    "Emission scalar values must be finite.");
+            }
+
+            return scalar;
+        }
+    }
+}
+
+############################################################
+FILE: WildsEngine.Core\Emission\EmitterBase.cs
+############################################################
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Abstractions;
+using WildsEngine.Core.Objects;
+
+namespace WildsEngine.Core.Emission
+{
+    /// <summary>
+    /// Base implementation for identifiable Wilds objects
+    /// capable of resolving consumer-owned data into scalar
+    /// emissions.
+    ///
+    /// The emitter owns no consumer vocabulary. Property
+    /// names, group names, and their values remain defined
+    /// by the consumer.
+    ///
+    /// As a BaseObject, every emitter also participates in
+    /// ordinary Wilds neighbor topology.
+    /// </summary>
+    public abstract class EmitterBase :
+        BaseObject,
+        IEmitter
+    {
+        private readonly IComponent _component;
+        private readonly IEmissionScalar _scalar;
+
+        protected EmitterBase(
+            IComponent component,
+            string layer,
+            IEmissionDataSource dataSource,
+            IEmissionScalar scalar)
+            : base(layer)
+        {
+            _component =
+                component ??
+                throw new ArgumentNullException(
+                    nameof(component));
+
+            DataSource =
+                dataSource ??
+                throw new ArgumentNullException(
+                    nameof(dataSource));
+
+            _scalar =
+                scalar ??
+                throw new ArgumentNullException(
+                    nameof(scalar));
+        }
+
+        public override IComponent Component =>
+            _component;
+
+        public IEmissionDataSource DataSource { get; }
+
+        protected IEmissionScalar Scalar =>
+            _scalar;
+
+        public virtual bool TryEmit(
+            string propertyName,
+            out double value)
+        {
+            value =
+                0.0;
+
+            if (string.IsNullOrWhiteSpace(
+                    propertyName))
+            {
+                return false;
+            }
+
+            if (!DataSource.TryGetProperty(
+                    propertyName,
+                    out var rawValue))
+            {
+                return false;
+            }
+
+            value =
+                ResolveScalar(
+                    rawValue);
+
+            return true;
+        }
+
+        public virtual bool TryEmitGroup(
+            string groupName,
+            out IReadOnlyDictionary<string, double> values)
+        {
+            values =
+                new Dictionary<string, double>();
+
+            if (string.IsNullOrWhiteSpace(
+                    groupName))
+            {
+                return false;
+            }
+
+            if (!DataSource.TryGetGroup(
+                    groupName,
+                    out var rawValues))
+            {
+                return false;
+            }
+
+            var resolved =
+                new Dictionary<string, double>(
+                    StringComparer.Ordinal);
+
+            foreach (var pair in rawValues)
+            {
+                if (string.IsNullOrWhiteSpace(
+                        pair.Key))
+                {
+                    throw new InvalidOperationException(
+                        "Emission groups cannot contain " +
+                        "an empty property name.");
+                }
+
+                resolved.Add(
+                    pair.Key,
+                    ResolveScalar(
+                        pair.Value));
+            }
+
+            values =
+                resolved;
+
+            return true;
+        }
+
+        protected virtual double ResolveScalar(
+            object? value)
+        {
+            return _scalar.Resolve(
+                value);
+        }
+        protected double ResolveTopologyScalar<TResult>(
+            INeighborSequenceOperator topology,
+            INeighborScalarOperator<TResult> scalar,
+            System.Func<TResult, double> conversion)
+        {
+            if (topology == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(topology));
+            }
+
+            if (scalar == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(scalar));
+            }
+
+            if (conversion == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(conversion));
+            }
+
+            var relationships =
+                ApplyNeighborOperator(
+                    topology);
+
+            var result =
+                scalar.Apply(
+                    this,
+                    relationships);
+
+            var value =
+                conversion(
+                    result);
+
+            if (double.IsNaN(value) ||
+                double.IsInfinity(value))
+            {
+                throw new ArithmeticException(
+                    "Topology scalar must be finite.");
+            }
+
+            return value;
+        }
+        
+        protected double ComposeEmission(
+            double emission,
+            double topology,
+            IEmissionComposition composition)
+        {
+            if (composition == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(composition));
+            }
+
+            return composition.Compose(
+                emission,
+                topology);
+        }
+        
+        protected bool TryResolveEmission<TResult>(
+            string propertyName,
+            INeighborSequenceOperator topology,
+            INeighborScalarOperator<TResult> topologyScalar,
+            Func<TResult, double> conversion,
+            IEmissionComposition composition,
+            out double value)
+        {
+            value =
+                0.0;
+
+            if (topology == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(topology));
+            }
+
+            if (topologyScalar == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(topologyScalar));
+            }
+
+            if (conversion == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(conversion));
+            }
+
+            if (composition == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(composition));
+            }
+
+            if (!TryEmit(
+                    propertyName,
+                    out var emission))
+            {
+                return false;
+            }
+
+            var resolvedTopology =
+                ResolveTopologyScalar(
+                    topology,
+                    topologyScalar,
+                    conversion);
+
+            value =
+                ComposeEmission(
+                    emission,
+                    resolvedTopology,
+                    composition);
+
+            return true;
+        }
+    }
+}
+
