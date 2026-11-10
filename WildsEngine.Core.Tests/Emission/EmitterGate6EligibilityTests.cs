@@ -1027,6 +1027,451 @@ namespace WildsEngine.Core.Tests.Emission
             WriteFinished(
                 "COMPONENT ORDER VALIDATION");
         }
+        
+        [Fact]
+public void Scalar_eligibility_remains_stable_after_topology_changes()
+{
+    InitializeEmissionReport();
+
+    TestLog.Section(
+        "EMITTER GATE 6 - SCALAR TOPOLOGY SNAPSHOT");
+
+    TestLog.Test(
+        "Eligibility remains an immutable decision about the propagated fact after live topology changes.");
+
+    var component =
+        new TestComponent(
+            "gate6.scalar.snapshot.component");
+
+    var emitter =
+        WildsFixtureFactory.CreateEmitter(
+            component);
+
+    var receiver =
+        WildsFixtureFactory.CreateTopologyObject(
+            component,
+            "gate6.scalar.snapshot.receiver");
+
+    Assert.True(
+        emitter.Neighbors.Add(
+            receiver,
+            "conversation",
+            2.0));
+
+    Assert.True(
+        emitter.Neighbors.TryGet(
+            receiver.Id,
+            "conversation",
+            out var relationship));
+
+    Assert.NotNull(
+        relationship);
+
+    var resolved =
+        new ResolvedEmission(
+            emitter,
+            "hesitation",
+            1.0);
+
+    var propagation =
+        new EmissionPropagation(
+            new ExponentialDistancePropagation(
+                0.5));
+
+    var propagated =
+        propagation.Propagate(
+            resolved,
+            relationship!);
+
+    var eligibility =
+        new EmissionEligibility(
+            new MinimumIntensityEligibility(
+                0.30));
+
+    var decision =
+        eligibility.Evaluate(
+            propagated);
+
+    var originalValue =
+        decision.EvaluatedValue;
+
+    var originalEligible =
+        decision.IsEligible;
+
+    var originalDistance =
+        propagated.PropagationDistance;
+
+    TestLog.State(
+        $"Original relationship distance = " +
+        $"{relationship.Distance:R}");
+
+    TestLog.State(
+        $"Frozen propagation distance = " +
+        $"{originalDistance:R}");
+
+    TestLog.State(
+        $"Evaluated value = " +
+        $"{originalValue:R}");
+
+    TestLog.State(
+        $"Eligible before topology change = " +
+        $"{originalEligible}");
+
+    TestLog.Task(
+        "Replacing the live relationship after eligibility evaluation.");
+
+    Assert.True(
+        emitter.Neighbors.Remove(
+            receiver.Id,
+            "conversation"));
+
+    Assert.True(
+        emitter.Neighbors.Add(
+            receiver,
+            "conversation",
+            5.0));
+
+    Assert.True(
+        emitter.Neighbors.TryGet(
+            receiver.Id,
+            "conversation",
+            out var replacement));
+
+    Assert.NotNull(
+        replacement);
+
+    TestLog.State(
+        $"Replacement relationship distance = " +
+        $"{replacement!.Distance:R}");
+
+    TestLog.State(
+        $"Eligibility evaluated value after topology change = " +
+        $"{decision.EvaluatedValue:R}");
+
+    TestLog.State(
+        $"Eligibility result after topology change = " +
+        $"{decision.IsEligible}");
+
+    TestLog.State(
+        $"Historical propagation distance after topology change = " +
+        $"{propagated.PropagationDistance:R}");
+
+    Assert.NotSame(
+        relationship,
+        replacement);
+
+    Assert.Equal(
+        5.0,
+        replacement.Distance,
+        12);
+
+    Assert.Same(
+        propagated,
+        decision.Emission);
+
+    Assert.Same(
+        relationship,
+        decision.Emission.Relationship);
+
+    Assert.Equal(
+        originalDistance,
+        decision.Emission.PropagationDistance,
+        12);
+
+    Assert.Equal(
+        originalValue,
+        decision.EvaluatedValue,
+        12);
+
+    Assert.Equal(
+        originalEligible,
+        decision.IsEligible);
+
+    TestLog.Pass(
+        "Scalar eligibility remained bound to the original propagated fact after live topology changed.");
+
+    TestLog.Pass(
+        "Eligibility value, decision, exact relationship, and frozen propagation distance remained historical facts.");
+
+    WriteFinished(
+        "SCALAR TOPOLOGY SNAPSHOT");
+}
+
+[Fact]
+public void Vector_eligibility_remains_stable_after_topology_changes()
+{
+    InitializeEmissionReport();
+
+    TestLog.Section(
+        "EMITTER GATE 6 - VECTOR TOPOLOGY SNAPSHOT");
+
+    TestLog.Test(
+        "Complete vector eligibility remains stable after live topology changes.");
+
+    var component =
+        new TestComponent(
+            "gate6.vector.snapshot.component");
+
+    var emitter =
+        WildsFixtureFactory.CreateEmitter(
+            component);
+
+    var receiver =
+        WildsFixtureFactory.CreateTopologyObject(
+            component,
+            "gate6.vector.snapshot.receiver");
+
+    Assert.True(
+        emitter.Neighbors.Add(
+            receiver,
+            "conversation",
+            2.0));
+
+    Assert.True(
+        emitter.Neighbors.TryGet(
+            receiver.Id,
+            "conversation",
+            out var relationship));
+
+    Assert.NotNull(
+        relationship);
+
+    var resolvedVector =
+        new ResolvedEmissionVector(
+            new IResolvedEmission[]
+            {
+                new ResolvedEmission(
+                    emitter,
+                    "panic",
+                    8.4),
+
+                new ResolvedEmission(
+                    emitter,
+                    "urgency",
+                    5.7),
+
+                new ResolvedEmission(
+                    emitter,
+                    "confusion",
+                    2.1),
+
+                new ResolvedEmission(
+                    emitter,
+                    "hesitation",
+                    1.3),
+
+                new ResolvedEmission(
+                    emitter,
+                    "trust",
+                    0.6)
+            });
+
+    var propagation =
+        new EmissionVectorPropagation(
+            new ProportionalEmissionNormalization(),
+            new ExponentialDistancePropagation(
+                0.25));
+
+    var propagatedVector =
+        propagation.Propagate(
+            resolvedVector,
+            relationship!);
+
+    var eligibility =
+        new EmissionVectorEligibility(
+            new MinimumIntensityEligibility(
+                0.10));
+
+    var decisionVector =
+        eligibility.Evaluate(
+            propagatedVector);
+
+    var originalEligibleCount =
+        decisionVector.EligibleCount;
+
+    var originalAnyEligible =
+        decisionVector.AnyEligible;
+
+    var originalAllEligible =
+        decisionVector.AllEligible;
+
+    var originalDistance =
+        propagatedVector.PropagationDistance;
+
+    var evaluatedValues =
+        new double[
+            decisionVector.Dimension];
+
+    var eligibilityDecisions =
+        new bool[
+            decisionVector.Dimension];
+
+    for (var index = 0;
+         index < decisionVector.Dimension;
+         index++)
+    {
+        evaluatedValues[index] =
+            decisionVector.Emissions[index]
+                .EvaluatedValue;
+
+        eligibilityDecisions[index] =
+            decisionVector.Emissions[index]
+                .IsEligible;
+    }
+
+    TestLog.State(
+        $"Original relationship distance = " +
+        $"{relationship.Distance:R}");
+
+    TestLog.State(
+        $"Frozen propagation distance = " +
+        $"{originalDistance:R}");
+
+    TestLog.State(
+        $"Dimensions = " +
+        $"{decisionVector.Dimension}");
+
+    TestLog.State(
+        $"Eligible components before topology change = " +
+        $"{originalEligibleCount}");
+
+    TestLog.State(
+        $"Any eligible before topology change = " +
+        $"{originalAnyEligible}");
+
+    TestLog.State(
+        $"All eligible before topology change = " +
+        $"{originalAllEligible}");
+
+    TestLog.Task(
+        "Replacing the live relationship after vector eligibility evaluation.");
+
+    Assert.True(
+        emitter.Neighbors.Remove(
+            receiver.Id,
+            "conversation"));
+
+    Assert.True(
+        emitter.Neighbors.Add(
+            receiver,
+            "conversation",
+            5.0));
+
+    Assert.True(
+        emitter.Neighbors.TryGet(
+            receiver.Id,
+            "conversation",
+            out var replacement));
+
+    Assert.NotNull(
+        replacement);
+
+    TestLog.State(
+        $"Replacement relationship distance = " +
+        $"{replacement!.Distance:R}");
+
+    TestLog.State(
+        $"Carrier propagation distance after topology change = " +
+        $"{decisionVector.Source.PropagationDistance:R}");
+
+    TestLog.State(
+        $"Eligible components after topology change = " +
+        $"{decisionVector.EligibleCount}");
+
+    TestLog.State(
+        $"Any eligible after topology change = " +
+        $"{decisionVector.AnyEligible}");
+
+    TestLog.State(
+        $"All eligible after topology change = " +
+        $"{decisionVector.AllEligible}");
+
+    Assert.NotSame(
+        relationship,
+        replacement);
+
+    Assert.Equal(
+        5.0,
+        replacement.Distance,
+        12);
+
+    Assert.Same(
+        propagatedVector,
+        decisionVector.Source);
+
+    Assert.Same(
+        relationship,
+        decisionVector.Source.Relationship);
+
+    Assert.Equal(
+        originalDistance,
+        decisionVector.Source.PropagationDistance,
+        12);
+
+    Assert.Equal(
+        resolvedVector.Dimension,
+        decisionVector.Dimension);
+
+    Assert.Equal(
+        originalEligibleCount,
+        decisionVector.EligibleCount);
+
+    Assert.Equal(
+        originalAnyEligible,
+        decisionVector.AnyEligible);
+
+    Assert.Equal(
+        originalAllEligible,
+        decisionVector.AllEligible);
+
+    for (var index = 0;
+         index < decisionVector.Dimension;
+         index++)
+    {
+        var propagated =
+            propagatedVector.Emissions[index];
+
+        var decision =
+            decisionVector.Emissions[index];
+
+        TestLog.State(
+            $"{propagated.Emission.Name} | " +
+            $"evaluated = {decision.EvaluatedValue:R} | " +
+            $"eligible = {decision.IsEligible} | " +
+            $"distance = {propagated.PropagationDistance:R}");
+
+        Assert.Same(
+            propagated,
+            decision.Emission);
+
+        Assert.Same(
+            relationship,
+            propagated.Relationship);
+
+        Assert.Equal(
+            originalDistance,
+            propagated.PropagationDistance,
+            12);
+
+        Assert.Equal(
+            evaluatedValues[index],
+            decision.EvaluatedValue,
+            12);
+
+        Assert.Equal(
+            eligibilityDecisions[index],
+            decision.IsEligible);
+    }
+
+    TestLog.Pass(
+        "Vector eligibility remained bound to the original propagated vector after live topology changed.");
+
+    TestLog.Pass(
+        "Eligible count, any/all summaries, component decisions, received values, and propagation provenance remained stable.");
+
+    WriteFinished(
+        "VECTOR TOPOLOGY SNAPSHOT");
+}
 
         private static IPropagatedEmission
             CreateScalarPropagatedEmission(
