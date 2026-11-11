@@ -1,0 +1,52 @@
+
+============================================================
+WILDS ENTITY E7-D CERTIFICATION
+============================================================
+Gate       : E7-D
+Title      : Evidence Contribution Policies
+Project    : C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj
+Started    : 2026-11-11 13:37:30
+
+Assertion filter:
+  FullyQualifiedName~EntityFactPolicyCertificationTests
+
+Readable filter:
+  FullyQualifiedName~EntityFactPolicyReadableTests
+
+============================================================
+E7-D RELEASE BUILD
+============================================================
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Release\netstandard2.1\WildsEngine.Core.dll
+  QSL -> C:\Users\jmatt\source\QSL\bin\Release\netstandard2.1\QSL.dll
+  WildsEngine.Core.Entities -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Entities\bin\Release\netstandard2.1\WildsEngine.Core.Entities.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Release\netstandard2.1\WildsEngine.Qsl.dll
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Entities\Certifications\E7D\Cert Tests\EntityFactPolicyCertificationTests.cs(180,24): error CS0246: The type or namespace name 'TestFact' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Entities\Certifications\E7D\Cert Tests\EntityFactPolicyReadableTests.cs(104,24): error CS0246: The type or namespace name 'TestFact' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+
+Build FAILED.
+
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Entities\Certifications\E7D\Cert Tests\EntityFactPolicyCertificationTests.cs(180,24): error CS0246: The type or namespace name 'TestFact' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Entities\Certifications\E7D\Cert Tests\EntityFactPolicyReadableTests.cs(104,24): error CS0246: The type or namespace name 'TestFact' could not be found (are you missing a using directive or an assembly reference?) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+    0 Warning(s)
+    2 Error(s)
+
+Time Elapsed 00:00:03.37
+
+[FAIL] E7-D RELEASE BUILD
+[FAIL] Exit code = 1
+
+============================================================
+E7-D CERTIFICATION SUMMARY
+============================================================
+Gate  : E7-D
+Title : Evidence Contribution Policies
+
+[FAIL] E7-D certification
+
+Failure:
+  E7-D RELEASE BUILD failed with exit code 1.
+
+Completed:
+  2026-11-11 13:37:33

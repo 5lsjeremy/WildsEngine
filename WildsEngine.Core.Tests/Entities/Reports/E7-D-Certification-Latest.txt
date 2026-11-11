@@ -1,0 +1,155 @@
+
+============================================================
+WILDS ENTITY E7-D CERTIFICATION
+============================================================
+Gate       : E7-D
+Title      : Evidence Contribution Policies
+Project    : C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj
+Started    : 2026-11-11 14:45:33
+
+Assertion filter:
+  (FullyQualifiedName~EntityFactPolicyCertificationTests|FullyQualifiedName~EntityProductionPolicyMatrixCertificationTests)
+
+Readable filter:
+  FullyQualifiedName~EntityFactPolicyReadableTests
+
+============================================================
+E7-D RELEASE BUILD
+============================================================
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Release\netstandard2.1\WildsEngine.Core.dll
+  QSL -> C:\Users\jmatt\source\QSL\bin\Release\netstandard2.1\QSL.dll
+  WildsEngine.Core.Entities -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Entities\bin\Release\netstandard2.1\WildsEngine.Core.Entities.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Release\netstandard2.1\WildsEngine.Qsl.dll
+  WildsEngine.Core.Tests -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.10
+
+[PASS] E7-D RELEASE BUILD
+
+============================================================
+E7-D ASSERTION CERTIFICATION
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.07]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.13]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.16]   Starting:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.OutcomeEqualsPolicyRequiresMatchingOutcome [4 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.ProductionPolicyInterpretationDoesNotMutateProofResult [6 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.ConditionEqualsPolicyRequiresMatchingValue [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.MaximumBelievabilityPolicyIsInclusive [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.MinimumNormalizedStrengthPolicyUsesNormalizedStrength [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.BelievableFalsePolicyAcceptsDocumentedCanonicalCase [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.AnyEvidencePoliciesRequiresAtLeastOneInnerPolicy [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.FalseEvidencePolicyMatchesFalsehood(isTrue: True, expected: False) [2 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.FalseEvidencePolicyMatchesFalsehood(isTrue: False, expected: True) [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.MinimumStrengthPolicyUsesRawStrength [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.ProductionPolicyRejectionPreservesEvidenceMembership [3 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.FalsePolicyAcceptsBelievableFalseEvidence [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.AllEvidencePoliciesRequiresEveryInnerPolicy [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.DelegateEvidencePolicyUsesConsumerPredicate [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.MinimumBelievabilityPolicyIsInclusive [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.HasSourcePolicyRejectsEvidenceWithoutSource [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.ForeignEntityEvidenceIsRejectedBeforeProductionPolicyInterpretation [1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.UnvalidatedEvidenceCannotContributeThroughProductionPolicy [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.SameEvidenceCanResolveDifferentlyUnderDifferentProductionPolicies [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.TruePolicyRejectsBelievableFalseEvidence [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.FactRetainsExactProductionContributionPolicy [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.MinimumBelievabilityPolicyAcceptsBelievableFalseEvidence [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.DocumentedAllPolicyCompositionRequiresEveryProductionPolicy [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.MinimumNeighborCountPolicyUsesCapturedNeighborCount [1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyCertificationTests.FactRejectsNullContributionPolicy [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.BelievabilityRangePolicyIncludesBothBoundaries [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.ConditionExistsPolicyRequiresNamedCondition [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.BelievableFalseEvidencePolicyRequiresBothConditions [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.TrueEvidencePolicyMatchesTruth(isTrue: True, expected: True) [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.TrueEvidencePolicyMatchesTruth(isTrue: False, expected: False) [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.AnyEvidencePolicyAcceptsValidatedEvidence [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.TrueButUnbelievableEvidencePolicyRequiresTruthAndMaximumBelievability [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.NotEvidencePolicyNegatesInnerPolicy [< 1 ms]
+[xUnit.net 00:00:00.23]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityProductionPolicyMatrixCertificationTests.BelievableTrueEvidencePolicyRequiresBothConditions [< 1 ms]
+
+Test Run Successful.
+Total tests: 34
+     Passed: 34
+ Total time: 0.6489 Seconds
+
+[PASS] E7-D ASSERTION CERTIFICATION
+
+============================================================
+E7-D READABLE CERTIFICATION
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.07]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.13]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.15]   Starting:    WildsEngine.Core.Tests
+============================================
+ E7-D - SAME REPORT, DIFFERENT PRODUCTION POLICIES
+============================================
+[TEST] Tom tells Jerry the monster bass came from North Cove.
+    [STATE] Tom's report: Believability=0.92, IsTrue=False
+    [STATE] TrueEvidencePolicy proves Fact = False
+    [STATE] MinimumBelievabilityPolicy(0.80) proves Fact = True
+[PASS] The same stable Evidence produced different Fact outcomes under real production policies.
+============================================
+ E7-D - UNVALIDATED STORY CANNOT CONTRIBUTE
+============================================
+    [STATE] Policy = TrueEvidencePolicy
+    [STATE] Evidence validated = False
+    [STATE] Evidence retained by Fact = 1
+    [STATE] Contributing Evidence count = 0
+    [STATE] Fact proven = False
+[PASS] FactBase retained the observation but withheld it from contribution before production-policy interpretation.
+============================================
+ E7-D - PRODUCTION POLICIES DO NOT REWRITE HISTORY
+============================================
+    [STATE] Before policies: 0.92 / False
+    [STATE] After TrueEvidencePolicy: 0.92 / False
+    [STATE] After MinimumBelievabilityPolicy: 0.92 / False
+[PASS] Different production-policy interpretations left Tom's historical ProofResult untouched.
+============================================
+ E7-D - TOM PASSES THE PRODUCTION BELIEVABLE-FALSE POLICY
+============================================
+    [STATE] Policy = BelievableFalseEvidencePolicy(0.80)
+    [STATE] Believability = 0.92
+    [STATE] IsTrue = False
+    [STATE] Fact proven = True
+[PASS] Tom's convincing lie contributed under the real production believable-false policy.
+[xUnit.net 00:00:00.20]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyReadableTests.SameTomReportDifferentProductionStandardsDifferentConclusions [10 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyReadableTests.UnvalidatedFishingStoryCannotContributeThroughProductionPolicy [5 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyReadableTests.ProductionInterpretationNeverRewritesTomsProofResult [3 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityFactPolicyReadableTests.TomPassesTheProductionBelievableFalsePolicy [1 ms]
+
+Test Run Successful.
+Total tests: 4
+     Passed: 4
+ Total time: 0.6167 Seconds
+
+[PASS] E7-D READABLE CERTIFICATION
+
+============================================================
+E7-D CERTIFICATION SUMMARY
+============================================================
+Gate  : E7-D
+Title : Evidence Contribution Policies
+
+[PASS] Release build
+[PASS] Assertion certification
+[PASS] Readable certification
+
+E7-D CERTIFIED
+
+Completed:
+  2026-11-11 14:45:37
