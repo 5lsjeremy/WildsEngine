@@ -9,21 +9,35 @@ public sealed class TestDiscovery :
 {
     public TestDiscovery(
         string slug,
-        IFact fact)
+        IFact fact,
+        bool isAvailable = false)
         : base(
             slug,
-            fact)
+            fact,
+            isAvailable)
     {
     }
 
     public TestDiscovery(
         Guid id,
         string slug,
-        IFact fact)
+        IFact fact,
+        bool isAvailable = false)
         : base(
             id,
             slug,
-            fact)
+            fact,
+            isAvailable)
     {
+    }
+
+    public void SetAvailable()
+    {
+        MakeAvailable();
+    }
+
+    public void SetUnavailable()
+    {
+        MakeUnavailable();
     }
 }

@@ -1,37 +1,57 @@
 ﻿using System;
-using WildsEngine.Core.Entities.Abstractions;
+using WildsEngine.Core.Entities.Base;
 
-namespace WildsEngine.Core.Entities.Base
+public abstract class DiscoveryBase :
+    IdentifierBase,
+    IDiscovery
 {
-    public abstract class DiscoveryBase :
-        IdentifierBase,
-        IDiscovery
+    protected DiscoveryBase(
+        string slug,
+        IFact fact,
+        bool isAvailable = false)
+        : base(
+            slug)
     {
-        protected DiscoveryBase(
-            string slug,
-            IFact fact)
-            : base(slug)
-        {
-            Fact =
-                fact ??
-                throw new ArgumentNullException(
-                    nameof(fact));
-        }
+        Fact =
+            fact ??
+            throw new ArgumentNullException(
+                nameof(fact));
 
-        protected DiscoveryBase(
-            Guid id,
-            string slug,
-            IFact fact)
-            : base(
-                id,
-                slug)
-        {
-            Fact =
-                fact ??
-                throw new ArgumentNullException(
-                    nameof(fact));
-        }
+        IsAvailable =
+            isAvailable;
+    }
 
-        public IFact Fact { get; }
+    protected DiscoveryBase(
+        Guid id,
+        string slug,
+        IFact fact,
+        bool isAvailable = false)
+        : base(
+            id,
+            slug)
+    {
+        Fact =
+            fact ??
+            throw new ArgumentNullException(
+                nameof(fact));
+
+        IsAvailable =
+            isAvailable;
+    }
+
+    public IFact Fact { get; }
+
+    public bool IsAvailable { get; private set; }
+
+    protected void MakeAvailable()
+    {
+        IsAvailable =
+            true;
+    }
+
+    protected void MakeUnavailable()
+    {
+        IsAvailable =
+            false;
     }
 }

@@ -1,14 +1,9 @@
-﻿namespace WildsEngine.Core.Entities.Abstractions
+﻿using WildsEngine.Core.Entities.Abstractions;
+
+public interface IDiscovery :
+    IIdentifier
 {
-    /// <summary>
-    /// Represents one interpretation derived from an exact Fact.
-    ///
-    /// A Discovery remains Entity-owned knowledge until Surface
-    /// deliberately promotes it into a Wilds-compatible form.
-    /// </summary>
-    public interface IDiscovery :
-        IIdentifier
-    {
-        IFact Fact { get; }
-    }
+    IFact Fact { get; }
+
+    bool IsAvailable { get; }
 }
