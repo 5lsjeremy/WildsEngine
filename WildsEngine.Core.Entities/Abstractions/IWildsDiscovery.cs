@@ -1,16 +1,10 @@
-﻿using WildsEngine.Core.Abstractions;
-
 namespace WildsEngine.Core.Entities.Abstractions
 {
     /// <summary>
-    /// Represents the Wilds-compatible projection of one
-    /// Entity-owned Discovery.
-    ///
-    /// The original Discovery remains available as authoritative
-    /// provenance.
+    /// Wilds-compatible projection of one authoritative consumer-facing Discovery.
     /// </summary>
     public interface IWildsDiscovery :
-        IBaseObject
+        IWildsProjection<IDiscovery>
     {
         IDiscovery Discovery { get; }
     }

@@ -1,57 +1,145 @@
-﻿using System;
-using WildsEngine.Core.Entities.Base;
+using System;
+using System.Collections.Generic;
+using WildsEngine.Core.Entities.Abstractions;
 
-public abstract class DiscoveryBase :
-    IdentifierBase,
-    IDiscovery
+namespace WildsEngine.Core.Entities.Base
 {
-    protected DiscoveryBase(
-        string slug,
-        IFact fact,
-        bool isAvailable = false)
-        : base(
-            slug)
+    public abstract class DiscoveryBase :
+        IDiscovery
     {
-        Fact =
-            fact ??
-            throw new ArgumentNullException(
-                nameof(fact));
+        private readonly List<IFact> _facts =
+            new List<IFact>();
 
-        IsAvailable =
-            isAvailable;
-    }
+        private readonly Resolution _resolution;
 
-    protected DiscoveryBase(
-        Guid id,
-        string slug,
-        IFact fact,
-        bool isAvailable = false)
-        : base(
-            id,
-            slug)
-    {
-        Fact =
-            fact ??
-            throw new ArgumentNullException(
-                nameof(fact));
+        protected DiscoveryBase(
+            IEntity entity,
+            int requiredFactCount,
+            string? name = null,
+            string? externalId = null)
+        {
+            Entity =
+                entity ??
+                throw new ArgumentNullException(
+                    nameof(entity));
 
-        IsAvailable =
-            isAvailable;
-    }
+            Name =
+                name;
 
-    public IFact Fact { get; }
+            ExternalId =
+                externalId;
 
-    public bool IsAvailable { get; private set; }
+            _resolution =
+                new Resolution(
+                    _facts,
+                    requiredFactCount);
+        }
 
-    protected void MakeAvailable()
-    {
-        IsAvailable =
-            true;
-    }
+        public string? ExternalId { get; }
 
-    protected void MakeUnavailable()
-    {
-        IsAvailable =
-            false;
+        public string? Name { get; }
+
+        public IEntity Entity { get; }
+
+        public IReadOnlyList<IFact> Facts =>
+            _facts;
+
+        public IReadOnlyList<IFact> Contributors =>
+            _resolution.Contributors;
+
+        public int RequiredFactCount =>
+            _resolution.RequiredCount;
+
+        public int CurrentFactCount =>
+            _resolution.CurrentCount;
+
+        public double FactPercentage =>
+            _resolution.Percentage;
+
+        public bool IsAvailable =>
+            _resolution.IsResolved;
+
+        public int RequiredCount =>
+            RequiredFactCount;
+
+        public int CurrentCount =>
+            CurrentFactCount;
+
+        public double Percentage =>
+            FactPercentage;
+
+        public bool IsResolved =>
+            IsAvailable;
+
+        protected bool AddFact(
+            IFact fact)
+        {
+            if (fact == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(fact));
+            }
+
+            if (!ReferenceEquals(
+                    fact.Entity,
+                    Entity))
+            {
+                throw new ArgumentException(
+                    "A Fact must belong to this exact Discovery Entity.",
+                    nameof(fact));
+            }
+
+            if (_facts.Contains(
+                    fact))
+            {
+                return false;
+            }
+
+            _facts.Add(
+                fact);
+
+            return true;
+        }
+
+        protected bool RemoveFact(
+            IFact fact)
+        {
+            if (fact == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(fact));
+            }
+
+            return _facts.Remove(
+                fact);
+        }
+
+        private sealed class Resolution :
+            ResolutionThresholdBase<IFact>
+        {
+            private readonly IReadOnlyList<IFact> _items;
+
+            public Resolution(
+                IReadOnlyList<IFact> items,
+                int requiredCount)
+                : base(
+                    requiredCount)
+            {
+                _items =
+                    items ??
+                    throw new ArgumentNullException(
+                        nameof(items));
+            }
+
+            protected override IReadOnlyList<IFact> Items =>
+                _items;
+
+            protected override bool IsValidContributor(
+                IFact contributor)
+            {
+                return contributor != null &&
+                       contributor.IsProven;
+            }
+        }
     }
 }

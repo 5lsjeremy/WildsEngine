@@ -1,8 +1,12 @@
 ﻿using System.Collections.Generic;
-using WildsEngine.Core.Entities.Abstractions;
 
-public interface IEntity :
-    IIdentifier
+namespace WildsEngine.Core.Entities.Abstractions
 {
-    IReadOnlyList<IFact> Facts { get; }
+    public interface IEntity :
+        IIdentifier
+    {
+        IReadOnlyList<IFact> Facts { get; }
+
+        IReadOnlyList<IDiscovery> Discoveries { get; }
+    }
 }

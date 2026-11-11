@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using WildsEngine.Core.Entities.Abstractions;
 
 namespace WildsEngine.Core.Entities.Base
@@ -55,8 +55,7 @@ namespace WildsEngine.Core.Entities.Base
                     Entity))
             {
                 throw new ArgumentException(
-                    "The Fact must belong to the exact " +
-                    "Surface Entity.",
+                    "The Fact must belong to the exact Surface Entity.",
                     nameof(fact));
             }
         }
@@ -70,16 +69,29 @@ namespace WildsEngine.Core.Entities.Base
                     nameof(discovery));
             }
 
-            RequireOwnedFact(
-                discovery.Fact);
+            if (!ReferenceEquals(
+                    discovery.Entity,
+                    Entity))
+            {
+                throw new ArgumentException(
+                    "The Discovery must belong to the exact Surface Entity.",
+                    nameof(discovery));
+            }
+
+            for (var index = 0;
+                 index < discovery.Facts.Count;
+                 index++)
+            {
+                RequireOwnedFact(
+                    discovery.Facts[index]);
+            }
         }
 
         private static string RequireVocabulary(
             string value,
             string parameterName)
         {
-            if (string.IsNullOrWhiteSpace(
-                    value))
+            if (string.IsNullOrWhiteSpace(value))
             {
                 throw new ArgumentException(
                     "Surface vocabulary cannot be empty.",

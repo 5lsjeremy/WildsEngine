@@ -1,298 +1,429 @@
-﻿param(
-    [switch]$SkipBuild,
-    [switch]$IncludeCoreSource
-)
+﻿$ErrorActionPreference = "Stop"
 
-$ErrorActionPreference = "Stop"
-
-$EntitiesRoot = Split-Path -Parent $PSScriptRoot
-$RepoRoot = Split-Path -Parent $EntitiesRoot
-$CoreRoot = Join-Path $RepoRoot "WildsEngine.Core"
-$QslRoot = Join-Path $RepoRoot "WildsEngine.Qsl"
-$AuditRoot = $PSScriptRoot
-
+$Root = (Get-Location).Path
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-$ReportPath = Join-Path $AuditRoot "WildsEngine-Entities-Audit-$Timestamp.txt"
-$LatestPath = Join-Path $AuditRoot "WildsEngine-Entities-Audit-Latest.txt"
 
-$Builder = New-Object System.Text.StringBuilder
+$ReportDir = Join-Path $Root "Audits/Reports"
+$Report = Join-Path $ReportDir "Entity-E7-Certification-Crawl-$Timestamp.txt"
+$Latest = Join-Path $ReportDir "Entity-E7-Certification-Crawl-Latest.txt"
 
-function Write-ReportLine {
-    param([string]$Text = "")
-    [void]$Builder.AppendLine($Text)
-}
+New-Item `
+    -ItemType Directory `
+    -Path $ReportDir `
+    -Force |
+        Out-Null
 
-function Write-Section {
-    param([string]$Title)
-    Write-ReportLine
-    Write-ReportLine ("=" * 72)
-    Write-ReportLine $Title
-    Write-ReportLine ("=" * 72)
-}
+$Files =
+Get-ChildItem `
+        -Path $Root `
+        -Recurse `
+        -File `
+        -Filter *.cs |
+        Where-Object {
+            $_.FullName -notmatch "\\bin\\" -and
+                    $_.FullName -notmatch "\\obj\\" -and
+                    $_.FullName -notmatch "\\Audit\\"
+        } |
+        Sort-Object FullName
 
-function Get-SourceFiles {
-    param([string]$Root)
-    if (-not (Test-Path $Root)) { return @() }
-    return @(
-    Get-ChildItem -Path $Root -Recurse -File -Filter "*.cs" |
-            Where-Object {
-                $_.FullName -notmatch "\\bin\\" -and
-                        $_.FullName -notmatch "\\obj\\" -and
-                        $_.FullName -notmatch "\\Audits\\"
-            } |
-            Sort-Object FullName
+function Write-Line
+{
+    param(
+        [string]$Text = ""
     )
+
+    $Text |
+            Tee-Object `
+            -FilePath $Report `
+            -Append
 }
 
-function Get-RelativePath {
-    param([string]$Path)
+function Write-Section
+{
+    param(
+        [string]$Title
+    )
 
-    # Windows PowerShell 5.1 compatible.
-    # System.IO.Path.GetRelativePath is not available on the .NET Framework
-    # runtime used by Windows PowerShell 5.1.
-    $Base = $RepoRoot.TrimEnd('\')
-    $Target = $Path
-
-    if ($Target.StartsWith(
-            $Base + '\',
-            [System.StringComparison]::OrdinalIgnoreCase))
-    {
-        return $Target.Substring($Base.Length + 1)
-    }
-
-    if ([string]::Equals(
-            $Target,
-            $Base,
-            [System.StringComparison]::OrdinalIgnoreCase))
-    {
-        return '.'
-    }
-
-    # Fallback for a path outside the repository. Keep the absolute path
-    # rather than failing the audit.
-    return $Target
+    Write-Line ""
+    Write-Line "============================================================"
+    Write-Line $Title
+    Write-Line "============================================================"
 }
 
-function Write-SourceFile {
-    param([System.IO.FileInfo]$File)
-    $Relative = Get-RelativePath $File.FullName
-    Write-ReportLine
-    Write-ReportLine ("#" * 72)
-    Write-ReportLine "FILE: $Relative"
-    Write-ReportLine ("#" * 72)
-    $LineNumber = 0
-    foreach ($Line in Get-Content $File.FullName) {
-        $LineNumber++
-        Write-ReportLine ("{0,5}: {1}" -f $LineNumber, $Line)
-    }
-}
-
-function Write-PatternAudit {
+function Write-Matches
+{
     param(
         [string]$Title,
-        [string[]]$Patterns,
-        [System.IO.FileInfo[]]$Files
+        [string]$Pattern
     )
-    Write-Section $Title
-    foreach ($Pattern in $Patterns) {
-        Write-ReportLine
-        Write-ReportLine "Pattern: $Pattern"
-        Write-ReportLine ("-" * 72)
-        $Matches = @($Files | Select-String -Pattern $Pattern -CaseSensitive:$false)
-        if ($Matches.Count -eq 0) {
-            Write-ReportLine "<no matches>"
-            continue
-        }
-        foreach ($Match in $Matches) {
-            Write-ReportLine ("{0}:{1}: {2}" -f (Get-RelativePath $Match.Path), $Match.LineNumber, $Match.Line.Trim())
-        }
-    }
-}
 
-function Write-TypeAudit {
-    param([System.IO.FileInfo[]]$Files)
-    Write-Section "TYPE DECLARATION AUDIT"
-    $Declarations = @()
-    foreach ($File in $Files) {
-        $Matches = Select-String -Path $File.FullName -Pattern "\b(class|interface|struct|record)\s+([A-Za-z_][A-Za-z0-9_]*)" -AllMatches
-        foreach ($Match in $Matches) {
-            foreach ($Token in $Match.Matches) {
-                $Declarations += [PSCustomObject]@{
-                    Type = $Token.Groups[1].Value
-                    Name = $Token.Groups[2].Value
-                    File = Get-RelativePath $File.FullName
-                    Line = $Match.LineNumber
-                }
-            }
-        }
-    }
-    foreach ($Declaration in $Declarations | Sort-Object Name, File) {
-        Write-ReportLine ("{0,-10} {1,-40} {2}:{3}" -f $Declaration.Type, $Declaration.Name, $Declaration.File, $Declaration.Line)
-    }
-    Write-Section "DUPLICATE TYPE DECLARATIONS"
-    $Duplicates = @($Declarations | Group-Object Name | Where-Object Count -gt 1 | Sort-Object Name)
-    if ($Duplicates.Count -eq 0) {
-        Write-ReportLine "[PASS] No duplicate type names found."
+    Write-Line ""
+    Write-Line "------------------------------------------------------------"
+    Write-Line $Title
+    Write-Line "------------------------------------------------------------"
+
+    $Hits =
+    $Files |
+            Select-String `
+            -Pattern $Pattern `
+            -CaseSensitive:$false
+
+    if (-not $Hits)
+    {
+        Write-Line "<none>"
         return
     }
-    foreach ($Duplicate in $Duplicates) {
-        Write-ReportLine
-        Write-ReportLine ("[REVIEW] {0} appears {1} times" -f $Duplicate.Name, $Duplicate.Count)
-        foreach ($Item in $Duplicate.Group) {
-            Write-ReportLine ("    {0}:{1}" -f $Item.File, $Item.Line)
-        }
-    }
-}
 
-Write-Section "WILDSENGINE CORE.ENTITIES AUDIT"
-Write-ReportLine "Generated: $(Get-Date -Format o)"
-Write-ReportLine "Repository: $RepoRoot"
-Write-ReportLine "Entities:   $EntitiesRoot"
-Write-ReportLine "Core:       $CoreRoot"
-Write-ReportLine "QSL:        $QslRoot"
+    foreach ($Hit in $Hits)
+    {
+        $Relative =
+        $Hit.Path.
+                Substring($Root.Length).
+                TrimStart("\")
 
-$EntityFiles = Get-SourceFiles $EntitiesRoot
-$CoreFiles = Get-SourceFiles $CoreRoot
-
-Write-ReportLine
-Write-ReportLine "Entities C# files: $($EntityFiles.Count)"
-Write-ReportLine "Core C# files:     $($CoreFiles.Count)"
-
-$ProjectFile = Join-Path $EntitiesRoot "WildsEngine.Core.Entities.csproj"
-Write-Section "PROJECT FILE"
-if (Test-Path $ProjectFile) {
-    foreach ($Line in Get-Content $ProjectFile) { Write-ReportLine $Line }
-} else {
-    Write-ReportLine "[MISSING] WildsEngine.Core.Entities.csproj"
-}
-
-Write-Section "PROJECT REFERENCES"
-if (Test-Path $ProjectFile) {
-    $References = @(Select-String -Path $ProjectFile -Pattern "ProjectReference|PackageReference")
-    if ($References.Count -eq 0) {
-        Write-ReportLine "<no project/package references>"
-    } else {
-        foreach ($Reference in $References) { Write-ReportLine $Reference.Line.Trim() }
-    }
-}
-
-Write-Section "ENTITIES SOURCE TREE"
-foreach ($File in $EntityFiles) { Write-ReportLine (Get-RelativePath $File.FullName) }
-
-Write-PatternAudit -Title "ENTITY CONTRACT AUDIT" -Patterns @(
-    "\bIIdentifier\b", "\bIEntity\b", "\bIFact\b", "\bIDiscovery\b", "\bIWildsDiscovery\b",
-    "\bIBaseObject\b", "\bBaseObject\b"
-) -Files $EntityFiles
-
-Write-PatternAudit -Title "CORE FUNDAMENTAL USAGE AUDIT" -Patterns @(
-    "\bIComponent\b", "\bIState\b", "\bIContext\b", "\bIStateInstruction\b", "\bIRegistry\b",
-    "\bRegistryBase\b", "\bINeighborCollection\b", "\bINeighborOperator\b"
-) -Files $EntityFiles
-
-Write-PatternAudit -Title "BOUNDARY LEAK AUDIT" -Patterns @(
-    "\bQSL\.", "\bQslEngine\b", "\bQslRuntimeContext\b", "\bQslConsumerBinding\b", "\bQslStatePackage\b",
-    "\bWildsQslRequest\b", "\bWildsQslExecutor\b", "\bWildsEngine\.Qsl\b"
-) -Files $EntityFiles
-
-Write-PatternAudit -Title "IMPLEMENTATION RISK AUDIT" -Patterns @(
-    "TODO", "FIXME", "NotImplementedException", "NotSupportedException", "null!", "throw new Exception",
-    "Guid\.Empty", "Guid\.NewGuid", "new Dictionary", "new ConcurrentDictionary"
-) -Files $EntityFiles
-
-Write-PatternAudit -Title "IDENTITY AND PROVENANCE AUDIT" -Patterns @(
-    "\bGuid\b", "\bId\b", "\bSlug\b", "\bPath\b", "\bEntity\b", "\bFact\b", "\bDiscovery\b"
-) -Files $EntityFiles
-
-Write-TypeAudit -Files $EntityFiles
-
-Write-Section "RELEVANT CORE CONTRACT LOCATIONS"
-$CorePatterns = @(
-    "interface IBaseObject", "abstract class BaseObject", "interface IComponent", "abstract class BaseComponent",
-    "interface IContext", "class WildsContext", "interface IState", "interface IStateInstruction",
-    "interface IRegistry", "class RegistryBase", "interface IEmitter", "interface IEmissionStateInstruction"
-)
-foreach ($Pattern in $CorePatterns) {
-    Write-ReportLine
-    Write-ReportLine "Pattern: $Pattern"
-    Write-ReportLine ("-" * 72)
-    $Matches = @($CoreFiles | Select-String -Pattern $Pattern -CaseSensitive:$false)
-    if ($Matches.Count -eq 0) {
-        Write-ReportLine "<no matches>"
-        continue
-    }
-    foreach ($Match in $Matches) {
-        Write-ReportLine ("{0}:{1}: {2}" -f (Get-RelativePath $Match.Path), $Match.LineNumber, $Match.Line.Trim())
-    }
-}
-
-if ($IncludeCoreSource) {
-    Write-Section "FULL RELEVANT CORE SOURCE"
-    $RelevantCoreFiles = @($CoreFiles | Where-Object {
-        $_.Name -in @(
-            "IBaseObject.cs", "BaseObject.cs", "IComponent.cs", "BaseComponent.cs", "IContext.cs",
-            "WildsContext.cs", "IState.cs", "IStateInstruction.cs", "IRegistry.cs", "RegistryBase.cs"
+        Write-Line (
+        "{0}:{1}: {2}" -f
+        $Relative,
+        $Hit.LineNumber,
+        $Hit.Line.Trim()
         )
-    } | Sort-Object FullName)
-    foreach ($File in $RelevantCoreFiles) { Write-SourceFile $File }
+    }
 }
 
-Write-Section "FULL ENTITIES SOURCE"
-foreach ($File in $EntityFiles) { Write-SourceFile $File }
+Write-Section "WILDS ENTITY E7 CERTIFICATION CRAWL"
 
-$BuildExitCode = $null
-if (-not $SkipBuild) {
-    Write-Section "BUILD"
-    $Solution = Join-Path $RepoRoot "WildsEngine.sln"
-    if (Test-Path $Solution) {
-        $BuildOutput = & dotnet build $Solution --configuration Debug --no-restore 2>&1
-        $BuildExitCode = $LASTEXITCODE
-        foreach ($Line in $BuildOutput) { Write-ReportLine ([string]$Line) }
-        Write-ReportLine
-        if ($BuildExitCode -eq 0) {
-            Write-ReportLine "[PASS] Solution build succeeded."
-        } else {
-            Write-ReportLine "[FAIL] Solution build returned exit code $BuildExitCode."
+Write-Line "Root: $Root"
+Write-Line "Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
+Write-Line "C# source files: $($Files.Count)"
+
+Write-Section "SOURCE INVENTORY"
+
+foreach ($File in $Files)
+{
+    $Relative =
+    $File.FullName.
+            Substring($Root.Length).
+            TrimStart("\")
+
+    Write-Line $Relative
+}
+
+Write-Section "TYPE INVENTORY"
+
+$Types = @()
+
+foreach ($File in $Files)
+{
+    $Relative =
+    $File.FullName.
+            Substring($Root.Length).
+            TrimStart("\")
+
+    $Matches =
+    Select-String `
+            -Path $File.FullName `
+            -Pattern `
+                "public\s+(?:abstract\s+|sealed\s+)?(?:class|interface)\s+([A-Za-z0-9_]+)" `
+            -AllMatches
+
+    foreach ($MatchSet in $Matches)
+    {
+        foreach ($Match in $MatchSet.Matches)
+        {
+            $TypeName =
+            $Match.Groups[1].Value
+
+            $Types +=
+            [pscustomobject]@{
+                Type = $TypeName
+                File = $Relative
+            }
+
+            Write-Line (
+            "{0} -> {1}" -f
+            $TypeName,
+            $Relative
+            )
         }
-    } else {
-        Write-ReportLine "[MISSING] WildsEngine.sln"
     }
 }
 
-Write-Section "AUDIT SUMMARY"
-Write-ReportLine "Entities files: $($EntityFiles.Count)"
+Write-Section "DUPLICATE TYPE CHECK"
 
-$QslLeaks = @($EntityFiles | Select-String -Pattern "QSL\.|QslEngine|QslRuntimeContext|QslConsumerBinding|QslStatePackage|WildsQslRequest|WildsQslExecutor|WildsEngine\.Qsl" -CaseSensitive:$false)
-if ($QslLeaks.Count -eq 0) {
-    Write-ReportLine "[PASS] No direct QSL integration references found in Core.Entities."
-} else {
-    Write-ReportLine "[REVIEW] Direct QSL-related references found: $($QslLeaks.Count)"
+$Duplicates =
+$Types |
+        Group-Object Type |
+        Where-Object {
+            $_.Count -gt 1
+        }
+
+if (-not $Duplicates)
+{
+    Write-Line "[PASS] No duplicate public type names."
 }
+else
+{
+    foreach ($Duplicate in $Duplicates)
+    {
+        Write-Line ""
+        Write-Line "[DUPLICATE] $($Duplicate.Name)"
 
-$WildsBaseUsage = @($EntityFiles | Select-String -Pattern "\bIBaseObject\b|\bBaseObject\b")
-Write-ReportLine "[INFO] Wilds base-object references found: $($WildsBaseUsage.Count)"
-Write-ReportLine
-Write-ReportLine "Report: $ReportPath"
-
-$Builder.ToString() | Set-Content -Path $ReportPath -Encoding UTF8
-Copy-Item -Path $ReportPath -Destination $LatestPath -Force
-
-Write-Host
-Write-Host "===================================================="
-Write-Host " WILDSENGINE CORE.ENTITIES AUDIT"
-Write-Host "===================================================="
-Write-Host
-Write-Host "Report:"
-Write-Host "  $ReportPath"
-Write-Host
-Write-Host "Latest:"
-Write-Host "  $LatestPath"
-Write-Host
-if (-not $SkipBuild -and $null -ne $BuildExitCode) {
-    if ($BuildExitCode -eq 0) {
-        Write-Host "Build: PASS" -ForegroundColor Green
-    } else {
-        Write-Host "Build: FAIL" -ForegroundColor Red
+        foreach ($Entry in $Duplicate.Group)
+        {
+            Write-Line "  $($Entry.File)"
+        }
     }
-} elseif ($SkipBuild) {
-    Write-Host "Build: SKIPPED" -ForegroundColor Yellow
 }
+
+Write-Section "E7 LEGACY MODEL CHECK"
+
+Write-Matches `
+    "Legacy Fact -> Discovery ownership" `
+    "List\s*<\s*IDiscovery\s*>|IReadOnlyList\s*<\s*IDiscovery\s*>|Fact.*Discoveries|AddDiscovery|RemoveDiscovery"
+
+Write-Matches `
+    "Legacy single Discovery.Fact relationship" `
+    "public\s+IFact\s+Fact\b|discovery\.Fact\b"
+
+Write-Matches `
+    "Legacy manual Discovery availability" `
+    "MakeAvailable|MakeUnavailable"
+
+Write-Matches `
+    "Legacy manual Fact proof" `
+    "MakeProven|MarkProven"
+
+Write-Matches `
+    "Legacy IsValid proof semantics" `
+    "\bIsValid\b|\bisValid\b"
+
+Write-Matches `
+    "Mutable resolution counters" `
+    "CurrentEvidenceCount\s*=|CurrentFactCount\s*=|EvidencePercentage\s*=|FactPercentage\s*="
+
+Write-Section "E7 KNOWLEDGE PIPELINE"
+
+Write-Matches `
+    "Evidence" `
+    "IDiscoveryEvidence|EvidenceBase|DiscoveryEvidence|AddEvidence|RemoveEvidence"
+
+Write-Matches `
+    "Proof" `
+    "IProof\b|IProofResult|ProofBase|ProofResult"
+
+Write-Matches `
+    "Believability" `
+    "\bBelievability\b|\bbelievability\b"
+
+Write-Matches `
+    "Truth resolution" `
+    "\bIsTrue\b|\bisTrue\b"
+
+Write-Matches `
+    "Evidence validation" `
+    "\bIsValidated\b|SetProofResult|ApplyProof"
+
+Write-Matches `
+    "Fact resolution" `
+    "RequiredEvidenceCount|CurrentEvidenceCount|EvidencePercentage|IsProven"
+
+Write-Matches `
+    "Discovery resolution" `
+    "RequiredFactCount|CurrentFactCount|FactPercentage|IsAvailable"
+
+Write-Section "NATIVE ATTRIBUTE CAPTURE"
+
+Write-Matches `
+    "Native surface contracts" `
+    "INativeAttribute|IEntityNativeSurface"
+
+Write-Matches `
+    "Native surface implementations" `
+    "NativeAttribute|EntityNativeSurface|NativeAttributes"
+
+Write-Matches `
+    "Reflection capture" `
+    "GetProperties|GetFields|BindingFlags|GetValue"
+
+Write-Section "WILDS PROJECTION MODEL"
+
+Write-Matches `
+    "Generic projection" `
+    "IWildsProjection|WildsProjectionBase"
+
+Write-Matches `
+    "Discovery projection" `
+    "IWildsDiscovery|WildsDiscoveryBase|WildsDiscovery"
+
+Write-Matches `
+    "Fact projection" `
+    "IWildsFact|WildsFactBase|WildsFact"
+
+Write-Matches `
+    "Evidence projection" `
+    "IWildsEvidence|WildsEvidenceBase|WildsEvidence"
+
+Write-Matches `
+    "Speculative ProofResult projection" `
+    "IWildsProofResult|WildsProofResult"
+
+Write-Section "ENTITY OWNERSHIP"
+
+Write-Matches `
+    "Entity Facts" `
+    "IReadOnlyList\s*<\s*IFact\s*>|AddFact|RemoveFact"
+
+Write-Matches `
+    "Entity Discoveries" `
+    "IReadOnlyList\s*<\s*IDiscovery\s*>|AddDiscovery|RemoveDiscovery"
+
+Write-Matches `
+    "Exact Entity ownership checks" `
+    "ReferenceEquals.*Entity|belong to this exact Entity|belong to the exact"
+
+Write-Section "IDENTITY SURFACES"
+
+Write-Matches `
+    "Consumer / domain identity" `
+    "IIdentifier|IdentifierBase|ExternalId|Slug"
+
+Write-Matches `
+    "Wilds runtime identity" `
+    "IBaseObject|BaseObject|Guid id|Guid\.NewGuid"
+
+Write-Section "NAMESPACE AUDIT"
+
+foreach ($File in $Files)
+{
+    $Relative =
+    $File.FullName.
+            Substring($Root.Length).
+            TrimStart("\")
+
+    $Namespace =
+    Select-String `
+            -Path $File.FullName `
+            -Pattern "^\s*namespace\s+([A-Za-z0-9_.]+)" |
+            Select-Object `
+            -First 1
+
+    if ($Namespace)
+    {
+        Write-Line (
+        "{0} -> {1}" -f
+        $Relative,
+        $Namespace.Matches[0].Groups[1].Value
+        )
+    }
+    else
+    {
+        Write-Line (
+        "[NO NAMESPACE] {0}" -f
+        $Relative
+        )
+    }
+}
+
+Write-Section "EXPECTED E7 TYPE INVENTORY"
+
+$Expected = @(
+    "IEntity",
+    "IEntitySurface",
+    "IEntityNativeSurface",
+    "INativeAttribute",
+
+    "IDiscoveryEvidence",
+    "IProof",
+    "IProofResult",
+
+    "IFact",
+    "IDiscovery",
+
+    "IResolutionThreshold",
+
+    "IWildsProjection",
+    "IWildsFact",
+    "IWildsDiscovery",
+    "IWildsEvidence",
+
+    "IdentifierBase",
+    "ResolutionThresholdBase",
+    "EvidenceBase",
+    "ProofBase",
+    "FactBase",
+    "DiscoveryBase",
+
+    "WildsProjectionBase",
+    "WildsFactBase",
+    "WildsDiscoveryBase",
+    "WildsEvidenceBase",
+
+    "NativeAttribute",
+    "EntityNativeSurface",
+    "DiscoveryEvidence",
+    "ProofResult",
+    "Fact",
+    "Discovery",
+
+    "WildsFact",
+    "WildsDiscovery",
+    "WildsEvidence"
+)
+
+foreach ($ExpectedType in $Expected)
+{
+    $Found =
+    $Types |
+            Where-Object {
+                $_.Type -eq $ExpectedType
+            }
+
+    if ($Found)
+    {
+        Write-Line "[FOUND]   $ExpectedType"
+    }
+    else
+    {
+        Write-Line "[MISSING] $ExpectedType"
+    }
+}
+
+Write-Section "FULL SOURCE"
+
+foreach ($File in $Files)
+{
+    $Relative =
+    $File.FullName.
+            Substring($Root.Length).
+            TrimStart("\")
+
+    Write-Line ""
+    Write-Line "------------------------------------------------------------"
+    Write-Line "FILE: $Relative"
+    Write-Line "------------------------------------------------------------"
+
+    Get-Content `
+        -Path $File.FullName |
+            ForEach-Object {
+                Write-Line $_
+            }
+}
+
+Write-Section "CRAWL COMPLETE"
+
+Write-Line "Report: $Report"
+Write-Line "Latest: $Latest"
+
+Copy-Item `
+    -Path $Report `
+    -Destination $Latest `
+    -Force
+
+Write-Host ""
+Write-Host "============================================================"
+Write-Host " ENTITY E7 CERTIFICATION CRAWL COMPLETE"
+Write-Host "============================================================"
+Write-Host "Files : $($Files.Count)"
+Write-Host "Report: $Report"
+Write-Host "Latest: $Latest"
+Write-Host "============================================================"

@@ -1,14 +1,28 @@
-﻿using System.Collections.Generic;
-using WildsEngine.Core.Entities.Abstractions;
+using System.Collections.Generic;
 
-public interface IFact :
-    IIdentifier
+namespace WildsEngine.Core.Entities.Abstractions
 {
-    IEntity Entity { get; }
+    public interface IFact :
+        IResolutionThreshold<IDiscoveryEvidence>
+    {
+        string? ExternalId { get; }
 
-    string Path { get; }
+        string Name { get; }
 
-    object? Value { get; }
+        object? Value { get; }
 
-    IReadOnlyList<IDiscovery> Discoveries { get; }
+        IEntity Entity { get; }
+
+        IEvidenceContributionPolicy ContributionPolicy { get; }
+
+        IReadOnlyList<IDiscoveryEvidence> Evidence { get; }
+
+        int RequiredEvidenceCount { get; }
+
+        int CurrentEvidenceCount { get; }
+
+        double EvidencePercentage { get; }
+
+        bool IsProven { get; }
+    }
 }

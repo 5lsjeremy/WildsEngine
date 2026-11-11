@@ -1,9 +1,17 @@
-﻿using WildsEngine.Core.Entities.Abstractions;
+using System.Collections.Generic;
 
-public interface IDiscovery :
-    IIdentifier
+namespace WildsEngine.Core.Entities.Abstractions
 {
-    IFact Fact { get; }
-
-    bool IsAvailable { get; }
+    public interface IDiscovery :
+        IResolutionThreshold<IFact>
+    {
+        string? ExternalId { get; }
+        string? Name { get; }
+        IEntity Entity { get; }
+        IReadOnlyList<IFact> Facts { get; }
+        int RequiredFactCount { get; }
+        int CurrentFactCount { get; }
+        double FactPercentage { get; }
+        bool IsAvailable { get; }
+    }
 }

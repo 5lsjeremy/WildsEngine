@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using WildsEngine.Core.Entities.Abstractions;
 
 namespace WildsEngine.Core.Entities.Base

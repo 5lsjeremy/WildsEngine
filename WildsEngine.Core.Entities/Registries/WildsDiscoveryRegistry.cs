@@ -2,25 +2,28 @@
 using WildsEngine.Core.Entities.Abstractions;
 using WildsEngine.Core.Processing;
 
-public sealed class WildsDiscoveryRegistry :
-    RegistryBase<IWildsDiscovery>
+namespace WildsEngine.Core.Entities.Registries
 {
-    public WildsDiscoveryRegistry(
-        IComponent component,
-        string layer)
-        : base(
-            component,
-            layer,
-            discovery => discovery.Id)
+    public sealed class WildsDiscoveryRegistry :
+        RegistryBase<IWildsDiscovery>
     {
-    }
+        public WildsDiscoveryRegistry(
+            IComponent component,
+            string layer)
+            : base(
+                component,
+                layer,
+                discovery => discovery.Id)
+        {
+        }
 
-    protected override void OnInitialize()
-    {
-    }
+        protected override void OnInitialize()
+        {
+        }
 
-    protected override void OnShutdown()
-    {
-        Clear();
+        protected override void OnShutdown()
+        {
+            Clear();
+        }
     }
 }

@@ -1,51 +1,27 @@
-﻿using System;
+using System;
 using WildsEngine.Core.Abstractions;
 using WildsEngine.Core.Entities.Abstractions;
-using WildsEngine.Core.Objects;
 
 namespace WildsEngine.Core.Entities.Base
 {
-    /// <summary>
-    /// Represents the Wilds-compatible projection of an
-    /// Entity-owned Discovery.
-    ///
-    /// Promotion preserves the exact Discovery identity
-    /// while adding normal Wilds runtime semantics.
-    /// </summary>
     public abstract class WildsDiscoveryBase :
-        BaseObject,
+        WildsProjectionBase<IDiscovery>,
         IWildsDiscovery
     {
-        private readonly IComponent _component;
-
         protected WildsDiscoveryBase(
             IDiscovery discovery,
             IComponent component,
+            Guid id,
             string layer)
             : base(
-                RequireDiscovery(discovery).Id,
+                discovery,
+                component,
+                id,
                 layer)
         {
-            Discovery =
-                discovery;
-
-            _component =
-                component ??
-                throw new ArgumentNullException(
-                    nameof(component));
         }
 
-        public IDiscovery Discovery { get; }
-
-        public sealed override IComponent Component =>
-            _component;
-
-        private static IDiscovery RequireDiscovery(
-            IDiscovery discovery)
-        {
-            return discovery ??
-                   throw new ArgumentNullException(
-                       nameof(discovery));
-        }
+        public IDiscovery Discovery =>
+            Source;
     }
 }
