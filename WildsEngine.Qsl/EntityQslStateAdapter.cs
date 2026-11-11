@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using QSL.Core;
 using QSL.Core.Runtime.Context;
+using QSL.Core.Runtime.Packages;
 using WildsEngine.Core.Entities.Abstractions;
 
 namespace WildsEngine.Qsl
@@ -9,6 +10,9 @@ namespace WildsEngine.Qsl
     /// <summary>
     /// Connects Entity Surfaces and available Discoveries
     /// to the existing live QSL state lifecycle.
+    ///
+    /// One available Discovery may expose multiple proven
+    /// Facts as one coherent QSL state package.
     ///
     /// This adapter owns no runtime state.
     ///
@@ -116,6 +120,10 @@ namespace WildsEngine.Qsl
             return binding;
         }
 
+        /// <summary>
+        /// Receives all proven Facts from one available
+        /// Discovery as one coherent QSL state package.
+        /// </summary>
         public bool Receive(
             IEntitySurface surface,
             IDiscovery discovery)
@@ -127,12 +135,30 @@ namespace WildsEngine.Qsl
                 surface,
                 discovery);
 
-            return _engine.ReceiveState(
-                surface.Target,
-                discovery.Fact.Path,
-                discovery.Fact.Value);
+            var properties =
+                CreateProvenFactProperties(
+                    discovery);
+
+            var package =
+                new QslStatePackage(
+                    surface.Target,
+                    properties);
+
+            var receivedCount =
+                _engine.ReceiveState(
+                    package);
+
+            return receivedCount ==
+                   properties.Count;
         }
 
+        /// <summary>
+        /// Updates every proven Fact currently exposed by
+        /// the available Discovery.
+        ///
+        /// QSL remains responsible for rejecting updates to
+        /// vocabulary that has not already been attached.
+        /// </summary>
         public bool Update(
             IEntitySurface surface,
             IDiscovery discovery)
@@ -144,12 +170,37 @@ namespace WildsEngine.Qsl
                 surface,
                 discovery);
 
-            return _engine.UpdateState(
-                surface.Target,
-                discovery.Fact.Path,
-                discovery.Fact.Value);
+            var properties =
+                CreateProvenFactProperties(
+                    discovery);
+
+            var updatedAll =
+                true;
+
+            foreach (var property in properties)
+            {
+                if (!_engine.UpdateState(
+                        surface.Target,
+                        property.Key,
+                        property.Value))
+                {
+                    updatedAll =
+                        false;
+                }
+            }
+
+            return updatedAll;
         }
 
+        /// <summary>
+        /// Removes every Fact vocabulary member contributed
+        /// by the Discovery.
+        ///
+        /// Removal does not require the Discovery to remain
+        /// available because previously attached state must
+        /// remain removable after its source falls below its
+        /// resolution threshold.
+        /// </summary>
         public bool Remove(
             IEntitySurface surface,
             IDiscovery discovery)
@@ -161,9 +212,60 @@ namespace WildsEngine.Qsl
                 surface,
                 discovery);
 
-            return _engine.RemoveState(
-                surface.Target,
-                discovery.Fact.Path);
+            if (discovery.Facts.Count == 0)
+            {
+                return false;
+            }
+
+            var removedAny =
+                false;
+
+            var removedAll =
+                true;
+
+            var names =
+                new HashSet<string>(
+                    StringComparer.Ordinal);
+
+            for (var index = 0;
+                 index < discovery.Facts.Count;
+                 index++)
+            {
+                var fact =
+                    discovery.Facts[index] ??
+                    throw new InvalidOperationException(
+                        "A Discovery cannot contain a null Fact.");
+
+                RequireOwnedFact(
+                    surface,
+                    fact);
+
+                var name =
+                    RequireFactName(
+                        fact);
+
+                if (!names.Add(
+                        name))
+                {
+                    throw new InvalidOperationException(
+                        "A Discovery cannot expose duplicate " +
+                        "Fact names to QSL.");
+                }
+
+                var removed =
+                    _engine.RemoveState(
+                        surface.Target,
+                        name);
+
+                removedAny |=
+                    removed;
+
+                removedAll &=
+                    removed;
+            }
+
+            return removedAny &&
+                   removedAll;
         }
 
         public bool Remove(
@@ -225,10 +327,62 @@ namespace WildsEngine.Qsl
             }
         }
 
+        private static Dictionary<string, object?>
+            CreateProvenFactProperties(
+                IDiscovery discovery)
+        {
+            var properties =
+                new Dictionary<string, object?>(
+                    StringComparer.Ordinal);
+
+            for (var index = 0;
+                 index < discovery.Facts.Count;
+                 index++)
+            {
+                var fact =
+                    discovery.Facts[index] ??
+                    throw new InvalidOperationException(
+                        "A Discovery cannot contain a null Fact.");
+
+                if (!fact.IsProven)
+                {
+                    continue;
+                }
+
+                var name =
+                    RequireFactName(
+                        fact);
+
+                if (!properties.TryAdd(
+                        name,
+                        fact.Value))
+                {
+                    throw new InvalidOperationException(
+                        "A Discovery cannot expose duplicate " +
+                        "proven Fact names to QSL.");
+                }
+            }
+
+            if (properties.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "An available Discovery must expose at " +
+                    "least one proven Fact.");
+            }
+
+            return properties;
+        }
+
         private static void RequireOwnedDiscovery(
             IEntitySurface surface,
             IDiscovery discovery)
         {
+            if (surface == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(surface));
+            }
+
             if (discovery == null)
             {
                 throw new ArgumentNullException(
@@ -236,13 +390,27 @@ namespace WildsEngine.Qsl
             }
 
             if (!ReferenceEquals(
-                    discovery.Fact.Entity,
+                    discovery.Entity,
                     surface.Entity))
             {
                 throw new ArgumentException(
-                    "The Discovery must originate from a Fact " +
-                    "owned by the exact Surface Entity.",
+                    "The Discovery must belong to the exact " +
+                    "Surface Entity.",
                     nameof(discovery));
+            }
+
+            for (var index = 0;
+                 index < discovery.Facts.Count;
+                 index++)
+            {
+                var fact =
+                    discovery.Facts[index] ??
+                    throw new InvalidOperationException(
+                        "A Discovery cannot contain a null Fact.");
+
+                RequireOwnedFact(
+                    surface,
+                    fact);
             }
         }
 
@@ -258,8 +426,36 @@ namespace WildsEngine.Qsl
             {
                 throw new InvalidOperationException(
                     "The Discovery must be available before " +
-                    "its Fact can enter live QSL state.");
+                    "its proven Facts can enter live QSL state.");
             }
+        }
+
+        private static void RequireOwnedFact(
+            IEntitySurface surface,
+            IFact fact)
+        {
+            if (!ReferenceEquals(
+                    fact.Entity,
+                    surface.Entity))
+            {
+                throw new ArgumentException(
+                    "Every Discovery Fact must belong to the " +
+                    "exact Surface Entity.",
+                    nameof(fact));
+            }
+        }
+
+        private static string RequireFactName(
+            IFact fact)
+        {
+            if (string.IsNullOrWhiteSpace(
+                    fact.Name))
+            {
+                throw new InvalidOperationException(
+                    "Facts exposed to QSL require a name.");
+            }
+
+            return fact.Name.Trim();
         }
     }
 }

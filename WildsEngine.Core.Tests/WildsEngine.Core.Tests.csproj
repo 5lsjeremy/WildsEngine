@@ -30,4 +30,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Audits\Reports\" />
+    <Folder Include="Entities\" />
+    <Folder Include="Entities\Integration\" />
+    <Folder Include="Entities\Policies\" />
+    <Folder Include="Entities\Reports\" />
+  </ItemGroup>
 </Project>

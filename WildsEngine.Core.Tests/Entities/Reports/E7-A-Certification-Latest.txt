@@ -1,0 +1,139 @@
+
+============================================================
+WILDS ENTITY E7-A CERTIFICATION
+============================================================
+Gate       : E7-A
+Title      : Native Surface Capture
+Project    : C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj
+Started    : 2026-11-11 12:46:45
+
+Assertion filter:
+  FullyQualifiedName~EntityNativeSurfaceCertificationTests
+
+Readable filter:
+  FullyQualifiedName~EntityNativeSurfaceReadableTests
+
+============================================================
+E7-A RELEASE BUILD
+============================================================
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Release\netstandard2.1\WildsEngine.Core.dll
+  QSL -> C:\Users\jmatt\source\QSL\bin\Release\netstandard2.1\QSL.dll
+  WildsEngine.Core.Entities -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Entities\bin\Release\netstandard2.1\WildsEngine.Core.Entities.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Release\netstandard2.1\WildsEngine.Qsl.dll
+  WildsEngine.Core.Tests -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.05
+
+[PASS] E7-A RELEASE BUILD
+
+============================================================
+E7-A ASSERTION CERTIFICATION
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.07]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.13]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.15]   Starting:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.ConsumerRemainsLiveAuthorityAfterNativeSnapshot [9 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeSurfaceCapturesReadablePublicProperties [1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeSurfaceCaptureIsStableAcrossRepeatedConstruction [3 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeAttributeSnapshotDoesNotChangeWhenConsumerChanges [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeAttributeNamesAndValuesMatchConsumerVocabulary [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeSurfaceRejectsNullConsumerTarget [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeSurfaceCapturesCalculatedReadOnlyProperties [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeSurfaceCapturesPublicFields [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeAttributeCollectionContainsUniqueVocabularyNames [< 1 ms]
+[xUnit.net 00:00:00.22]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeSurfaceRejectsNullEntity [< 1 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceCertificationTests.NativeSurfacePreservesExactEntityAndConsumerTarget [< 1 ms]
+
+Test Run Successful.
+Total tests: 11
+     Passed: 11
+ Total time: 0.6011 Seconds
+
+[PASS] E7-A ASSERTION CERTIFICATION
+
+============================================================
+E7-A READABLE CERTIFICATION
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.07]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.13]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.15]   Starting:    WildsEngine.Core.Tests
+============================================
+ E7-A - DETERMINISTIC NATIVE CAPTURE
+============================================
+    [STATE] First capture count = 6
+    [STATE] Second capture count = 6
+    [STATE] [0] Health | First=100 | Second=100
+    [STATE] [1] Mana | First=50 | Second=50
+    [STATE] [2] Name | First=Mara | Second=Mara
+    [STATE] [3] ReadOnlyLabel | First=Mara | Second=Mara
+    [STATE] [4] Stamina | First=75 | Second=75
+    [STATE] [5] PublicField | First=42 | Second=42
+[PASS] Repeated capture preserved vocabulary order and values.
+============================================
+ E7-A - NATIVE CONSUMER VOCABULARY
+============================================
+    [STATE] Captured attributes = 6
+    [STATE] Health | Type=Double | InitialValue=100 | CanRead=True | CanWrite=True
+    [STATE] Mana | Type=Double | InitialValue=50 | CanRead=True | CanWrite=True
+    [STATE] Name | Type=String | InitialValue=Mara | CanRead=True | CanWrite=True
+    [STATE] ReadOnlyLabel | Type=String | InitialValue=Mara | CanRead=True | CanWrite=False
+    [STATE] Stamina | Type=Double | InitialValue=75 | CanRead=True | CanWrite=False
+    [STATE] PublicField | Type=Int32 | InitialValue=42 | CanRead=True | CanWrite=True
+[PASS] Consumer vocabulary was captured without requiring Wilds-specific members on the consumer object.
+============================================
+ E7-A - EXACT ENTITY AND CONSUMER IDENTITY
+============================================
+[TEST] Native surface preserves exact Entity and consumer-owned target references.
+    [STATE] Entity.Id = 1860a3aa-e245-4d98-89bc-33a9b6cec85f
+    [STATE] Entity.Slug = mara
+[PASS] Surface preserved the exact Entity reference.
+[PASS] Surface preserved the exact consumer-owned target.
+============================================
+ E7-A - SNAPSHOT VS LIVE CONSUMER AUTHORITY
+============================================
+    [STATE] Snapshot: Health=100, Mana=50, Name=Mara, PublicField=10
+    [STATE] Live consumer: Health=22, Mana=9, Name=Changed, PublicField=99
+    [STATE] Historical snapshot: Health=100, Mana=50, Name=Mara, PublicField=10
+[PASS] Native snapshot remained historical after live mutation.
+[PASS] The exact consumer object remained the live authority.
+[xUnit.net 00:00:00.20]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceReadableTests.RepeatedNativeCaptureIsDeterministic [15 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceReadableTests.NativeConsumerVocabularyIsCaptured [4 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceReadableTests.ExactEntityAndConsumerIdentityArePreserved [2 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityNativeSurfaceReadableTests.SnapshotAndLiveConsumerAuthorityRemainDistinct [2 ms]
+
+Test Run Successful.
+Total tests: 4
+     Passed: 4
+ Total time: 0.6172 Seconds
+
+[PASS] E7-A READABLE CERTIFICATION
+
+============================================================
+E7-A CERTIFICATION SUMMARY
+============================================================
+Gate  : E7-A
+Title : Native Surface Capture
+
+[PASS] Release build
+[PASS] Assertion certification
+[PASS] Readable certification
+
+E7-A CERTIFIED
+
+Completed:
+  2026-11-11 12:46:49

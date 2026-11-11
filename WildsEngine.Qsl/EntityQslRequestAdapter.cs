@@ -173,8 +173,14 @@ namespace WildsEngine.Qsl
                     }
 
                     properties.Add(
-                        fact.Path,
+                        fact.Name,
                         fact.Value);
+                    
+                    if (!fact.IsProven)
+                    {
+                        throw new InvalidOperationException(
+                            "Only proven Facts can enter attached QSL state.");
+                    }
                 }
 
                 packages.Add(
