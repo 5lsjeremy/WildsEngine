@@ -4,6 +4,7 @@
     <attachedFolders>
       <Path>Audit</Path>
       <Path>Builders</Path>
+      <Path>Docs</Path>
       <Path>Functions</Path>
     </attachedFolders>
     <explicitIncludes />
