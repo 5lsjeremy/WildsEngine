@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using QSL.Core;
 using QSL.Core.Runtime.Context;
 using QSL.Core.Runtime.Packages;
-using WildsEngine.Core.Entities.Abstractions;
+using WildsEngine.Discoveries.Abstractions;
 
 namespace WildsEngine.Qsl
 {

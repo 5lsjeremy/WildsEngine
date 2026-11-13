@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
-    <ProjectReference Include="..\WildsEngine.Core.Entities\WildsEngine.Core.Entities.csproj" />
+    <ProjectReference Include="..\WildsEngine.Discoveries\WildsEngine.Discoveries.csproj" />
     <ProjectReference Include="..\..\QSL\QSL.csproj" />
   </ItemGroup>
 

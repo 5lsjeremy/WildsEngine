@@ -1,5 +1,5 @@
-﻿using WildsEngine.Core.Entities.Abstractions;
-using WildsEngine.Core.Entities.Base;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Base;
 
 namespace WildsEngine.Core.Tests.Entities.Fixtures
 {

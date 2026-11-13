@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Core", "WildsEngine.Core\WildsEngine.Core.csproj", "{9A2F378C-3645-474E-909E-D9D8409803C4}"
 EndProject
@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Core.Tests", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Console", "WildsEngine.Console\WildsEngine.Console.csproj", "{B6EAE22A-C115-4CF8-9EF7-AE010F86B101}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Core.Entities", "WildsEngine.Core.Entities\WildsEngine.Core.Entities.csproj", "{857758D4-4ADB-4C51-91D9-CE75F2A5B4C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WildsEngine.Discoveries", "WildsEngine.Discoveries\WildsEngine.Discoveries.csproj", "{857758D4-4ADB-4C51-91D9-CE75F2A5B4C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

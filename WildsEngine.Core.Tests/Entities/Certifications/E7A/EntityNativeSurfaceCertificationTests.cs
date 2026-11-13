@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using WildsEngine.Core.Entities.Abstractions;
-using WildsEngine.Core.Entities.Concrete;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Concrete;
 using WildsEngine.Core.Tests.Entities.Fixtures;
 using Xunit;
 

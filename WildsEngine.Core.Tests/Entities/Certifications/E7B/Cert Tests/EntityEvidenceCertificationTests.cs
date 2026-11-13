@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using WildsEngine.Core.Abstractions;
-using WildsEngine.Core.Entities.Abstractions;
-using WildsEngine.Core.Entities.Evidences;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Evidences;
 using WildsEngine.Core.Tests.Entities.Fixtures;
 using WildsEngine.Tests.Registry;
 using Xunit;

@@ -1,5 +1,5 @@
 using System;
-using WildsEngine.Core.Entities.Base;
+using WildsEngine.Discoveries.Base;
 
 namespace WildsEngine.Core.Tests.Entities.Fixtures
 {
