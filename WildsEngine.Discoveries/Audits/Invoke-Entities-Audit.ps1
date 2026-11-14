@@ -1,11 +1,24 @@
 ﻿$ErrorActionPreference = "Stop"
 
-$Root = (Get-Location).Path
+# ============================================================
+# PATHS
+#
+# Expected script location:
+# <repo>\WildsEngine.Core\Abstractions\Invoke-Abstractions-Crawl.ps1
+#
+# Script location is authoritative. Rider's current working
+# directory does not matter.
+# ============================================================
+
+$AbstractionsRoot = $PSScriptRoot
+$CoreRoot = Split-Path -Parent $AbstractionsRoot
+$Root = Split-Path -Parent $CoreRoot
+
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 
-$ReportDir = Join-Path $Root "Audits/Reports"
-$Report = Join-Path $ReportDir "Entity-E7-Certification-Crawl-$Timestamp.txt"
-$Latest = Join-Path $ReportDir "Entity-E7-Certification-Crawl-Latest.txt"
+$ReportDir = Join-Path $AbstractionsRoot "Audit\Reports"
+$Report = Join-Path $ReportDir "Wilds-Core-Abstractions-Crawl-$Timestamp.txt"
+$Latest = Join-Path $ReportDir "Wilds-Core-Abstractions-Crawl-Latest.txt"
 
 New-Item `
     -ItemType Directory `
@@ -13,18 +26,58 @@ New-Item `
     -Force |
         Out-Null
 
+# ============================================================
+# SOURCE SCOPE
+#
+# Capture the contracts plus the Core implementation areas that
+# exercise topology, sampling, propagation, eligibility,
+# emissions, state, runtime objects, and units.
+# ============================================================
+
+$SourceRoots = @(
+    (Join-Path $CoreRoot "Abstractions"),
+    (Join-Path $CoreRoot "Neighbors"),
+    (Join-Path $CoreRoot "Topology"),
+    (Join-Path $CoreRoot "Emission"),
+    (Join-Path $CoreRoot "Objects"),
+    (Join-Path $CoreRoot "States"),
+    (Join-Path $CoreRoot "Contexts"),
+    (Join-Path $CoreRoot "Units")
+) |
+        Where-Object {
+            Test-Path $_
+        }
+
 $Files =
-Get-ChildItem `
-        -Path $Root `
+$SourceRoots |
+        ForEach-Object {
+            Get-ChildItem `
+        -Path $_ `
         -Recurse `
         -File `
-        -Filter *.cs |
+        -Filter *.cs
+        } |
         Where-Object {
             $_.FullName -notmatch "\\bin\\" -and
                     $_.FullName -notmatch "\\obj\\" -and
                     $_.FullName -notmatch "\\Audit\\"
         } |
-        Sort-Object FullName
+        Sort-Object FullName -Unique
+
+# ============================================================
+# HELPERS
+# ============================================================
+
+function Get-RelativePath
+{
+    param(
+        [string]$Path
+    )
+
+    return $Path.
+            Substring($CoreRoot.Length).
+            TrimStart("\")
+}
 
 function Write-Line
 {
@@ -34,8 +87,8 @@ function Write-Line
 
     $Text |
             Tee-Object `
-            -FilePath $Report `
-            -Append
+        -FilePath $Report `
+        -Append
 }
 
 function Write-Section
@@ -65,8 +118,8 @@ function Write-Matches
     $Hits =
     $Files |
             Select-String `
-            -Pattern $Pattern `
-            -CaseSensitive:$false
+        -Pattern $Pattern `
+        -CaseSensitive:$false
 
     if (-not $Hits)
     {
@@ -76,10 +129,7 @@ function Write-Matches
 
     foreach ($Hit in $Hits)
     {
-        $Relative =
-        $Hit.Path.
-                Substring($Root.Length).
-                TrimStart("\")
+        $Relative = Get-RelativePath $Hit.Path
 
         Write-Line (
         "{0}:{1}: {2}" -f
@@ -90,23 +140,40 @@ function Write-Matches
     }
 }
 
-Write-Section "WILDS ENTITY E7 CERTIFICATION CRAWL"
+# ============================================================
+# HEADER
+# ============================================================
 
-Write-Line "Root: $Root"
+Write-Section "WILDS CORE ABSTRACTIONS / TOPOLOGY CRAWL"
+
+Write-Line "Repo root: $Root"
+Write-Line "Core root: $CoreRoot"
+Write-Line "Abstractions root: $AbstractionsRoot"
 Write-Line "Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 Write-Line "C# source files: $($Files.Count)"
+
+Write-Line ""
+Write-Line "Source roots:"
+
+foreach ($SourceRoot in $SourceRoots)
+{
+    Write-Line "  $(Get-RelativePath $SourceRoot)"
+}
+
+# ============================================================
+# SOURCE INVENTORY
+# ============================================================
 
 Write-Section "SOURCE INVENTORY"
 
 foreach ($File in $Files)
 {
-    $Relative =
-    $File.FullName.
-            Substring($Root.Length).
-            TrimStart("\")
-
-    Write-Line $Relative
+    Write-Line (Get-RelativePath $File.FullName)
 }
+
+# ============================================================
+# TYPE INVENTORY
+# ============================================================
 
 Write-Section "TYPE INVENTORY"
 
@@ -114,24 +181,19 @@ $Types = @()
 
 foreach ($File in $Files)
 {
-    $Relative =
-    $File.FullName.
-            Substring($Root.Length).
-            TrimStart("\")
+    $Relative = Get-RelativePath $File.FullName
 
     $Matches =
     Select-String `
-            -Path $File.FullName `
-            -Pattern `
-                "public\s+(?:abstract\s+|sealed\s+)?(?:class|interface)\s+([A-Za-z0-9_]+)" `
-            -AllMatches
+        -Path $File.FullName `
+        -Pattern "public\s+(?:abstract\s+|sealed\s+|static\s+)?(?:class|interface|struct|enum)\s+([A-Za-z0-9_]+)" `
+        -AllMatches
 
     foreach ($MatchSet in $Matches)
     {
         foreach ($Match in $MatchSet.Matches)
         {
-            $TypeName =
-            $Match.Groups[1].Value
+            $TypeName = $Match.Groups[1].Value
 
             $Types +=
             [pscustomobject]@{
@@ -147,6 +209,10 @@ foreach ($File in $Files)
         }
     }
 }
+
+# ============================================================
+# DUPLICATE PUBLIC TYPES
+# ============================================================
 
 Write-Section "DUPLICATE TYPE CHECK"
 
@@ -175,137 +241,292 @@ else
     }
 }
 
-Write-Section "E7 LEGACY MODEL CHECK"
+# ============================================================
+# BASE OBJECT / COMPONENT MODEL
+# ============================================================
+
+Write-Section "BASE OBJECT / COMPONENT MODEL"
 
 Write-Matches `
-    "Legacy Fact -> Discovery ownership" `
-    "List\s*<\s*IDiscovery\s*>|IReadOnlyList\s*<\s*IDiscovery\s*>|Fact.*Discoveries|AddDiscovery|RemoveDiscovery"
+    "Base object contracts and implementations" `
+    "\bIBaseObject\b|\bBaseObject\b"
 
 Write-Matches `
-    "Legacy single Discovery.Fact relationship" `
-    "public\s+IFact\s+Fact\b|discovery\.Fact\b"
+    "Component contracts and implementations" `
+    "\bIComponent\b|\bBaseComponent\b"
 
 Write-Matches `
-    "Legacy manual Discovery availability" `
-    "MakeAvailable|MakeUnavailable"
+    "Component binding" `
+    "\bComponent\b|_component"
 
 Write-Matches `
-    "Legacy manual Fact proof" `
-    "MakeProven|MarkProven"
+    "Runtime identity" `
+    "\bGuid\b|\bId\b|\bLayer\b"
+
+# ============================================================
+# NEIGHBOR RELATIONSHIP MODEL
+# ============================================================
+
+Write-Section "NEIGHBOR RELATIONSHIP MODEL"
 
 Write-Matches `
-    "Legacy IsValid proof semantics" `
-    "\bIsValid\b|\bisValid\b"
+    "Neighbor contracts" `
+    "INeighborCollection|INeighborRelationship|NeighborCollection|NeighborRelationship"
 
 Write-Matches `
-    "Mutable resolution counters" `
-    "CurrentEvidenceCount\s*=|CurrentFactCount\s*=|EvidencePercentage\s*=|FactPercentage\s*="
-
-Write-Section "E7 KNOWLEDGE PIPELINE"
+    "Membership" `
+    "\bMembership\b|\bmembership\b"
 
 Write-Matches `
-    "Evidence" `
-    "IDiscoveryEvidence|EvidenceBase|DiscoveryEvidence|AddEvidence|RemoveEvidence"
+    "Distance" `
+    "NeighborDistance|\bDistance\b|\bdistance\b"
 
 Write-Matches `
-    "Proof" `
-    "IProof\b|IProofResult|ProofBase|ProofResult"
+    "Relationship mutation" `
+    "AddNeighbor|RemoveNeighbor|SetNeighborDistance"
+
+# ============================================================
+# TOPOLOGY OPERATORS
+# ============================================================
+
+Write-Section "TOPOLOGY OPERATORS"
 
 Write-Matches `
-    "Believability" `
-    "\bBelievability\b|\bbelievability\b"
+    "Generic neighbor operators" `
+    "INeighborOperator|NeighborOperatorBase|NeighborCompositeOperatorBase"
 
 Write-Matches `
-    "Truth resolution" `
-    "\bIsTrue\b|\bisTrue\b"
+    "Predicates" `
+    "INeighborPredicate|NeighborPredicateBase|Predicate"
 
 Write-Matches `
-    "Evidence validation" `
-    "\bIsValidated\b|SetProofResult|ApplyProof"
+    "Filters" `
+    "Filter|NeighborFilterOperatorBase"
 
 Write-Matches `
-    "Fact resolution" `
-    "RequiredEvidenceCount|CurrentEvidenceCount|EvidencePercentage|IsProven"
+    "Ordering" `
+    "Order|Comparer|NeighborOrderOperatorBase"
 
 Write-Matches `
-    "Discovery resolution" `
-    "RequiredFactCount|CurrentFactCount|FactPercentage|IsAvailable"
-
-Write-Section "NATIVE ATTRIBUTE CAPTURE"
+    "Grouping" `
+    "Group|INeighborGroupingOperator|NeighborGroupingOperatorBase"
 
 Write-Matches `
-    "Native surface contracts" `
-    "INativeAttribute|IEntityNativeSurface"
+    "Scalar reduction" `
+    "INeighborScalarOperator|NeighborCount|AverageNeighborDistance|MinimumNeighborDistance|MaximumNeighborDistance"
 
 Write-Matches `
-    "Native surface implementations" `
-    "NativeAttribute|EntityNativeSurface|NativeAttributes"
+    "Pipelines" `
+    "NeighborPipeline|Pipeline"
+
+# ============================================================
+# SAMPLING
+# ============================================================
+
+Write-Section "NEIGHBOR SAMPLING"
 
 Write-Matches `
-    "Reflection capture" `
-    "GetProperties|GetFields|BindingFlags|GetValue"
-
-Write-Section "WILDS PROJECTION MODEL"
+    "Sampling contracts" `
+    "INeighborSampler|NeighborSamplerBase"
 
 Write-Matches `
-    "Generic projection" `
-    "IWildsProjection|WildsProjectionBase"
+    "Deterministic sampling" `
+    "DeterministicNeighborSample"
 
 Write-Matches `
-    "Discovery projection" `
-    "IWildsDiscovery|WildsDiscoveryBase|WildsDiscovery"
+    "Random sampling" `
+    "RandomNeighborSample"
 
 Write-Matches `
-    "Fact projection" `
-    "IWildsFact|WildsFactBase|WildsFact"
+    "Sampling mechanics" `
+    "\bSample\b|\bsample\b|Take\(|Random|OrderBy|Count"
+
+# ============================================================
+# TOPOLOGY ROUTING / TRAVERSAL
+# ============================================================
+
+Write-Section "TOPOLOGY ROUTING / TRAVERSAL"
 
 Write-Matches `
-    "Evidence projection" `
-    "IWildsEvidence|WildsEvidenceBase|WildsEvidence"
+    "Traversal" `
+    "INeighborTraversal|NeighborTraversal"
 
 Write-Matches `
-    "Speculative ProofResult projection" `
-    "IWildsProofResult|WildsProofResult"
-
-Write-Section "ENTITY OWNERSHIP"
+    "Routing" `
+    "INeighborRoute|INeighborRouter|NeighborRoute|NeighborRouter"
 
 Write-Matches `
-    "Entity Facts" `
-    "IReadOnlyList\s*<\s*IFact\s*>|AddFact|RemoveFact"
+    "Clustering" `
+    "INeighborCluster|INeighborClusterer|NeighborCluster|NeighborClusterer"
 
 Write-Matches `
-    "Entity Discoveries" `
-    "IReadOnlyList\s*<\s*IDiscovery\s*>|AddDiscovery|RemoveDiscovery"
+    "Propagation topology" `
+    "INeighborPropagation|INeighborPropagationRule|NeighborPropagation"
+
+# ============================================================
+# PROPAGATION
+# ============================================================
+
+Write-Section "PROPAGATION"
 
 Write-Matches `
-    "Exact Entity ownership checks" `
-    "ReferenceEquals.*Entity|belong to this exact Entity|belong to the exact"
-
-Write-Section "IDENTITY SURFACES"
+    "Neighbor propagation contracts" `
+    "INeighborPropogation|INeighborPropagation|ExponentialDistancePropagation"
 
 Write-Matches `
-    "Consumer / domain identity" `
-    "IIdentifier|IdentifierBase|ExternalId|Slug"
+    "Exponential attenuation" `
+    "Exp\(|exponential|decay"
 
 Write-Matches `
-    "Wilds runtime identity" `
-    "IBaseObject|BaseObject|Guid id|Guid\.NewGuid"
+    "Propagation values" `
+    "sourceIntensity|received|intensity|Value"
+
+# ============================================================
+# ELIGIBILITY
+# ============================================================
+
+Write-Section "ELIGIBILITY"
+
+Write-Matches `
+    "Eligibility contracts" `
+    "INeighborPropagationEligibility|IEmissionEligibilityResult|IEmissionEligibilityVector"
+
+Write-Matches `
+    "Minimum intensity eligibility" `
+    "MinimumIntensityEligibility"
+
+Write-Matches `
+    "Emission eligibility" `
+    "EmissionEligibility|EmissionVectorEligibility"
+
+Write-Matches `
+    "Eligibility decisions" `
+    "Eligible|Eligibility|threshold"
+
+# ============================================================
+# EMISSION RESOLUTION
+# ============================================================
+
+Write-Section "EMISSION RESOLUTION"
+
+Write-Matches `
+    "Emitter contracts" `
+    "\bIEmitter\b|\bEmitterBase\b"
+
+Write-Matches `
+    "Emission data source" `
+    "IEmissionDataSource"
+
+Write-Matches `
+    "Resolved emission" `
+    "IResolvedEmission|ResolvedEmission"
+
+Write-Matches `
+    "Resolved emission vectors" `
+    "IResolvedEmissionVector|ResolvedEmissionVector"
+
+Write-Matches `
+    "Normalization" `
+    "IEmissionNormalizationPolicy|NormalizedEmission|ProportionalEmissionNormalization"
+
+Write-Matches `
+    "Propagation carriers" `
+    "IPropagatedEmission|IPropagatedEmissionVector|PropagatedEmission|PropogatedEmission"
+
+Write-Matches `
+    "Composition" `
+    "IEmissionComposition|EmissionCompositionBase"
+
+# ============================================================
+# STATE BOUNDARY
+# ============================================================
+
+Write-Section "STATE / INSTRUCTION BOUNDARY"
+
+Write-Matches `
+    "State contracts" `
+    "\bIState\b|\bWildsState\b"
+
+Write-Matches `
+    "State instructions" `
+    "IStateInstruction|StateInstructionBase|EmissionStateInstruction"
+
+Write-Matches `
+    "Context" `
+    "\bIContext\b|\bWildsContext\b"
+
+Write-Matches `
+    "Metadata" `
+    "Metadata|SetComponentMetadata"
+
+# ============================================================
+# UNIT / PROVENANCE SURFACES
+# ============================================================
+
+Write-Section "UNIT / PROVENANCE SURFACES"
+
+Write-Matches `
+    "Base units" `
+    "IBaseUnit|BaseUnit"
+
+Write-Matches `
+    "Pulse and work units" `
+    "\bIPulse\b|\bPulse\b|IWorkUnit|WorkUnit"
+
+Write-Matches `
+    "Moment / timeline / epoch" `
+    "IMoment|\bMoment\b|ITimeline|\bTimeline\b|IEpoch|\bEpoch\b"
+
+Write-Matches `
+    "Source references" `
+    "\bSource\b|\bsource\b|Provenance"
+
+# ============================================================
+# DISCOVERY-COMPOSITION CLUES
+#
+# These searches do not assume that Core knows Discoveries.
+# They identify generic extension points that Discoveries may
+# compose with from its own project.
+# ============================================================
+
+Write-Section "DISCOVERY COMPOSITION CLUES"
+
+Write-Matches `
+    "Generic selection surfaces" `
+    "INeighborSampler|INeighborPredicate|INeighborSequenceOperator|INeighborGroupingOperator"
+
+Write-Matches `
+    "Generic scalar surfaces" `
+    "INeighborScalarOperator|IEmissionScalar"
+
+Write-Matches `
+    "Generic data-source surfaces" `
+    "IEmissionDataSource"
+
+Write-Matches `
+    "Generic processable-object surfaces" `
+    "IBaseObject|IComponent"
+
+Write-Matches `
+    "Read-only / snapshot surfaces" `
+    "IReadOnlyList|IReadOnlyCollection|ReadOnlyCollection|ToArray|snapshot"
+
+# ============================================================
+# NAMESPACE AUDIT
+# ============================================================
 
 Write-Section "NAMESPACE AUDIT"
 
 foreach ($File in $Files)
 {
-    $Relative =
-    $File.FullName.
-            Substring($Root.Length).
-            TrimStart("\")
+    $Relative = Get-RelativePath $File.FullName
 
     $Namespace =
     Select-String `
-            -Path $File.FullName `
-            -Pattern "^\s*namespace\s+([A-Za-z0-9_.]+)" |
+        -Path $File.FullName `
+        -Pattern "^\s*namespace\s+([A-Za-z0-9_.]+)" |
             Select-Object `
-            -First 1
+        -First 1
 
     if ($Namespace)
     {
@@ -324,50 +545,58 @@ foreach ($File in $Files)
     }
 }
 
-Write-Section "EXPECTED E7 TYPE INVENTORY"
+# ============================================================
+# EXPECTED CORE TYPE INVENTORY
+# ============================================================
+
+Write-Section "EXPECTED CORE TYPE INVENTORY"
 
 $Expected = @(
-    "IEntity",
-    "IEntitySurface",
-    "IEntityNativeSurface",
-    "INativeAttribute",
+    "IBaseObject",
+    "IComponent",
+    "IContext",
+    "IState",
 
-    "IDiscoveryEvidence",
-    "IProof",
-    "IProofResult",
+    "INeighborCollection",
+    "INeighborRelationship",
+    "NeighborDistance",
 
-    "IFact",
-    "IDiscovery",
+    "INeighborOperator",
+    "INeighborPredicate",
+    "INeighborSampler",
+    "INeighborScalarOperator",
+    "INeighborSequenceOperator",
+    "INeighborGroupingOperator",
 
-    "IResolutionThreshold",
+    "NeighborSamplerBase",
+    "DeterministicNeighborSample",
+    "RandomNeighborSample",
+    "NeighborPipeline",
 
-    "IWildsProjection",
-    "IWildsFact",
-    "IWildsDiscovery",
-    "IWildsEvidence",
+    "INeighborTraversal",
+    "INeighborRoute",
+    "INeighborRouter",
+    "INeighborCluster",
+    "INeighborClusterer",
 
-    "IdentifierBase",
-    "ResolutionThresholdBase",
-    "EvidenceBase",
-    "ProofBase",
-    "FactBase",
-    "DiscoveryBase",
+    "IEmissionDataSource",
+    "IEmissionComposition",
+    "IEmissionScalar",
+    "IResolvedEmission",
+    "IResolvedEmissionVector",
+    "INormalizedEmission",
+    "INormalizedEmissionVector",
+    "IPropagatedEmission",
+    "IPropagatedEmissionVector",
+    "IEmissionEligibilityResult",
+    "IEmissionEligibilityVector",
 
-    "WildsProjectionBase",
-    "WildsFactBase",
-    "WildsDiscoveryBase",
-    "WildsEvidenceBase",
-
-    "NativeAttribute",
-    "EntityNativeSurface",
-    "DiscoveryEvidence",
-    "ProofResult",
-    "Fact",
-    "Discovery",
-
-    "WildsFact",
-    "WildsDiscovery",
-    "WildsEvidence"
+    "IBaseUnit",
+    "IPulse",
+    "IWorkUnit",
+    "IMoment",
+    "ITimeline",
+    "IEpoch"
 )
 
 foreach ($ExpectedType in $Expected)
@@ -388,14 +617,15 @@ foreach ($ExpectedType in $Expected)
     }
 }
 
+# ============================================================
+# FULL SOURCE
+# ============================================================
+
 Write-Section "FULL SOURCE"
 
 foreach ($File in $Files)
 {
-    $Relative =
-    $File.FullName.
-            Substring($Root.Length).
-            TrimStart("\")
+    $Relative = Get-RelativePath $File.FullName
 
     Write-Line ""
     Write-Line "------------------------------------------------------------"
@@ -409,8 +639,15 @@ foreach ($File in $Files)
             }
 }
 
+# ============================================================
+# COMPLETE
+# ============================================================
+
 Write-Section "CRAWL COMPLETE"
 
+Write-Line "Repo root: $Root"
+Write-Line "Core root: $CoreRoot"
+Write-Line "Abstractions root: $AbstractionsRoot"
 Write-Line "Report: $Report"
 Write-Line "Latest: $Latest"
 
@@ -421,9 +658,11 @@ Copy-Item `
 
 Write-Host ""
 Write-Host "============================================================"
-Write-Host " ENTITY E7 CERTIFICATION CRAWL COMPLETE"
+Write-Host " WILDS CORE ABSTRACTIONS / TOPOLOGY CRAWL COMPLETE"
 Write-Host "============================================================"
-Write-Host "Files : $($Files.Count)"
-Write-Host "Report: $Report"
-Write-Host "Latest: $Latest"
+Write-Host "Repo   : $Root"
+Write-Host "Core   : $CoreRoot"
+Write-Host "Files  : $($Files.Count)"
+Write-Host "Report : $Report"
+Write-Host "Latest : $Latest"
 Write-Host "============================================================"
