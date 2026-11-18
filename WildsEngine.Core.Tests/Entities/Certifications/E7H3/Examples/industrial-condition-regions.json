@@ -1,0 +1,33 @@
+{
+  "id": "7d0fba79-9ea0-44ec-8d4e-45e11c45af10",
+  "slug": "industrial-condition-regions-v1",
+  "version": "1.0",
+  "mappings": [
+    {
+      "id": "1f6f1dbc-e8d2-49ad-a150-26f5db409101",
+      "slug": "normal-operation",
+      "semanticKey": "NormalOperation",
+      "geometryType": "hypersphere",
+      "centroid": {
+        "mechanical-stress": 0.25,
+        "thermal-stress": 0.25,
+        "operational-stability": 0.80
+      },
+      "radius": 0.20,
+      "metadata": { "displayName": "Normal Operation" }
+    },
+    {
+      "id": "4aeca222-8635-4130-a125-b5b9ce3e9202",
+      "slug": "maintenance-concern",
+      "semanticKey": "MaintenanceConcern",
+      "geometryType": "hypersphere",
+      "centroid": {
+        "mechanical-stress": 0.70,
+        "thermal-stress": 0.65,
+        "operational-stability": 0.45
+      },
+      "radius": 0.18,
+      "metadata": { "displayName": "Maintenance Concern" }
+    }
+  ]
+}
