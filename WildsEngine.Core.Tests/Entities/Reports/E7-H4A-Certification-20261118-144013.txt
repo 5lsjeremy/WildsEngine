@@ -1,0 +1,50 @@
+﻿WILDS DISCOVERIES E7-H4A CERTIFICATION
+Core guard: PASS
+
+RELEASE BUILD
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Release\netstandard2.1\WildsEngine.Core.dll
+  QSL -> C:\Users\jmatt\source\QSL\bin\Release\netstandard2.1\QSL.dll
+  WildsEngine.Discoveries -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Discoveries\bin\Release\netstandard2.1\WildsEngine.Discoveries.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Release\netstandard2.1\WildsEngine.Qsl.dll
+  WildsEngine.Core.Tests -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.23
+
+H4A ASSERTIONS
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     6, Skipped:     0, Total:     6, Duration: 38 ms - WildsEngine.Core.Tests.dll (net10.0)
+
+H4A READABLE
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.08]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.14]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.16]   Starting:    WildsEngine.Core.Tests
+============================================
+ E7-H4A - RECOGNIZED GEOMETRY POPULATION
+============================================
+    [STATE] Scope = pizza-party
+    [STATE] Registration = 07932ce0-0a0d-49d4-a90b-42ed64a1fa87
+    [STATE] Recognized members = 2
+    [STATE] Narrative candidate 1 = PepperoniOliveMushroomOnion
+    [STATE] Narrative candidate 2 = PepperoniSausageJalapenoOnion
+[PASS] Two recognized four-topping preference structures entered one immutable scoped population without being averaged into a combination neither source expressed.
+[xUnit.net 00:00:00.23]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.DiscoveryRecognizedGeometryPopulationReadableTests.CompetingPizzaPreferencesRemainDistinctInOnePopulation [29 ms]
+
+Test Run Successful.
+Total tests: 1
+     Passed: 1
+ Total time: 0.6451 Seconds
+RESULT: PASS
+Core unchanged. H4A immutable scoped recognized-geometry population certified without averaging distinct structures.

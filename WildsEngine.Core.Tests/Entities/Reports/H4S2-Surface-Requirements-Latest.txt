@@ -1,0 +1,3500 @@
+﻿H4S2 SURFACE REQUIREMENTS AUDIT
+Repo: C:\Users\jmatt\source\WildsEngine
+Classification: DERIVED | SUPPLIED_DEFINITION | SUPPLIED_POLICY | SUPPLIED_METRIC | SUPPLIED_SERVICE | OPTION | RESULT | INTERNAL
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterObservation.cs
+using System;
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterObservation
+    {
+        IDiscoveryClusterSpatialRelationship Relationship { get; }
+        DateTimeOffset ObservedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterPersistencePolicy.cs
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterPersistencePolicy : IIdentifier
+    {
+        bool IsSatisfied(IDiscoveryClusterPersistenceResult result);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterPersistenceResult.cs
+using System;
+using System.Collections.Generic;
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterPersistenceResult
+    {
+        IDiscoveryClusterMapping Mapping { get; }
+        IReadOnlyList<IDiscoveryClusterObservation> Observations { get; }
+        int ObservationCount { get; }
+        int InsideObservationCount { get; }
+        int ConsecutiveInsideCount { get; }
+        double OccupancyRatio { get; }
+        DateTimeOffset? ObservedEntryAt { get; }
+        DateTimeOffset? ObservedExitAt { get; }
+        TimeSpan? ObservedDurationInside { get; }
+        double Stability { get; }
+        bool IsPersistent { get; }
+        Guid PersistencePolicyId { get; }
+        string PersistencePolicySlug { get; }
+        Guid StabilityMetricId { get; }
+        string StabilityMetricSlug { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterRecognitionPolicy.cs
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterRecognitionPolicy : IIdentifier
+    {
+        bool Recognizes(IDiscoveryClusterPersistenceResult persistence);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterRecognitionResult.cs
+using System;
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterRecognitionResult
+    {
+        IDiscoveryClusterMapping Mapping { get; }
+        IDiscoveryClusterPersistenceResult Persistence { get; }
+        bool IsRecognized { get; }
+        Guid RecognitionPolicyId { get; }
+        string RecognitionPolicySlug { get; }
+        DateTimeOffset EvaluatedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterRelationshipProjector.cs
+using WildsEngine.Discoveries.Abstractions.Motion;
+
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterRelationshipProjector
+    {
+        IDiscoveryClusterSpatialRelationship Locate(
+            IDiscoveryVectorEvaluation evaluation,
+            IDiscoveryClusterMapping mapping);
+
+        IDiscoveryClusterTrajectoryProjection Project(
+            IDiscoveryVectorMotionResult motion,
+            IDiscoveryClusterMapping mapping);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterSpatialRelationship.cs
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Motion;
+
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterSpatialRelationship
+    {
+        IDiscoveryClusterMapping Mapping { get; }
+        IDiscoveryVectorEvaluation Evaluation { get; }
+        double DistanceToCentroid { get; }
+        double SignedDistanceToBoundary { get; }
+        bool IsInside { get; }
+        bool IsOnBoundary { get; }
+        IReadOnlyDictionary<string, double> NearestBoundaryPoint { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterStabilityMetric.cs
+using System.Collections.Generic;
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterStabilityMetric : IIdentifier
+    {
+        double GetStability(IReadOnlyList<IDiscoveryClusterObservation> observations);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Clusters\IDiscoveryClusterTrajectoryProjection.cs
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Motion;
+
+namespace WildsEngine.Discoveries.Abstractions.Clusters
+{
+    public interface IDiscoveryClusterTrajectoryProjection
+    {
+        IDiscoveryClusterSpatialRelationship Spatial { get; }
+        IDiscoveryVectorMotionResult Motion { get; }
+        string ProjectionBasis { get; }
+        DiscoveryClusterTransitKind TransitKind { get; }
+        double RadialRate { get; }
+        bool IsApproaching { get; }
+        bool IsReceding { get; }
+        double TimeToClosestApproachSeconds { get; }
+        double ClosestApproachDistanceToCentroid { get; }
+        double ClosestApproachDistanceToBoundary { get; }
+        double? TimeToEntrySeconds { get; }
+        double? TimeToExitSeconds { get; }
+        double? ProjectedDurationInsideSeconds { get; }
+        IReadOnlyDictionary<string, double>? EntryPoint { get; }
+        IReadOnlyDictionary<string, double>? ExitPoint { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IConsequence.cs
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents a consumer-defined projected outcome derived
+    /// from one or more scoped Truths.
+    ///
+    /// A Consequence describes what may result. It does not
+    /// prescribe behavior.
+    /// </summary>
+    public interface IConsequence :
+        IIdentifier
+    {
+        string Name { get; }
+
+        object? Value { get; }
+
+        IReadOnlyList<ITruth> Truths { get; }
+
+        double Magnitude { get; }
+
+        double Confidence { get; }
+
+        DateTimeOffset ProjectedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IConsequenceProjectionPolicy.cs
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Consumer-supplied policy that projects possible
+    /// Consequences from scoped Truths.
+    /// </summary>
+    public interface IConsequenceProjectionPolicy
+    {
+        IReadOnlyList<IConsequence> Project(
+            IReadOnlyList<ITruth> truths);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IDiscoveryCluster.cs
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents one geometrically coherent region found within
+    /// a Discovery-vector sample.
+    ///
+    /// A cluster is a derived result and has no independent
+    /// domain or Wilds runtime identity.
+    /// </summary>
+    public interface IDiscoveryCluster
+    {
+        IReadOnlyList<IDiscoveryVector> Members { get; }
+
+        IDiscoveryVectorPoint Centroid { get; }
+
+        double Density { get; }
+
+        double Dispersion { get; }
+
+        double Coherence { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IDiscoveryClusterer.cs
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Finds geometric structure within immutable Discovery
+    /// vectors.
+    ///
+    /// This is knowledge-space clustering, not Core topology
+    /// clustering.
+    /// </summary>
+    public interface IDiscoveryClusterer
+    {
+        IReadOnlyList<IDiscoveryCluster> Cluster(
+            IReadOnlyList<IDiscoveryVector> vectors);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IDiscoveryVector.cs
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents one immutable, provenance-bearing evaluation
+    /// of Discovery geometry.
+    ///
+    /// A Discovery vector is not independently identifiable.
+    /// It is an evaluation result over authoritative sources.
+    /// </summary>
+    public interface IDiscoveryVector :
+        IDiscoveryVectorPoint
+    {
+        IReadOnlyList<IDiscoveryVectorContribution> Contributions { get; }
+
+        IReadOnlyList<IDiscoveryVectorMotion> Motion { get; }
+
+        IDiscoveryVectorMetric Metric { get; }
+
+        double Magnitude { get; }
+
+        DateTimeOffset EvaluatedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IDiscoveryVectorMetric.cs
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Calculates magnitude for one Discovery-vector point.
+    ///
+    /// The metric supplies the geometry. A vector cannot accept
+    /// an unrelated caller-supplied magnitude.
+    /// </summary>
+    public interface IDiscoveryVectorMetric
+    {
+        double GetMagnitude(
+            IDiscoveryVectorPoint point);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IEntityNativeSurface.cs
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Exposes what an Entity saw on the exact consumer-owned target at surface
+    /// creation without becoming an alternative authority for live state.
+    /// </summary>
+    public interface IEntityNativeSurface
+    {
+        IEntity Entity { get; }
+
+        object Target { get; }
+
+        IReadOnlyList<INativeAttribute> NativeAttributes { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IEntitySurface.cs
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents the controlled processing boundary for
+    /// one Entity and one exact consumer-owned runtime object.
+    /// </summary>
+    public interface IEntitySurface
+    {
+        IEntity Entity { get; }
+
+        object Target { get; }
+
+        string Alias { get; }
+
+        string ConsumerType { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IEvidenceContributionPolicy.cs
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Determines whether one validated Evidence item contributes
+    /// toward proving a particular Fact.
+    ///
+    /// The policy may consider truth, Believability, Evidence
+    /// strength, conditions, outcome, source, or any other
+    /// consumer-facing information.
+    ///
+    /// Wilds imposes no universal relationship between
+    /// Believability and truth.
+    /// </summary>
+    public interface IEvidenceContributionPolicy
+    {
+        bool Contributes(
+            IDiscoveryEvidence evidence);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IFact.cs
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    public interface IFact :
+        IResolutionThreshold<IDiscoveryEvidence>
+    {
+        string? ExternalId { get; }
+
+        string Name { get; }
+
+        object? Value { get; }
+
+        IEntity Entity { get; }
+
+        IEvidenceContributionPolicy ContributionPolicy { get; }
+
+        IReadOnlyList<IDiscoveryEvidence> Evidence { get; }
+
+        int RequiredEvidenceCount { get; }
+
+        int CurrentEvidenceCount { get; }
+
+        double EvidencePercentage { get; }
+
+        bool IsProven { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\IIdentifier.cs
+using System;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents stable identity established outside
+    /// the Wilds processing boundary.
+    ///
+    /// Identity does not imply Wilds registration,
+    /// promotion, topology participation, or processing.
+    /// </summary>
+    public interface IIdentifier
+    {
+        Guid Id { get; }
+
+        string Slug { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\INativeAttribute.cs
+using System;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Describes one native consumer attribute observed when an Entity surface
+    /// is created. The captured value is historical and is not authoritative
+    /// for the consumer's current live value.
+    /// </summary>
+    public interface INativeAttribute
+    {
+        string Name { get; }
+
+        Type ValueType { get; }
+
+        object? InitialValue { get; }
+
+        bool CanRead { get; }
+
+        bool CanWrite { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\ITruth.cs
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents scoped knowledge that has congealed from the
+    /// composition of Discoveries and their geometric clusters.
+    ///
+    /// Truth remains attributable and scoped.
+    ///
+    /// It is not an assertion of universal consumer reality.
+    /// </summary>
+    public interface ITruth :
+        IIdentifier
+    {
+        string Name { get; }
+
+        object? Value { get; }
+
+        IDiscoveryVectorSeries Series { get; }
+
+        IReadOnlyList<IDiscoveryCluster> Clusters { get; }
+
+        IReadOnlyList<IDiscovery> Discoveries { get; }
+
+        double Stability { get; }
+
+        double Confidence { get; }
+
+        DateTimeOffset CongealedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\ITruthCongealmentPolicy.cs
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Consumer-supplied policy that determines whether Discovery
+    /// geometry has become stable enough to produce a scoped
+    /// Truth.
+    /// </summary>
+    public interface ITruthCongealmentPolicy
+    {
+        bool CanCongeal(
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IDiscoveryVectorSeries series);
+
+        ITruth Congeal(
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IDiscoveryVectorSeries series);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Narratives\IDiscoveryRecognizedGeometryPopulation.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Surface;
+
+namespace WildsEngine.Discoveries.Abstractions.Narratives
+{
+    public interface IDiscoveryRecognizedGeometryPopulation
+    {
+        Guid Id { get; }
+        string Scope { get; }
+        IDiscoveryGeometryRegistration Registration { get; }
+        IReadOnlyList<IDiscoveryClusterRecognitionResult> Members { get; }
+        IReadOnlyList<string> SemanticKeys { get; }
+        DateTimeOffset CreatedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Narratives\IDiscoveryRecognizedGeometryPopulationFactory.cs
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Surface;
+
+namespace WildsEngine.Discoveries.Abstractions.Narratives
+{
+    public interface IDiscoveryRecognizedGeometryPopulationFactory
+    {
+        IDiscoveryRecognizedGeometryPopulation Create(
+            IDiscoveryGeometryRegistration registration,
+            IReadOnlyList<IDiscoveryClusterRecognitionResult> members);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IDiscoveryGeometryObservationResult.cs
+using WildsEngine.Discoveries.Abstractions.Clusters;
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IDiscoveryGeometryObservationResult
+    {
+        IDiscoveryClusterSpatialRelationship Spatial { get; }
+        IDiscoveryClusterPersistenceResult Persistence { get; }
+        IDiscoveryClusterRecognitionResult Recognition { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IDiscoveryGeometryProfile.cs
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IDiscoveryGeometryProfile : IWildsDiscoveriesProfile
+    {
+        IReadOnlyList<IDiscoveryClusterMapping> Mappings { get; }
+        IDiscoveryClusterPersistencePolicy? PersistencePolicy { get; }
+        IDiscoveryClusterStabilityMetric? StabilityMetric { get; }
+        IDiscoveryClusterRecognitionPolicy? RecognitionPolicy { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IDiscoveryGeometryRegistration.cs
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IDiscoveryGeometryRegistration : IWildsDiscoveriesRegistration
+    {
+        IReadOnlyList<Guid> MappingIds { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IDiscoveryGeometrySurface.cs
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Motion;
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IDiscoveryGeometrySurface
+    {
+        IDiscoveryGeometryRegistration Register(IDiscoveryGeometryProfile profile);
+        Task<IDiscoveryGeometryRegistration> RegisterDocumentAsync(string sourceName,string documentContent,object? provenance=null,Guid? parentExecutionId=null,Guid? pulseId=null,CancellationToken cancellationToken=default);
+        IReadOnlyList<IDiscoveryGeometryRegistration> Registrations { get; }
+        bool TryGetRegistration(Guid registrationId,out IDiscoveryGeometryRegistration? registration);
+        bool TryGetMapping(string semanticKey,out IDiscoveryClusterMapping? mapping);
+        IDiscoveryClusterSpatialRelationship Locate(IDiscoveryVectorEvaluation evaluation,string semanticKey);
+        IDiscoveryClusterTrajectoryProjection Project(IDiscoveryVectorMotionResult motion,string semanticKey);
+        IDiscoveryGeometryObservationResult Observe(IDiscoveryVectorEvaluation evaluation,string semanticKey);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IDiscoveryNarrativeSurface.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Narratives;
+
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IDiscoveryNarrativeSurface
+    {
+        IDiscoveryRecognizedGeometryPopulation CreatePopulation(
+            Guid geometryRegistrationId,
+            IReadOnlyList<IDiscoveryClusterRecognitionResult> recognizedGeometry);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IWildsDiscoveries.cs
+using WildsEngine.Discoveries.Abstractions.Services;
+
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IWildsDiscoveries
+    {
+        IDiscoveryGeometrySurface Geometry { get; }
+        IDiscoveryNarrativeSurface Narratives { get; }
+        IWildsServiceExecutionJournal Executions { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IWildsDiscoveriesProfile.cs
+using System;
+
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IWildsDiscoveriesProfile : IIdentifier
+    {
+        string Version { get; }
+        string Scope { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Surface\IWildsDiscoveriesRegistration.cs
+using System;
+
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IWildsDiscoveriesRegistration : IIdentifier
+    {
+        Guid ProfileId { get; }
+        string ProfileSlug { get; }
+        string ProfileVersion { get; }
+        string Scope { get; }
+        DateTimeOffset RegisteredAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Abstractions\Vectorization\IDiscoveryVectorizerFactory.cs
+namespace WildsEngine.Discoveries.Abstractions.Vectorization
+{
+    public interface IDiscoveryVectorizerFactory
+    {
+        IDiscoveryVectorizer Create(
+            IDiscoveryVectorizationService service,
+            IDiscoveryVectorMetric metric);
+    }
+}
+
+FILE: WildsEngine.Discoveries\Base\ConsequenceBase.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    /// <summary>
+    /// Reusable base for projected Consequences.
+    ///
+    /// Consequence uses the established Discoveries identity
+    /// model and remains knowledge rather than behavior.
+    /// </summary>
+    public abstract class ConsequenceBase :
+        IdentifierBase,
+        IConsequence
+    {
+        protected ConsequenceBase(
+            string slug,
+            string name,
+            object? value,
+            IReadOnlyList<ITruth> truths,
+            double magnitude,
+            double confidence,
+            DateTimeOffset projectedAt)
+            : base(
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                truths,
+                magnitude,
+                confidence,
+                projectedAt);
+        }
+
+        protected ConsequenceBase(
+            Guid id,
+            string slug,
+            string name,
+            object? value,
+            IReadOnlyList<ITruth> truths,
+            double magnitude,
+            double confidence,
+            DateTimeOffset projectedAt)
+            : base(
+                id,
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                truths,
+                magnitude,
+                confidence,
+                projectedAt);
+        }
+
+        public string Name { get; private set; } = null!;
+
+        public object? Value { get; private set; }
+
+        public IReadOnlyList<ITruth> Truths
+        {
+            get;
+            private set;
+        } = null!;
+
+        public double Magnitude { get; private set; }
+
+        public double Confidence { get; private set; }
+
+        public DateTimeOffset ProjectedAt { get; private set; }
+
+        private void Initialize(
+            string name,
+            object? value,
+            IReadOnlyList<ITruth> truths,
+            double magnitude,
+            double confidence,
+            DateTimeOffset projectedAt)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException(
+                    "Consequence name cannot be empty.",
+                    nameof(name));
+            }
+
+            Name =
+                name.Trim();
+
+            Value =
+                value;
+
+            Truths =
+                DiscoverySnapshots.Required(
+                    truths,
+                    nameof(truths));
+
+            Magnitude =
+                DiscoveryNumbers.NonNegative(
+                    magnitude,
+                    nameof(magnitude));
+
+            Confidence =
+                DiscoveryNumbers.Unit(
+                    confidence,
+                    nameof(confidence));
+
+            ProjectedAt =
+                projectedAt;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Base\DiscoveryClusterBase.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    /// <summary>
+    /// Reusable immutable geometric cluster over Discovery
+    /// vectors.
+    ///
+    /// The centroid is a geometric point, not a complete
+    /// provenance-bearing vector evaluation.
+    /// </summary>
+    public abstract class DiscoveryClusterBase :
+        IDiscoveryCluster
+    {
+        protected DiscoveryClusterBase(
+            IReadOnlyList<IDiscoveryVector> members,
+            IDiscoveryVectorPoint centroid,
+            double density,
+            double dispersion,
+            double coherence)
+        {
+            if (members == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(members));
+            }
+
+            if (members.Count == 0)
+            {
+                throw new ArgumentException(
+                    "A Discovery cluster requires at least one member.",
+                    nameof(members));
+            }
+
+            Members =
+                DiscoverySnapshots.Required(
+                    members,
+                    nameof(members));
+
+            Centroid =
+                centroid ??
+                throw new ArgumentNullException(
+                    nameof(centroid));
+
+            Density =
+                DiscoveryNumbers.Unit(
+                    density,
+                    nameof(density));
+
+            Dispersion =
+                DiscoveryNumbers.NonNegative(
+                    dispersion,
+                    nameof(dispersion));
+
+            Coherence =
+                DiscoveryNumbers.Unit(
+                    coherence,
+                    nameof(coherence));
+        }
+
+        public IReadOnlyList<IDiscoveryVector> Members { get; }
+
+        public IDiscoveryVectorPoint Centroid { get; }
+
+        public double Density { get; }
+
+        public double Dispersion { get; }
+
+        public double Coherence { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Base\DiscoveryVectorBase.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    /// <summary>
+    /// Reusable immutable Discovery-vector evaluation.
+    ///
+    /// Magnitude is calculated by the supplied metric from the
+    /// exact validated component snapshot.
+    /// </summary>
+    public abstract class DiscoveryVectorBase :
+        IDiscoveryVector
+    {
+        protected DiscoveryVectorBase(
+            IReadOnlyList<IDiscoveryVectorComponent> components,
+            IReadOnlyList<IDiscoveryVectorContribution> contributions,
+            IReadOnlyList<IDiscoveryVectorMotion> motion,
+            IDiscoveryVectorMetric metric,
+            DateTimeOffset evaluatedAt)
+        {
+            Components =
+                DiscoverySnapshots.Required(
+                    components,
+                    nameof(components));
+
+            Contributions =
+                DiscoverySnapshots.Required(
+                    contributions,
+                    nameof(contributions));
+
+            Motion =
+                DiscoverySnapshots.Required(
+                    motion,
+                    nameof(motion));
+
+            DiscoveryDimensions.ValidateComponents(
+                Components,
+                nameof(components));
+
+            DiscoveryDimensions.ValidateContributions(
+                Contributions,
+                Components,
+                nameof(contributions));
+
+            DiscoveryDimensions.ValidateMotion(
+                Motion,
+                Components,
+                nameof(motion));
+
+            Metric =
+                metric ??
+                throw new ArgumentNullException(
+                    nameof(metric));
+
+            EvaluatedAt =
+                evaluatedAt;
+
+            var magnitude =
+                Metric.GetMagnitude(
+                    this);
+
+            Magnitude =
+                DiscoveryNumbers.NonNegative(
+                    magnitude,
+                    nameof(magnitude));
+        }
+
+        public IReadOnlyList<IDiscoveryVectorComponent> Components { get; }
+
+        public int Dimension =>
+            Components.Count;
+
+        public IReadOnlyList<IDiscoveryVectorContribution> Contributions
+        {
+            get;
+        }
+
+        public IReadOnlyList<IDiscoveryVectorMotion> Motion { get; }
+
+        public IDiscoveryVectorMetric Metric { get; }
+
+        public double Magnitude { get; }
+
+        public DateTimeOffset EvaluatedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Base\EntitySurfaceBase.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    public abstract class EntitySurfaceBase :
+        IEntitySurface
+    {
+        protected EntitySurfaceBase(
+            IEntity entity,
+            object target,
+            string alias,
+            string consumerType)
+        {
+            Entity =
+                entity ??
+                throw new ArgumentNullException(
+                    nameof(entity));
+
+            Target =
+                target ??
+                throw new ArgumentNullException(
+                    nameof(target));
+
+            Alias =
+                RequireVocabulary(
+                    alias,
+                    nameof(alias));
+
+            ConsumerType =
+                RequireVocabulary(
+                    consumerType,
+                    nameof(consumerType));
+        }
+
+        public IEntity Entity { get; }
+
+        public object Target { get; }
+
+        public string Alias { get; }
+
+        public string ConsumerType { get; }
+
+        protected void RequireOwnedFact(
+            IFact fact)
+        {
+            if (fact == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(fact));
+            }
+
+            if (!ReferenceEquals(
+                    fact.Entity,
+                    Entity))
+            {
+                throw new ArgumentException(
+                    "The Fact must belong to the exact Surface Entity.",
+                    nameof(fact));
+            }
+        }
+
+        protected void RequireOwnedDiscovery(
+            IDiscovery discovery)
+        {
+            if (discovery == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(discovery));
+            }
+
+            if (!ReferenceEquals(
+                    discovery.Entity,
+                    Entity))
+            {
+                throw new ArgumentException(
+                    "The Discovery must belong to the exact Surface Entity.",
+                    nameof(discovery));
+            }
+
+            for (var index = 0;
+                 index < discovery.Facts.Count;
+                 index++)
+            {
+                RequireOwnedFact(
+                    discovery.Facts[index]);
+            }
+        }
+
+        private static string RequireVocabulary(
+            string value,
+            string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(
+                    "Surface vocabulary cannot be empty.",
+                    parameterName);
+            }
+
+            return value.Trim();
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Base\FactBase.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    public abstract class FactBase :
+        IFact
+    {
+        private readonly List<IDiscoveryEvidence> _evidence =
+            new List<IDiscoveryEvidence>();
+
+        private readonly Resolution _resolution;
+
+        protected FactBase(
+            IEntity entity,
+            string name,
+            object? value,
+            int requiredEvidenceCount,
+            IEvidenceContributionPolicy contributionPolicy,
+            string? externalId = null)
+        {
+            Entity =
+                entity ??
+                throw new ArgumentNullException(
+                    nameof(entity));
+
+            if (string.IsNullOrWhiteSpace(
+                    name))
+            {
+                throw new ArgumentException(
+                    "A Fact requires a name.",
+                    nameof(name));
+            }
+
+            ContributionPolicy =
+                contributionPolicy ??
+                throw new ArgumentNullException(
+                    nameof(contributionPolicy));
+
+            Name =
+                name.Trim();
+
+            Value =
+                value;
+
+            ExternalId =
+                externalId;
+
+            _resolution =
+                new Resolution(
+                    _evidence,
+                    requiredEvidenceCount,
+                    ContributionPolicy);
+        }
+
+        public string? ExternalId { get; }
+
+        public string Name { get; }
+
+        public object? Value { get; private set; }
+
+        public IEntity Entity { get; }
+
+        public IEvidenceContributionPolicy ContributionPolicy { get; }
+
+        public IReadOnlyList<IDiscoveryEvidence> Evidence =>
+            _evidence;
+
+        public IReadOnlyList<IDiscoveryEvidence> Contributors =>
+            _resolution.Contributors;
+
+        public int RequiredEvidenceCount =>
+            _resolution.RequiredCount;
+
+        public int CurrentEvidenceCount =>
+            _resolution.CurrentCount;
+
+        public double EvidencePercentage =>
+            _resolution.Percentage;
+
+        public bool IsProven =>
+            _resolution.IsResolved;
+
+        public int RequiredCount =>
+            RequiredEvidenceCount;
+
+        public int CurrentCount =>
+            CurrentEvidenceCount;
+
+        public double Percentage =>
+            EvidencePercentage;
+
+        public bool IsResolved =>
+            IsProven;
+
+        protected void SetValue(
+            object? value)
+        {
+            Value =
+                value;
+        }
+
+        protected bool AddEvidence(
+            IDiscoveryEvidence evidence)
+        {
+            if (evidence == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(evidence));
+            }
+
+            if (!ReferenceEquals(
+                    evidence.Entity,
+                    Entity))
+            {
+                throw new ArgumentException(
+                    "Evidence must belong to this exact Entity.",
+                    nameof(evidence));
+            }
+
+            if (_evidence.Contains(
+                    evidence))
+            {
+                return false;
+            }
+
+            _evidence.Add(
+                evidence);
+
+            return true;
+        }
+
+        protected bool RemoveEvidence(
+            IDiscoveryEvidence evidence)
+        {
+            if (evidence == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(evidence));
+            }
+
+            return _evidence.Remove(
+                evidence);
+        }
+
+        private sealed class Resolution :
+            ResolutionThresholdBase<IDiscoveryEvidence>
+        {
+            private readonly IReadOnlyList<IDiscoveryEvidence> _items;
+
+            private readonly IEvidenceContributionPolicy _policy;
+
+            public Resolution(
+                IReadOnlyList<IDiscoveryEvidence> items,
+                int requiredCount,
+                IEvidenceContributionPolicy policy)
+                : base(
+                    requiredCount)
+            {
+                _items =
+                    items ??
+                    throw new ArgumentNullException(
+                        nameof(items));
+
+                _policy =
+                    policy ??
+                    throw new ArgumentNullException(
+                        nameof(policy));
+            }
+
+            protected override IReadOnlyList<IDiscoveryEvidence> Items =>
+                _items;
+
+            protected override bool IsValidContributor(
+                IDiscoveryEvidence contributor)
+            {
+                if (contributor == null ||
+                    !contributor.IsValidated)
+                {
+                    return false;
+                }
+
+                if (!ReferenceEquals(
+                        contributor.ProofResult.Evidence,
+                        contributor))
+                {
+                    return false;
+                }
+
+                return _policy.Contributes(
+                    contributor);
+            }
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Base\TruthBase.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    /// <summary>
+    /// Reusable base for scoped Truths congealed from Discovery
+    /// composition.
+    ///
+    /// Truth reuses established Discoveries identity and retains
+    /// the exact scoped vector series whose composition
+    /// congealed.
+    /// </summary>
+    public abstract class TruthBase :
+        IdentifierBase,
+        ITruth
+    {
+        protected TruthBase(
+            string slug,
+            string name,
+            object? value,
+            IDiscoveryVectorSeries series,
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IReadOnlyList<IDiscovery> discoveries,
+            double stability,
+            double confidence,
+            DateTimeOffset congealedAt)
+            : base(
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                series,
+                clusters,
+                discoveries,
+                stability,
+                confidence,
+                congealedAt);
+        }
+
+        protected TruthBase(
+            Guid id,
+            string slug,
+            string name,
+            object? value,
+            IDiscoveryVectorSeries series,
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IReadOnlyList<IDiscovery> discoveries,
+            double stability,
+            double confidence,
+            DateTimeOffset congealedAt)
+            : base(
+                id,
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                series,
+                clusters,
+                discoveries,
+                stability,
+                confidence,
+                congealedAt);
+        }
+
+        public string Name { get; private set; } = null!;
+
+        public object? Value { get; private set; }
+
+        public IDiscoveryVectorSeries Series
+        {
+            get;
+            private set;
+        } = null!;
+
+        public IReadOnlyList<IDiscoveryCluster> Clusters
+        {
+            get;
+            private set;
+        } = null!;
+
+        public IReadOnlyList<IDiscovery> Discoveries
+        {
+            get;
+            private set;
+        } = null!;
+
+        public double Stability { get; private set; }
+
+        public double Confidence { get; private set; }
+
+        public DateTimeOffset CongealedAt { get; private set; }
+
+        private void Initialize(
+            string name,
+            object? value,
+            IDiscoveryVectorSeries series,
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IReadOnlyList<IDiscovery> discoveries,
+            double stability,
+            double confidence,
+            DateTimeOffset congealedAt)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException(
+                    "Truth name cannot be empty.",
+                    nameof(name));
+            }
+
+            Name =
+                name.Trim();
+
+            Value =
+                value;
+
+            Series =
+                series ??
+                throw new ArgumentNullException(
+                    nameof(series));
+
+            if (string.IsNullOrWhiteSpace(
+                    Series.Scope))
+            {
+                throw new ArgumentException(
+                    "Truth requires a scoped Discovery-vector series.",
+                    nameof(series));
+            }
+
+            if (Series.Inputs == null)
+            {
+                throw new ArgumentException(
+                    "Truth requires a series with an input population.",
+                    nameof(series));
+            }
+
+            if (Series.Vectors == null)
+            {
+                throw new ArgumentException(
+                    "Truth requires a series with vector evaluations.",
+                    nameof(series));
+            }
+
+            Clusters =
+                DiscoverySnapshots.Required(
+                    clusters,
+                    nameof(clusters));
+
+            Discoveries =
+                DiscoverySnapshots.Required(
+                    discoveries,
+                    nameof(discoveries));
+
+            ValidateDiscoveriesBelongToSeries(
+                Discoveries,
+                Series);
+
+            Stability =
+                DiscoveryNumbers.Unit(
+                    stability,
+                    nameof(stability));
+
+            Confidence =
+                DiscoveryNumbers.Unit(
+                    confidence,
+                    nameof(confidence));
+
+            CongealedAt =
+                congealedAt;
+        }
+
+        private static void ValidateDiscoveriesBelongToSeries(
+            IReadOnlyList<IDiscovery> discoveries,
+            IDiscoveryVectorSeries series)
+        {
+            for (var discoveryIndex = 0;
+                 discoveryIndex < discoveries.Count;
+                 discoveryIndex++)
+            {
+                var discovery =
+                    discoveries[discoveryIndex];
+
+                var found =
+                    false;
+
+                for (var inputIndex = 0;
+                     inputIndex < series.Inputs.Count;
+                     inputIndex++)
+                {
+                    var input =
+                        series.Inputs[inputIndex];
+
+                    if (input == null)
+                    {
+                        throw new ArgumentException(
+                            "Truth series inputs cannot contain null items.",
+                            nameof(series));
+                    }
+
+                    if (ReferenceEquals(
+                            discovery,
+                            input.Discovery))
+                    {
+                        found =
+                            true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    throw new ArgumentException(
+                        "Every Truth Discovery must belong to the exact congealment series.",
+                        nameof(discoveries));
+                }
+            }
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Clusters\DiscoveryClusterObservation.cs
+using System;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+namespace WildsEngine.Discoveries.Clusters
+{
+    public sealed class DiscoveryClusterObservation : IDiscoveryClusterObservation
+    {
+        public DiscoveryClusterObservation(IDiscoveryClusterSpatialRelationship relationship)
+        {
+            Relationship=relationship??throw new ArgumentNullException(nameof(relationship));
+            ObservedAt=relationship.Evaluation.EvaluatedAt;
+        }
+        public IDiscoveryClusterSpatialRelationship Relationship { get; }
+        public DateTimeOffset ObservedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Clusters\DiscoveryClusterPersistenceResult.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+namespace WildsEngine.Discoveries.Clusters
+{
+    public sealed class DiscoveryClusterPersistenceResult : IDiscoveryClusterPersistenceResult
+    {
+        public DiscoveryClusterPersistenceResult(IDiscoveryClusterMapping mapping,IReadOnlyList<IDiscoveryClusterObservation> observations,double stability,IDiscoveryClusterPersistencePolicy policy,IDiscoveryClusterStabilityMetric metric)
+        {
+            Mapping=mapping??throw new ArgumentNullException(nameof(mapping));
+            if(observations==null||observations.Count==0)throw new ArgumentException("At least one observation is required.",nameof(observations));
+            if(double.IsNaN(stability)||double.IsInfinity(stability)||stability<0||stability>1)throw new ArgumentOutOfRangeException(nameof(stability));
+            if(policy==null)throw new ArgumentNullException(nameof(policy));if(metric==null)throw new ArgumentNullException(nameof(metric));
+            var copy=new IDiscoveryClusterObservation[observations.Count];int inside=0,consecutive=0;DateTimeOffset? entry=null,exit=null;
+            for(var i=0;i<observations.Count;i++){
+                copy[i]=observations[i]??throw new ArgumentException("Observations cannot contain null.",nameof(observations));
+                if(copy[i].Relationship.Mapping.Id!=mapping.Id)throw new ArgumentException("Every observation must reference the same mapping.",nameof(observations));
+                if(i>0&&copy[i].ObservedAt<=copy[i-1].ObservedAt)throw new ArgumentException("Observation times must be strictly increasing.",nameof(observations));
+                var isInside=copy[i].Relationship.IsInside||copy[i].Relationship.IsOnBoundary;
+                if(isInside){inside++;consecutive++;if(!entry.HasValue||(i>0&&!(copy[i-1].Relationship.IsInside||copy[i-1].Relationship.IsOnBoundary)))entry=copy[i].ObservedAt;exit=null;}
+                else {if(i>0&&(copy[i-1].Relationship.IsInside||copy[i-1].Relationship.IsOnBoundary))exit=copy[i].ObservedAt;consecutive=0;}
+            }
+            Observations=new ReadOnlyCollection<IDiscoveryClusterObservation>(copy);ObservationCount=copy.Length;InsideObservationCount=inside;ConsecutiveInsideCount=consecutive;OccupancyRatio=(double)inside/copy.Length;ObservedEntryAt=entry;ObservedExitAt=exit;
+            if(entry.HasValue)ObservedDurationInside=(exit.HasValue?exit.Value:copy[copy.Length-1].ObservedAt)-entry.Value;
+            Stability=stability;PersistencePolicyId=policy.Id;PersistencePolicySlug=policy.Slug;StabilityMetricId=metric.Id;StabilityMetricSlug=metric.Slug;IsPersistent=policy.IsSatisfied(this);
+        }
+        public IDiscoveryClusterMapping Mapping{get;} public IReadOnlyList<IDiscoveryClusterObservation> Observations{get;} public int ObservationCount{get;} public int InsideObservationCount{get;} public int ConsecutiveInsideCount{get;} public double OccupancyRatio{get;} public DateTimeOffset? ObservedEntryAt{get;} public DateTimeOffset? ObservedExitAt{get;} public TimeSpan? ObservedDurationInside{get;} public double Stability{get;} public bool IsPersistent{get;} public Guid PersistencePolicyId{get;} public string PersistencePolicySlug{get;} public Guid StabilityMetricId{get;} public string StabilityMetricSlug{get;}
+    }
+}
+
+FILE: WildsEngine.Discoveries\Clusters\DiscoveryClusterRecognitionResult.cs
+using System;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+namespace WildsEngine.Discoveries.Clusters
+{
+    public sealed class DiscoveryClusterRecognitionResult : IDiscoveryClusterRecognitionResult
+    {
+        public DiscoveryClusterRecognitionResult(IDiscoveryClusterPersistenceResult persistence,IDiscoveryClusterRecognitionPolicy policy,DateTimeOffset evaluatedAt)
+        { Persistence=persistence??throw new ArgumentNullException(nameof(persistence));Mapping=persistence.Mapping;if(policy==null)throw new ArgumentNullException(nameof(policy));RecognitionPolicyId=policy.Id;RecognitionPolicySlug=policy.Slug;EvaluatedAt=evaluatedAt;IsRecognized=policy.Recognizes(persistence); }
+        public IDiscoveryClusterMapping Mapping{get;} public IDiscoveryClusterPersistenceResult Persistence{get;} public bool IsRecognized{get;} public Guid RecognitionPolicyId{get;} public string RecognitionPolicySlug{get;} public DateTimeOffset EvaluatedAt{get;}
+    }
+}
+
+FILE: WildsEngine.Discoveries\Clusters\DiscoveryClusterSpatialRelationship.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Motion;
+
+namespace WildsEngine.Discoveries.Clusters
+{
+    public sealed class DiscoveryClusterSpatialRelationship : IDiscoveryClusterSpatialRelationship
+    {
+        public DiscoveryClusterSpatialRelationship(
+            IDiscoveryClusterMapping mapping,
+            IDiscoveryVectorEvaluation evaluation,
+            double distanceToCentroid,
+            double signedDistanceToBoundary,
+            bool isInside,
+            bool isOnBoundary,
+            IReadOnlyDictionary<string, double> nearestBoundaryPoint)
+        {
+            Mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
+            Evaluation = evaluation ?? throw new ArgumentNullException(nameof(evaluation));
+            DistanceToCentroid = Finite(distanceToCentroid, nameof(distanceToCentroid));
+            SignedDistanceToBoundary = Finite(signedDistanceToBoundary, nameof(signedDistanceToBoundary));
+            IsInside = isInside;
+            IsOnBoundary = isOnBoundary;
+            if (nearestBoundaryPoint == null) throw new ArgumentNullException(nameof(nearestBoundaryPoint));
+            NearestBoundaryPoint = new ReadOnlyDictionary<string, double>(
+                new Dictionary<string, double>(nearestBoundaryPoint, StringComparer.Ordinal));
+        }
+        public IDiscoveryClusterMapping Mapping { get; }
+        public IDiscoveryVectorEvaluation Evaluation { get; }
+        public double DistanceToCentroid { get; }
+        public double SignedDistanceToBoundary { get; }
+        public bool IsInside { get; }
+        public bool IsOnBoundary { get; }
+        public IReadOnlyDictionary<string, double> NearestBoundaryPoint { get; }
+        private static double Finite(double value, string name)
+        { if (double.IsNaN(value) || double.IsInfinity(value)) throw new ArgumentOutOfRangeException(name); return value; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Clusters\DiscoveryClusterTrajectoryProjection.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Motion;
+
+namespace WildsEngine.Discoveries.Clusters
+{
+    public sealed class DiscoveryClusterTrajectoryProjection : IDiscoveryClusterTrajectoryProjection
+    {
+        public DiscoveryClusterTrajectoryProjection(
+            IDiscoveryClusterSpatialRelationship spatial,
+            IDiscoveryVectorMotionResult motion,
+            DiscoveryClusterTransitKind transitKind,
+            double radialRate,
+            double timeToClosestApproachSeconds,
+            double closestApproachDistanceToCentroid,
+            double closestApproachDistanceToBoundary,
+            double? timeToEntrySeconds,
+            double? timeToExitSeconds,
+            double? projectedDurationInsideSeconds,
+            IReadOnlyDictionary<string,double>? entryPoint,
+            IReadOnlyDictionary<string,double>? exitPoint)
+        {
+            Spatial = spatial ?? throw new ArgumentNullException(nameof(spatial));
+            Motion = motion ?? throw new ArgumentNullException(nameof(motion));
+            ProjectionBasis = "constant-velocity";
+            TransitKind = transitKind;
+            RadialRate = radialRate;
+            IsApproaching = radialRate < 0.0;
+            IsReceding = radialRate > 0.0;
+            TimeToClosestApproachSeconds = timeToClosestApproachSeconds;
+            ClosestApproachDistanceToCentroid = closestApproachDistanceToCentroid;
+            ClosestApproachDistanceToBoundary = closestApproachDistanceToBoundary;
+            TimeToEntrySeconds = timeToEntrySeconds;
+            TimeToExitSeconds = timeToExitSeconds;
+            ProjectedDurationInsideSeconds = projectedDurationInsideSeconds;
+            EntryPoint = Copy(entryPoint);
+            ExitPoint = Copy(exitPoint);
+        }
+        public IDiscoveryClusterSpatialRelationship Spatial { get; }
+        public IDiscoveryVectorMotionResult Motion { get; }
+        public string ProjectionBasis { get; }
+        public DiscoveryClusterTransitKind TransitKind { get; }
+        public double RadialRate { get; }
+        public bool IsApproaching { get; }
+        public bool IsReceding { get; }
+        public double TimeToClosestApproachSeconds { get; }
+        public double ClosestApproachDistanceToCentroid { get; }
+        public double ClosestApproachDistanceToBoundary { get; }
+        public double? TimeToEntrySeconds { get; }
+        public double? TimeToExitSeconds { get; }
+        public double? ProjectedDurationInsideSeconds { get; }
+        public IReadOnlyDictionary<string, double>? EntryPoint { get; }
+        public IReadOnlyDictionary<string, double>? ExitPoint { get; }
+        private static IReadOnlyDictionary<string,double>? Copy(IReadOnlyDictionary<string,double>? source)
+        { return source == null ? null : new ReadOnlyDictionary<string,double>(new Dictionary<string,double>(source,StringComparer.Ordinal)); }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Clusters\HypersphereDiscoveryClusterRelationshipProjector.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Motion;
+
+namespace WildsEngine.Discoveries.Clusters
+{
+    public sealed class HypersphereDiscoveryClusterRelationshipProjector : IDiscoveryClusterRelationshipProjector
+    {
+        private readonly double _epsilon;
+        public HypersphereDiscoveryClusterRelationshipProjector(double epsilon = 1e-10)
+        {
+            if (double.IsNaN(epsilon) || double.IsInfinity(epsilon) || epsilon < 0.0)
+                throw new ArgumentOutOfRangeException(nameof(epsilon));
+            _epsilon = epsilon;
+        }
+
+        public IDiscoveryClusterSpatialRelationship Locate(
+            IDiscoveryVectorEvaluation evaluation,
+            IDiscoveryClusterMapping mapping)
+        {
+            Validate(evaluation, mapping);
+            var position = Position(evaluation.Vector, mapping);
+            var delta = Delta(position, mapping.Centroid);
+            var distance = Magnitude(delta);
+            var signed = distance - mapping.Radius;
+            var onBoundary = Math.Abs(signed) <= _epsilon;
+            var nearest = new Dictionary<string,double>(StringComparer.Ordinal);
+            foreach (var pair in mapping.Centroid)
+            {
+                var direction = distance <= _epsilon ? FirstAxis(pair.Key, mapping.Centroid) : delta[pair.Key] / distance;
+                nearest[pair.Key] = pair.Value + (direction * mapping.Radius);
+            }
+            return new DiscoveryClusterSpatialRelationship(
+                mapping, evaluation, distance, signed, signed < -_epsilon, onBoundary, nearest);
+        }
+
+        public IDiscoveryClusterTrajectoryProjection Project(
+            IDiscoveryVectorMotionResult motion,
+            IDiscoveryClusterMapping mapping)
+        {
+            if (motion == null) throw new ArgumentNullException(nameof(motion));
+            var spatial = Locate(motion.Evaluation, mapping);
+            var position = Position(motion.Evaluation.Vector, mapping);
+            var velocity = Velocity(motion.Motion, mapping);
+            var offset = Delta(position, mapping.Centroid);
+            var speedSquared = Dot(velocity, velocity);
+            var radialRate = spatial.DistanceToCentroid <= _epsilon ? 0.0 : Dot(offset, velocity) / spatial.DistanceToCentroid;
+            if (speedSquared <= _epsilon)
+                return BuildStationary(spatial, motion, radialRate);
+
+            var closestTime = Math.Max(0.0, -Dot(offset, velocity) / speedSquared);
+            var closestPosition = At(position, velocity, closestTime);
+            var closestDistance = Magnitude(Delta(closestPosition, mapping.Centroid));
+
+            var b = 2.0 * Dot(offset, velocity);
+            var c = Dot(offset, offset) - (mapping.Radius * mapping.Radius);
+            var discriminant = (b * b) - (4.0 * speedSquared * c);
+            double? entry = null;
+            double? exit = null;
+            IReadOnlyDictionary<string,double>? entryPoint = null;
+            IReadOnlyDictionary<string,double>? exitPoint = null;
+
+            if (discriminant >= -_epsilon)
+            {
+                discriminant = Math.Max(0.0, discriminant);
+                var root = Math.Sqrt(discriminant);
+                var t1 = (-b - root) / (2.0 * speedSquared);
+                var t2 = (-b + root) / (2.0 * speedSquared);
+                if (spatial.IsInside || spatial.IsOnBoundary)
+                {
+                    entry = 0.0;
+                    if (t2 >= 0.0) exit = t2;
+                }
+                else
+                {
+                    if (t1 >= 0.0) entry = t1;
+                    if (t2 >= 0.0) exit = t2;
+                }
+                if (entry.HasValue) entryPoint = At(position, velocity, entry.Value);
+                if (exit.HasValue) exitPoint = At(position, velocity, exit.Value);
+            }
+
+            double? duration =
+                entry.HasValue && exit.HasValue
+                    ? (double?)Math.Max(0.0, exit.Value - entry.Value)
+                    : null;
+            var kind = Classify(spatial, radialRate, entry, exit, closestDistance, mapping.Radius);
+            return new DiscoveryClusterTrajectoryProjection(
+                spatial, motion, kind, radialRate, closestTime, closestDistance,
+                closestDistance - mapping.Radius, entry, exit, duration, entryPoint, exitPoint);
+        }
+
+        private IDiscoveryClusterTrajectoryProjection BuildStationary(
+            IDiscoveryClusterSpatialRelationship spatial,
+            IDiscoveryVectorMotionResult motion,
+            double radialRate)
+        {
+            return new DiscoveryClusterTrajectoryProjection(
+                spatial,
+                motion,
+                spatial.IsInside
+                    ? DiscoveryClusterTransitKind.RemainingInside
+                    : DiscoveryClusterTransitKind.Stationary,
+                radialRate,
+                0.0,
+                spatial.DistanceToCentroid,
+                spatial.SignedDistanceToBoundary,
+                spatial.IsInside ? (double?)0.0 : null,
+                null,
+                null,
+                null,
+                null);
+        }
+
+        private DiscoveryClusterTransitKind Classify(
+            IDiscoveryClusterSpatialRelationship spatial, double radialRate,
+            double? entry, double? exit, double closestDistance, double radius)
+        {
+            if (spatial.IsInside || spatial.IsOnBoundary)
+                return exit.HasValue ? DiscoveryClusterTransitKind.Exiting : DiscoveryClusterTransitKind.RemainingInside;
+            if (entry.HasValue && exit.HasValue) return DiscoveryClusterTransitKind.PassingThrough;
+            if (Math.Abs(closestDistance - radius) <= _epsilon) return DiscoveryClusterTransitKind.Flyby;
+            if (radialRate < -_epsilon) return DiscoveryClusterTransitKind.Approaching;
+            if (radialRate > _epsilon) return DiscoveryClusterTransitKind.Receding;
+            return DiscoveryClusterTransitKind.Stationary;
+        }
+
+        private static void Validate(IDiscoveryVectorEvaluation evaluation, IDiscoveryClusterMapping mapping)
+        {
+            if (evaluation == null) throw new ArgumentNullException(nameof(evaluation));
+            if (mapping == null) throw new ArgumentNullException(nameof(mapping));
+            if (!string.Equals(mapping.GeometryType, "hypersphere", StringComparison.Ordinal))
+                throw new NotSupportedException("This projector supports hypersphere mappings only.");
+        }
+        private static Dictionary<string,double> Position(IDiscoveryVector vector, IDiscoveryClusterMapping mapping)
+        {
+            var source = new Dictionary<string,double>(StringComparer.Ordinal);
+            for (var i=0;i<vector.Components.Count;i++) source[vector.Components[i].Name]=vector.Components[i].Value;
+            var result = new Dictionary<string,double>(StringComparer.Ordinal);
+            foreach(var dimension in mapping.Centroid.Keys)
+            { if(!source.TryGetValue(dimension,out var value)) throw new InvalidOperationException("Vector is missing mapped dimension: "+dimension); result[dimension]=value; }
+            return result;
+        }
+        private static Dictionary<string,double> Velocity(IReadOnlyList<IDiscoveryVectorMotion> motion, IDiscoveryClusterMapping mapping)
+        {
+            var source=new Dictionary<string,double>(StringComparer.Ordinal);
+            for(var i=0;i<motion.Count;i++) source[motion[i].Dimension]=motion[i].Velocity;
+            var result=new Dictionary<string,double>(StringComparer.Ordinal);
+            foreach(var dimension in mapping.Centroid.Keys)
+            { if(!source.TryGetValue(dimension,out var value)) throw new InvalidOperationException("Motion is missing mapped dimension: "+dimension); result[dimension]=value; }
+            return result;
+        }
+        private static Dictionary<string,double> Delta(IReadOnlyDictionary<string,double> a,IReadOnlyDictionary<string,double> b)
+        { var r=new Dictionary<string,double>(StringComparer.Ordinal);foreach(var p in b) r[p.Key]=a[p.Key]-p.Value;return r; }
+        private static double Dot(IReadOnlyDictionary<string,double> a,IReadOnlyDictionary<string,double> b)
+        { var t=0.0;foreach(var p in a)t+=p.Value*b[p.Key];return t; }
+        private static double Magnitude(IReadOnlyDictionary<string,double> v)=>Math.Sqrt(Dot(v,v));
+        private static Dictionary<string,double> At(IReadOnlyDictionary<string,double> p,IReadOnlyDictionary<string,double> v,double t)
+        { var r=new Dictionary<string,double>(StringComparer.Ordinal);foreach(var x in p)r[x.Key]=x.Value+(v[x.Key]*t);return r; }
+        private static double FirstAxis(string key,IReadOnlyDictionary<string,double> centroid)
+        { foreach(var p in centroid)return string.Equals(p.Key,key,StringComparison.Ordinal)?1.0:0.0;return 0.0; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Entities\EntityNativeSurface.cs
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Concrete
+{
+    public sealed class EntityNativeSurface :
+        IEntityNativeSurface
+    {
+        private readonly IReadOnlyList<INativeAttribute> _nativeAttributes;
+
+        public EntityNativeSurface(
+            IEntity entity,
+            object target)
+        {
+            Entity =
+                entity ??
+                throw new ArgumentNullException(
+                    nameof(entity));
+
+            Target =
+                target ??
+                throw new ArgumentNullException(
+                    nameof(target));
+
+            _nativeAttributes =
+                Capture(
+                    target);
+        }
+
+        public IEntity Entity { get; }
+
+        public object Target { get; }
+
+        public IReadOnlyList<INativeAttribute> NativeAttributes =>
+            _nativeAttributes;
+
+        private static IReadOnlyList<INativeAttribute> Capture(
+            object target)
+        {
+            var attributes =
+                new List<INativeAttribute>();
+
+            var properties =
+                target.GetType().GetProperties(
+                    BindingFlags.Instance |
+                    BindingFlags.Public);
+
+            Array.Sort(
+                properties,
+                (left, right) =>
+                    string.CompareOrdinal(
+                        left.Name,
+                        right.Name));
+
+            for (var index = 0;
+                 index < properties.Length;
+                 index++)
+            {
+                var property =
+                    properties[index];
+
+                if (property.GetIndexParameters().Length != 0)
+                {
+                    continue;
+                }
+
+                var canRead =
+                    property.GetMethod != null &&
+                    property.GetMethod.IsPublic;
+
+                if (!canRead)
+                {
+                    continue;
+                }
+
+                var canWrite =
+                    property.SetMethod != null &&
+                    property.SetMethod.IsPublic;
+
+                attributes.Add(
+                    new NativeAttribute(
+                        property.Name,
+                        property.PropertyType,
+                        property.GetValue(target),
+                        canRead,
+                        canWrite));
+            }
+
+            var fields =
+                target.GetType().GetFields(
+                    BindingFlags.Instance |
+                    BindingFlags.Public);
+
+            Array.Sort(
+                fields,
+                (left, right) =>
+                    string.CompareOrdinal(
+                        left.Name,
+                        right.Name));
+
+            for (var index = 0;
+                 index < fields.Length;
+                 index++)
+            {
+                var field =
+                    fields[index];
+
+                attributes.Add(
+                    new NativeAttribute(
+                        field.Name,
+                        field.FieldType,
+                        field.GetValue(target),
+                        true,
+                        !field.IsInitOnly && !field.IsLiteral));
+            }
+
+            return attributes;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Facts\Fact.cs
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Base;
+
+namespace WildsEngine.Discoveries.Concrete
+{
+    public sealed class Fact :
+        FactBase
+    {
+        public Fact(
+            IEntity entity,
+            string name,
+            object? value,
+            int requiredEvidenceCount,
+            IEvidenceContributionPolicy contributionPolicy,
+            string? externalId = null)
+            : base(
+                entity,
+                name,
+                value,
+                requiredEvidenceCount,
+                contributionPolicy,
+                externalId)
+        {
+        }
+
+        public bool ReceiveEvidence(
+            IDiscoveryEvidence evidence)
+        {
+            return AddEvidence(
+                evidence);
+        }
+
+        public bool RemoveEvidenceItem(
+            IDiscoveryEvidence evidence)
+        {
+            return RemoveEvidence(
+                evidence);
+        }
+
+        public void UpdateValue(
+            object? value)
+        {
+            SetValue(
+                value);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Motion\DiscoveryVectorEvaluationSeries.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Abstractions.Motion;
+
+namespace WildsEngine.Discoveries.Motion
+{
+    public sealed class DiscoveryVectorEvaluationSeries : IDiscoveryVectorEvaluationSeries
+    {
+        public DiscoveryVectorEvaluationSeries(
+            string scope,
+            IReadOnlyList<IDiscoveryVectorInput> inputs,
+            IReadOnlyList<IDiscoveryVectorEvaluation> evaluations)
+        {
+            if (string.IsNullOrWhiteSpace(scope)) throw new ArgumentException("Series requires a scope.", nameof(scope));
+            if (inputs == null) throw new ArgumentNullException(nameof(inputs));
+            if (evaluations == null) throw new ArgumentNullException(nameof(evaluations));
+            if (inputs.Count == 0) throw new ArgumentException("Series requires at least one input.", nameof(inputs));
+            if (evaluations.Count == 0) throw new ArgumentException("Series requires at least one evaluation.", nameof(evaluations));
+            var inputCopy = new IDiscoveryVectorInput[inputs.Count];
+            for (var i = 0; i < inputs.Count; i++) inputCopy[i] = inputs[i] ?? throw new ArgumentException("Inputs cannot contain null.", nameof(inputs));
+            var evalCopy = new IDiscoveryVectorEvaluation[evaluations.Count];
+            DateTimeOffset? prior = null;
+            for (var i = 0; i < evaluations.Count; i++)
+            {
+                var evaluation = evaluations[i] ?? throw new ArgumentException("Evaluations cannot contain null.", nameof(evaluations));
+                if (prior.HasValue && evaluation.EvaluatedAt <= prior.Value)
+                    throw new ArgumentException("Evaluation timestamps must be strictly increasing.", nameof(evaluations));
+                ValidateInputs(inputCopy, evaluation);
+                evalCopy[i] = evaluation; prior = evaluation.EvaluatedAt;
+            }
+            Scope = scope.Trim();
+            Inputs = new ReadOnlyCollection<IDiscoveryVectorInput>(inputCopy);
+            Evaluations = new ReadOnlyCollection<IDiscoveryVectorEvaluation>(evalCopy);
+        }
+        public string Scope { get; }
+        public IReadOnlyList<IDiscoveryVectorInput> Inputs { get; }
+        public IReadOnlyList<IDiscoveryVectorEvaluation> Evaluations { get; }
+        public IDiscoveryVectorEvaluation? Current => Evaluations.Count == 0 ? null : Evaluations[Evaluations.Count - 1];
+        public IDiscoveryVectorEvaluation? Previous => Evaluations.Count < 2 ? null : Evaluations[Evaluations.Count - 2];
+
+        private static void ValidateInputs(
+            IReadOnlyList<IDiscoveryVectorInput> inputs,
+            IDiscoveryVectorEvaluation evaluation)
+        {
+            for (var c = 0; c < evaluation.Vector.Contributions.Count; c++)
+            {
+                var candidate = evaluation.Vector.Contributions[c].Input;
+                var found = false;
+                for (var i = 0; i < inputs.Count; i++)
+                    if (ReferenceEquals(candidate, inputs[i])) { found = true; break; }
+                if (!found) throw new ArgumentException("Evaluation contains a contribution from outside the series input population.");
+            }
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Narratives\DiscoveryRecognizedGeometryPopulation.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Narratives;
+using WildsEngine.Discoveries.Abstractions.Surface;
+
+namespace WildsEngine.Discoveries.Narratives
+{
+    public sealed class DiscoveryRecognizedGeometryPopulation :
+        IDiscoveryRecognizedGeometryPopulation
+    {
+        public DiscoveryRecognizedGeometryPopulation(
+            Guid id,
+            IDiscoveryGeometryRegistration registration,
+            IReadOnlyList<IDiscoveryClusterRecognitionResult> members,
+            DateTimeOffset createdAt)
+        {
+            if (id == Guid.Empty)
+                throw new ArgumentException("Population identity is required.", nameof(id));
+            Registration = registration ?? throw new ArgumentNullException(nameof(registration));
+            if (members == null || members.Count == 0)
+                throw new ArgumentException("At least one recognized geometry result is required.", nameof(members));
+
+            var allowedMappings = new HashSet<Guid>(registration.MappingIds);
+            var memberCopy = new IDiscoveryClusterRecognitionResult[members.Count];
+            var semanticKeys = new List<string>();
+            var seenSemanticKeys = new HashSet<string>(StringComparer.Ordinal);
+
+            for (var index = 0; index < members.Count; index++)
+            {
+                var member = members[index] ??
+                    throw new ArgumentException("Population members cannot contain null.", nameof(members));
+                if (!member.IsRecognized)
+                    throw new ArgumentException("Every population member must be recognized.", nameof(members));
+                if (!allowedMappings.Contains(member.Mapping.Id))
+                    throw new ArgumentException("Every population member must belong to the supplied geometry registration.", nameof(members));
+                memberCopy[index] = member;
+                if (seenSemanticKeys.Add(member.Mapping.SemanticKey))
+                    semanticKeys.Add(member.Mapping.SemanticKey);
+            }
+
+            semanticKeys.Sort(StringComparer.Ordinal);
+            Id = id;
+            Scope = registration.Scope;
+            Members = new ReadOnlyCollection<IDiscoveryClusterRecognitionResult>(memberCopy);
+            SemanticKeys = new ReadOnlyCollection<string>(semanticKeys);
+            CreatedAt = createdAt;
+        }
+
+        public Guid Id { get; }
+        public string Scope { get; }
+        public IDiscoveryGeometryRegistration Registration { get; }
+        public IReadOnlyList<IDiscoveryClusterRecognitionResult> Members { get; }
+        public IReadOnlyList<string> SemanticKeys { get; }
+        public DateTimeOffset CreatedAt { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Narratives\DiscoveryRecognizedGeometryPopulationFactory.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Narratives;
+using WildsEngine.Discoveries.Abstractions.Services;
+using WildsEngine.Discoveries.Abstractions.Surface;
+
+namespace WildsEngine.Discoveries.Narratives
+{
+    public sealed class DiscoveryRecognizedGeometryPopulationFactory :
+        IDiscoveryRecognizedGeometryPopulationFactory
+    {
+        private readonly IWildsServiceClock _clock;
+
+        public DiscoveryRecognizedGeometryPopulationFactory(IWildsServiceClock clock)
+        {
+            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
+        }
+
+        public IDiscoveryRecognizedGeometryPopulation Create(
+            IDiscoveryGeometryRegistration registration,
+            IReadOnlyList<IDiscoveryClusterRecognitionResult> members)
+        {
+            return new DiscoveryRecognizedGeometryPopulation(
+                Guid.NewGuid(),
+                registration,
+                members,
+                _clock.GetUtcNow());
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\AllEvidencePolicies.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts Evidence only when every supplied policy accepts it.
+    /// </summary>
+    public sealed class AllEvidencePolicies :
+        EvidenceContributionPolicyBase
+    {
+        private readonly IReadOnlyList<IEvidenceContributionPolicy> _policies;
+
+        public AllEvidencePolicies(
+            IReadOnlyList<IEvidenceContributionPolicy> policies)
+        {
+            if (policies == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(policies));
+            }
+
+            if (policies.Count == 0)
+            {
+                throw new ArgumentException(
+                    "At least one policy is required.",
+                    nameof(policies));
+            }
+
+            var snapshot =
+                new List<IEvidenceContributionPolicy>(
+                    policies.Count);
+
+            for (var index = 0;
+                 index < policies.Count;
+                 index++)
+            {
+                snapshot.Add(
+                    policies[index] ??
+                    throw new ArgumentException(
+                        "Policies cannot contain null.",
+                        nameof(policies)));
+            }
+
+            _policies =
+                new ReadOnlyCollection<IEvidenceContributionPolicy>(
+                    snapshot);
+        }
+
+        public IReadOnlyList<IEvidenceContributionPolicy> Policies =>
+            _policies;
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            for (var index = 0;
+                 index < _policies.Count;
+                 index++)
+            {
+                if (!_policies[index].Contributes(evidence))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\AnyEvidencePolicies.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts Evidence when at least one supplied policy accepts it.
+    /// </summary>
+    public sealed class AnyEvidencePolicies :
+        EvidenceContributionPolicyBase
+    {
+        private readonly IReadOnlyList<IEvidenceContributionPolicy> _policies;
+
+        public AnyEvidencePolicies(
+            IReadOnlyList<IEvidenceContributionPolicy> policies)
+        {
+            if (policies == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(policies));
+            }
+
+            if (policies.Count == 0)
+            {
+                throw new ArgumentException(
+                    "At least one policy is required.",
+                    nameof(policies));
+            }
+
+            var snapshot =
+                new List<IEvidenceContributionPolicy>(
+                    policies.Count);
+
+            for (var index = 0;
+                 index < policies.Count;
+                 index++)
+            {
+                snapshot.Add(
+                    policies[index] ??
+                    throw new ArgumentException(
+                        "Policies cannot contain null.",
+                        nameof(policies)));
+            }
+
+            _policies =
+                new ReadOnlyCollection<IEvidenceContributionPolicy>(
+                    snapshot);
+        }
+
+        public IReadOnlyList<IEvidenceContributionPolicy> Policies =>
+            _policies;
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            for (var index = 0;
+                 index < _policies.Count;
+                 index++)
+            {
+                if (_policies[index].Contributes(evidence))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\AnyEvidencePolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts every Evidence item that reaches policy evaluation.
+    /// FactBase must still enforce validation and exact provenance first.
+    /// </summary>
+    public sealed class AnyEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return true;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\BelievabilityRangePolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class BelievabilityRangePolicy :
+        EvidenceContributionPolicyBase
+    {
+        public BelievabilityRangePolicy(
+            double minimumBelievability,
+            double maximumBelievability)
+        {
+            MinimumBelievability =
+                RequireNormalized(
+                    minimumBelievability,
+                    nameof(minimumBelievability));
+
+            MaximumBelievability =
+                RequireNormalized(
+                    maximumBelievability,
+                    nameof(maximumBelievability));
+
+            if (MinimumBelievability > MaximumBelievability)
+            {
+                throw new ArgumentException(
+                    "Minimum Believability cannot exceed maximum Believability.");
+            }
+        }
+
+        public double MinimumBelievability { get; }
+        public double MaximumBelievability { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            var believability =
+                evidence.ProofResult.Believability;
+
+            return believability >= MinimumBelievability &&
+                   believability <= MaximumBelievability;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\BelievableFalseEvidencePolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts convincing Evidence whose claim is nevertheless false.
+    /// This is the central social-deduction and deception policy.
+    /// </summary>
+    public sealed class BelievableFalseEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        public BelievableFalseEvidencePolicy(
+            double minimumBelievability)
+        {
+            MinimumBelievability =
+                RequireNormalized(
+                    minimumBelievability,
+                    nameof(minimumBelievability));
+        }
+
+        public double MinimumBelievability { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return !evidence.ProofResult.IsTrue &&
+                   evidence.ProofResult.Believability >=
+                   MinimumBelievability;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\BelievableTrueEvidencePolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts true Evidence only when it also meets a Believability threshold.
+    /// </summary>
+    public sealed class BelievableTrueEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        public BelievableTrueEvidencePolicy(
+            double minimumBelievability)
+        {
+            MinimumBelievability =
+                RequireNormalized(
+                    minimumBelievability,
+                    nameof(minimumBelievability));
+        }
+
+        public double MinimumBelievability { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.ProofResult.IsTrue &&
+                   evidence.ProofResult.Believability >=
+                   MinimumBelievability;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\BoundaryVarianceClusterStabilityMetric.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Base;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class BoundaryVarianceClusterStabilityMetric :
+        IdentifierBase,
+        IDiscoveryClusterStabilityMetric
+    {
+        public BoundaryVarianceClusterStabilityMetric(
+            string slug = "boundary-variance")
+            : base(
+                Guid.NewGuid(),
+                slug)
+        {
+        }
+
+        public double GetStability(
+            IReadOnlyList<IDiscoveryClusterObservation> observations)
+        {
+            if (observations == null ||
+                observations.Count == 0)
+            {
+                throw new ArgumentException(
+                    "At least one observation is required.",
+                    nameof(observations));
+            }
+
+            if (observations.Count == 1)
+            {
+                return 1.0;
+            }
+
+            double mean = 0.0;
+
+            for (var index = 0;
+                 index < observations.Count;
+                 index++)
+            {
+                mean +=
+                    observations[index]
+                        .Relationship
+                        .SignedDistanceToBoundary;
+            }
+
+            mean /= observations.Count;
+
+            double variance = 0.0;
+
+            for (var index = 0;
+                 index < observations.Count;
+                 index++)
+            {
+                var delta =
+                    observations[index]
+                        .Relationship
+                        .SignedDistanceToBoundary -
+                    mean;
+
+                variance +=
+                    delta * delta;
+            }
+
+            variance /=
+                observations.Count;
+
+            return
+                1.0 /
+                (1.0 + variance);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\ConditionEqualsPolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class ConditionEqualsPolicy :
+        EvidenceContributionPolicyBase
+    {
+        private readonly object? _expectedValue;
+
+        public ConditionEqualsPolicy(
+            string conditionName,
+            object? expectedValue)
+        {
+            if (string.IsNullOrWhiteSpace(conditionName))
+            {
+                throw new ArgumentException(
+                    "A condition name is required.",
+                    nameof(conditionName));
+            }
+
+            ConditionName =
+                conditionName.Trim();
+
+            _expectedValue =
+                expectedValue;
+        }
+
+        public string ConditionName { get; }
+        public object? ExpectedValue => _expectedValue;
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.Conditions.TryGetValue(
+                       ConditionName,
+                       out var actualValue) &&
+                   Equals(
+                       actualValue,
+                       _expectedValue);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\ConditionExistsPolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class ConditionExistsPolicy :
+        EvidenceContributionPolicyBase
+    {
+        public ConditionExistsPolicy(
+            string conditionName)
+        {
+            if (string.IsNullOrWhiteSpace(conditionName))
+            {
+                throw new ArgumentException(
+                    "A condition name is required.",
+                    nameof(conditionName));
+            }
+
+            ConditionName =
+                conditionName.Trim();
+        }
+
+        public string ConditionName { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.Conditions.ContainsKey(
+                ConditionName);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\DelegateEvidencePolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Adapts an arbitrary consumer predicate into an Evidence policy.
+    /// Useful at integration boundaries and in certification fixtures.
+    /// </summary>
+    public sealed class DelegateEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        private readonly Func<IDiscoveryEvidence, bool> _predicate;
+
+        public DelegateEvidencePolicy(
+            Func<IDiscoveryEvidence, bool> predicate)
+        {
+            _predicate =
+                predicate ??
+                throw new ArgumentNullException(
+                    nameof(predicate));
+        }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return _predicate(
+                evidence);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\EvidenceContributionPolicyBase.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Provides null validation for reusable Evidence contribution policies.
+    /// </summary>
+    public abstract class EvidenceContributionPolicyBase :
+        IEvidenceContributionPolicy
+    {
+        public bool Contributes(
+            IDiscoveryEvidence evidence)
+        {
+            if (evidence == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(evidence));
+            }
+
+            return Evaluate(
+                evidence);
+        }
+
+        protected abstract bool Evaluate(
+            IDiscoveryEvidence evidence);
+
+        protected static double RequireNormalized(
+            double value,
+            string parameterName)
+        {
+            if (double.IsNaN(value) ||
+                double.IsInfinity(value) ||
+                value < 0.0 ||
+                value > 1.0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    parameterName,
+                    "The value must be between zero and one.");
+            }
+
+            return value;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\FalseEvidencePolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts Evidence whose Proof concludes that the claim is false.
+    /// Useful for disproven claims, deception analysis, and contradiction Facts.
+    /// </summary>
+    public sealed class FalseEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return !evidence.ProofResult.IsTrue;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\HasSourcePolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class HasSourcePolicy :
+        EvidenceContributionPolicyBase
+    {
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.Source != null;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\MaximumBelievabilityPolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts Evidence at or below a Believability ceiling.
+    /// Useful for doubt, weak-rumor, and suspicious-source Facts.
+    /// </summary>
+    public sealed class MaximumBelievabilityPolicy :
+        EvidenceContributionPolicyBase
+    {
+        public MaximumBelievabilityPolicy(
+            double maximumBelievability)
+        {
+            MaximumBelievability =
+                RequireNormalized(
+                    maximumBelievability,
+                    nameof(maximumBelievability));
+        }
+
+        public double MaximumBelievability { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.ProofResult.Believability <=
+                   MaximumBelievability;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\MinimumBelievabilityPolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts sufficiently believable Evidence regardless of objective truth.
+    /// </summary>
+    public sealed class MinimumBelievabilityPolicy :
+        EvidenceContributionPolicyBase
+    {
+        public MinimumBelievabilityPolicy(
+            double minimumBelievability)
+        {
+            MinimumBelievability =
+                RequireNormalized(
+                    minimumBelievability,
+                    nameof(minimumBelievability));
+        }
+
+        public double MinimumBelievability { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.ProofResult.Believability >=
+                   MinimumBelievability;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\MinimumClusterPersistencePolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Base;
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class MinimumClusterPersistencePolicy : IdentifierBase, IDiscoveryClusterPersistencePolicy
+    {
+        public MinimumClusterPersistencePolicy(string slug,int minimumConsecutiveInside,double minimumOccupancyRatio,double minimumStability):base(Guid.NewGuid(),slug)
+        {if(minimumConsecutiveInside<1)throw new ArgumentOutOfRangeException(nameof(minimumConsecutiveInside));if(minimumOccupancyRatio<0||minimumOccupancyRatio>1)throw new ArgumentOutOfRangeException(nameof(minimumOccupancyRatio));if(minimumStability<0||minimumStability>1)throw new ArgumentOutOfRangeException(nameof(minimumStability));MinimumConsecutiveInside=minimumConsecutiveInside;MinimumOccupancyRatio=minimumOccupancyRatio;MinimumStability=minimumStability;}
+        public int MinimumConsecutiveInside{get;} public double MinimumOccupancyRatio{get;} public double MinimumStability{get;}
+        public bool IsSatisfied(IDiscoveryClusterPersistenceResult r){if(r==null)throw new ArgumentNullException(nameof(r));return r.ConsecutiveInsideCount>=MinimumConsecutiveInside&&r.OccupancyRatio>=MinimumOccupancyRatio&&r.Stability>=MinimumStability;}
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\MinimumNeighborCountPolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class MinimumNeighborCountPolicy :
+        EvidenceContributionPolicyBase
+    {
+        public MinimumNeighborCountPolicy(
+            int minimumNeighborCount)
+        {
+            if (minimumNeighborCount < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(minimumNeighborCount));
+            }
+
+            MinimumNeighborCount =
+                minimumNeighborCount;
+        }
+
+        public int MinimumNeighborCount { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.Neighbors.Count >=
+                   MinimumNeighborCount;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\MinimumNormalizedStrengthPolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class MinimumNormalizedStrengthPolicy :
+        EvidenceContributionPolicyBase
+    {
+        public MinimumNormalizedStrengthPolicy(
+            double minimumNormalizedStrength)
+        {
+            MinimumNormalizedStrength =
+                RequireNormalized(
+                    minimumNormalizedStrength,
+                    nameof(minimumNormalizedStrength));
+        }
+
+        public double MinimumNormalizedStrength { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.NormalizedStrength >=
+                   MinimumNormalizedStrength;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\MinimumStrengthPolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class MinimumStrengthPolicy :
+        EvidenceContributionPolicyBase
+    {
+        public MinimumStrengthPolicy(
+            double minimumStrength)
+        {
+            if (double.IsNaN(minimumStrength) ||
+                double.IsInfinity(minimumStrength))
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(minimumStrength),
+                    "Minimum strength must be finite.");
+            }
+
+            MinimumStrength =
+                minimumStrength;
+        }
+
+        public double MinimumStrength { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.Strength >= MinimumStrength;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\NotEvidencePolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class NotEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        private readonly IEvidenceContributionPolicy _policy;
+
+        public NotEvidencePolicy(
+            IEvidenceContributionPolicy policy)
+        {
+            _policy =
+                policy ??
+                throw new ArgumentNullException(
+                    nameof(policy));
+        }
+
+        public IEvidenceContributionPolicy Policy =>
+            _policy;
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return !_policy.Contributes(
+                evidence);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\OutcomeEqualsPolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class OutcomeEqualsPolicy :
+        EvidenceContributionPolicyBase
+    {
+        private readonly object? _expectedOutcome;
+
+        public OutcomeEqualsPolicy(
+            object? expectedOutcome)
+        {
+            _expectedOutcome =
+                expectedOutcome;
+        }
+
+        public object? ExpectedOutcome =>
+            _expectedOutcome;
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return Equals(
+                evidence.Outcome,
+                _expectedOutcome);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\PersistentClusterRecognitionPolicy.cs
+using System;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Base;
+namespace WildsEngine.Discoveries.Policies
+{
+    public sealed class PersistentClusterRecognitionPolicy : IdentifierBase, IDiscoveryClusterRecognitionPolicy
+    {
+        public PersistentClusterRecognitionPolicy(string slug="persistent-cluster"):base(Guid.NewGuid(),slug){}
+        public bool Recognizes(IDiscoveryClusterPersistenceResult persistence){if(persistence==null)throw new ArgumentNullException(nameof(persistence));return persistence.IsPersistent;}
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\TrueButUnbelievableEvidencePolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts true Evidence that remains below a Believability ceiling.
+    /// Useful for dismissed truths and warnings nobody accepts.
+    /// </summary>
+    public sealed class TrueButUnbelievableEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        public TrueButUnbelievableEvidencePolicy(
+            double maximumBelievability)
+        {
+            MaximumBelievability =
+                RequireNormalized(
+                    maximumBelievability,
+                    nameof(maximumBelievability));
+        }
+
+        public double MaximumBelievability { get; }
+
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.ProofResult.IsTrue &&
+                   evidence.ProofResult.Believability <=
+                   MaximumBelievability;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Policies\TrueEvidencePolicy.cs
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Policies
+{
+    /// <summary>
+    /// Counts Evidence whose Proof concludes that the claim is true.
+    /// Believability does not affect the decision.
+    /// </summary>
+    public sealed class TrueEvidencePolicy :
+        EvidenceContributionPolicyBase
+    {
+        protected override bool Evaluate(
+            IDiscoveryEvidence evidence)
+        {
+            return evidence.ProofResult.IsTrue;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\DiscoveryGeometryObservationResult.cs
+using System;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Surface;
+namespace WildsEngine.Discoveries.Surface
+{
+    public sealed class DiscoveryGeometryObservationResult : IDiscoveryGeometryObservationResult
+    {
+        public DiscoveryGeometryObservationResult(IDiscoveryClusterSpatialRelationship spatial,IDiscoveryClusterPersistenceResult persistence,IDiscoveryClusterRecognitionResult recognition){Spatial=spatial??throw new ArgumentNullException(nameof(spatial));Persistence=persistence??throw new ArgumentNullException(nameof(persistence));Recognition=recognition??throw new ArgumentNullException(nameof(recognition));}
+        public IDiscoveryClusterSpatialRelationship Spatial{get;} public IDiscoveryClusterPersistenceResult Persistence{get;} public IDiscoveryClusterRecognitionResult Recognition{get;}
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\DiscoveryGeometryProfile.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Surface;
+using WildsEngine.Discoveries.Base;
+namespace WildsEngine.Discoveries.Surface
+{
+    public sealed class DiscoveryGeometryProfile : IdentifierBase, IDiscoveryGeometryProfile
+    {
+        public DiscoveryGeometryProfile(Guid id,string slug,string version,string scope,IReadOnlyList<IDiscoveryClusterMapping> mappings,IDiscoveryClusterPersistencePolicy? persistencePolicy=null,IDiscoveryClusterStabilityMetric? stabilityMetric=null,IDiscoveryClusterRecognitionPolicy? recognitionPolicy=null):base(id,slug)
+        {
+            if(string.IsNullOrWhiteSpace(version))throw new ArgumentException("Profile version is required.",nameof(version));if(string.IsNullOrWhiteSpace(scope))throw new ArgumentException("Profile scope is required.",nameof(scope));if(mappings==null||mappings.Count==0)throw new ArgumentException("At least one cluster mapping is required.",nameof(mappings));
+            if((persistencePolicy==null)!=(stabilityMetric==null))throw new ArgumentException("Persistence policy and stability metric must be supplied together.");if(recognitionPolicy!=null&&persistencePolicy==null)throw new ArgumentException("Recognition requires persistence configuration.");
+            var copy=new IDiscoveryClusterMapping[mappings.Count];var ids=new HashSet<Guid>();var slugs=new HashSet<string>(StringComparer.Ordinal);var semantics=new HashSet<string>(StringComparer.Ordinal);
+            for(var i=0;i<mappings.Count;i++){var m=mappings[i]??throw new ArgumentException("Mappings cannot contain null.",nameof(mappings));if(m.DocumentId!=id)throw new ArgumentException("Every mapping must belong to the profile identity.",nameof(mappings));if(!string.Equals(m.DocumentVersion,version,StringComparison.Ordinal))throw new ArgumentException("Every mapping must use the profile version.",nameof(mappings));if(!ids.Add(m.Id)||!slugs.Add(m.Slug)||!semantics.Add(m.SemanticKey))throw new ArgumentException("Mapping identity, slug, and semantic keys must be unique.",nameof(mappings));copy[i]=m;}
+            Version=version.Trim();Scope=scope.Trim();Mappings=new ReadOnlyCollection<IDiscoveryClusterMapping>(copy);PersistencePolicy=persistencePolicy;StabilityMetric=stabilityMetric;RecognitionPolicy=recognitionPolicy;
+        }
+        public string Version{get;} public string Scope{get;} public IReadOnlyList<IDiscoveryClusterMapping> Mappings{get;} public IDiscoveryClusterPersistencePolicy? PersistencePolicy{get;} public IDiscoveryClusterStabilityMetric? StabilityMetric{get;} public IDiscoveryClusterRecognitionPolicy? RecognitionPolicy{get;}
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\DiscoveryGeometryRegistration.cs
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using WildsEngine.Discoveries.Abstractions.Surface;
+using WildsEngine.Discoveries.Base;
+
+namespace WildsEngine.Discoveries.Surface
+{
+    public sealed class DiscoveryGeometryRegistration : IdentifierBase, IDiscoveryGeometryRegistration
+    {
+        public DiscoveryGeometryRegistration(
+            Guid id,
+            string slug,
+            Guid profileId,
+            string profileSlug,
+            string profileVersion,
+            string scope,
+            DateTimeOffset registeredAt,
+            IReadOnlyList<Guid> mappingIds)
+            : base(id, slug)
+        {
+            if (profileId == Guid.Empty) throw new ArgumentException("Profile ID is required.", nameof(profileId));
+            if (string.IsNullOrWhiteSpace(profileSlug)) throw new ArgumentException("Profile slug is required.", nameof(profileSlug));
+            if (string.IsNullOrWhiteSpace(profileVersion)) throw new ArgumentException("Profile version is required.", nameof(profileVersion));
+            if (string.IsNullOrWhiteSpace(scope)) throw new ArgumentException("Scope is required.", nameof(scope));
+            if (mappingIds == null || mappingIds.Count == 0) throw new ArgumentException("At least one mapping ID is required.", nameof(mappingIds));
+            var copy = new Guid[mappingIds.Count];
+            var unique = new HashSet<Guid>();
+            for (var index = 0; index < mappingIds.Count; index++)
+            {
+                if (mappingIds[index] == Guid.Empty || !unique.Add(mappingIds[index])) throw new ArgumentException("Mapping IDs must be non-empty and unique.", nameof(mappingIds));
+                copy[index] = mappingIds[index];
+            }
+            ProfileId = profileId;
+            ProfileSlug = profileSlug.Trim();
+            ProfileVersion = profileVersion.Trim();
+            Scope = scope.Trim();
+            RegisteredAt = registeredAt;
+            MappingIds = new ReadOnlyCollection<Guid>(copy);
+        }
+        public Guid ProfileId { get; }
+        public string ProfileSlug { get; }
+        public string ProfileVersion { get; }
+        public string Scope { get; }
+        public DateTimeOffset RegisteredAt { get; }
+        public IReadOnlyList<Guid> MappingIds { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\DiscoveryGeometryRegistrationCatalog.cs
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Surface;
+
+namespace WildsEngine.Discoveries.Surface
+{
+    internal sealed class DiscoveryGeometryRegistrationCatalog
+    {
+        private readonly ConcurrentDictionary<Guid, IDiscoveryGeometryRegistration> _byId = new ConcurrentDictionary<Guid, IDiscoveryGeometryRegistration>();
+        private readonly ConcurrentDictionary<Guid, IDiscoveryGeometryRegistration> _byProfile = new ConcurrentDictionary<Guid, IDiscoveryGeometryRegistration>();
+        public void Register(IDiscoveryGeometryRegistration registration)
+        {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (!_byProfile.TryAdd(registration.ProfileId, registration)) throw new InvalidOperationException("This geometry profile is already registered.");
+            if (!_byId.TryAdd(registration.Id, registration))
+            {
+                _byProfile.TryRemove(registration.ProfileId, out _);
+                throw new InvalidOperationException("A geometry registration with this ID already exists.");
+            }
+        }
+        public bool TryGet(Guid id, out IDiscoveryGeometryRegistration? registration) => _byId.TryGetValue(id, out registration);
+        public IReadOnlyList<IDiscoveryGeometryRegistration> All
+        {
+            get
+            {
+                var result = new List<IDiscoveryGeometryRegistration>(_byId.Values);
+                result.Sort((left, right) => left.RegisteredAt.CompareTo(right.RegisteredAt));
+                return result.AsReadOnly();
+            }
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\DiscoveryGeometrySurface.cs
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Motion;
+using WildsEngine.Discoveries.Abstractions.Services;
+using WildsEngine.Discoveries.Abstractions.Surface;
+using WildsEngine.Discoveries.Clusters;
+namespace WildsEngine.Discoveries.Surface
+{
+    internal sealed class DiscoveryGeometrySurface : IDiscoveryGeometrySurface
+    {
+        private readonly IDiscoveryClusterMappingRegistry _mappings;private readonly IDiscoveryClusterMappingImportService _imports;private readonly IDiscoveryClusterRelationshipProjector _projector;private readonly IWildsServiceClock _clock;private readonly DiscoveryGeometryRegistrationCatalog _registrations;
+        private readonly ConcurrentDictionary<string,IDiscoveryGeometryProfile> _profiles=new ConcurrentDictionary<string,IDiscoveryGeometryProfile>(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string,List<IDiscoveryClusterObservation>> _observations=new ConcurrentDictionary<string,List<IDiscoveryClusterObservation>>(StringComparer.Ordinal);
+        public DiscoveryGeometrySurface(IDiscoveryClusterMappingRegistry mappings,IDiscoveryClusterMappingImportService imports,IDiscoveryClusterRelationshipProjector projector,IWildsServiceClock clock,DiscoveryGeometryRegistrationCatalog registrations){_mappings=mappings??throw new ArgumentNullException(nameof(mappings));_imports=imports??throw new ArgumentNullException(nameof(imports));_projector=projector??throw new ArgumentNullException(nameof(projector));_clock=clock??throw new ArgumentNullException(nameof(clock));_registrations=registrations??throw new ArgumentNullException(nameof(registrations));}
+        public IDiscoveryGeometryRegistration Register(IDiscoveryGeometryProfile profile){if(profile==null)throw new ArgumentNullException(nameof(profile));var document=new DiscoveryClusterMappingDocument(profile.Id,profile.Slug,profile.Version,"programmatic-profile",profile.Mappings);_mappings.RegisterDocument(document);foreach(var m in profile.Mappings)if(!_profiles.TryAdd(m.SemanticKey,profile))throw new InvalidOperationException("A geometry profile already owns semantic key: "+m.SemanticKey);return RegisterSnapshot(profile.Id,profile.Slug,profile.Version,profile.Scope,profile.Mappings);}
+        public async Task<IDiscoveryGeometryRegistration> RegisterDocumentAsync(string sourceName,string documentContent,object? provenance=null,Guid? parentExecutionId=null,Guid? pulseId=null,CancellationToken cancellationToken=default){var result=await _imports.ExecuteAsync(new DiscoveryClusterMappingImportRequest(sourceName,documentContent),provenance,parentExecutionId,pulseId,cancellationToken);var maps=_mappings.GetByDocument(result.Value.DocumentId);if(maps.Count==0)throw new InvalidOperationException("The imported mapping document produced no registered mappings.");return RegisterSnapshot(result.Value.DocumentId,result.Value.DocumentSlug,maps[0].DocumentVersion,result.Value.DocumentSlug,maps);}
+        public IReadOnlyList<IDiscoveryGeometryRegistration> Registrations=>_registrations.All;public bool TryGetRegistration(Guid id,out IDiscoveryGeometryRegistration? r)=>_registrations.TryGet(id,out r);public bool TryGetMapping(string key,out IDiscoveryClusterMapping? m)=>_mappings.TryGetBySemanticKey(key,out m);
+        public IDiscoveryClusterSpatialRelationship Locate(IDiscoveryVectorEvaluation e,string key){return _projector.Locate(e,Mapping(key));}
+        public IDiscoveryClusterTrajectoryProjection Project(IDiscoveryVectorMotionResult m,string key){return _projector.Project(m,Mapping(key));}
+        public IDiscoveryGeometryObservationResult Observe(
+    IDiscoveryVectorEvaluation evaluation,
+    string semanticKey)
+{
+    if (evaluation == null)
+    {
+        throw new ArgumentNullException(
+            nameof(evaluation));
+    }
+
+    if (!_profiles.TryGetValue(
+            semanticKey,
+            out var profile) ||
+        profile.PersistencePolicy == null ||
+        profile.StabilityMetric == null ||
+        profile.RecognitionPolicy == null)
+    {
+        throw new InvalidOperationException(
+            "The registered geometry profile does not configure " +
+            "persistence and recognition for: " +
+            semanticKey);
+    }
+
+    var spatial =
+        Locate(
+            evaluation,
+            semanticKey);
+
+    var observation =
+        new DiscoveryClusterObservation(
+            spatial);
+
+    var observations =
+        _observations.GetOrAdd(
+            semanticKey,
+            _ => new List<IDiscoveryClusterObservation>());
+
+    IDiscoveryClusterObservation[] snapshot;
+
+    lock (observations)
+    {
+        if (observations.Count > 0 &&
+            observation.ObservedAt <=
+            observations[observations.Count - 1].ObservedAt)
+        {
+            throw new InvalidOperationException(
+                "Observations must arrive in strictly increasing " +
+                "evaluation time.");
+        }
+
+        observations.Add(
+            observation);
+
+        snapshot =
+            observations.ToArray();
+    }
+
+    var stabilityObservations =
+        GetCurrentOccupancyObservations(
+            snapshot);
+
+    var stability =
+        profile.StabilityMetric.GetStability(
+            stabilityObservations);
+
+    var persistence =
+        new DiscoveryClusterPersistenceResult(
+            spatial.Mapping,
+            snapshot,
+            stability,
+            profile.PersistencePolicy,
+            profile.StabilityMetric);
+
+    var recognition =
+        new DiscoveryClusterRecognitionResult(
+            persistence,
+            profile.RecognitionPolicy,
+            _clock.GetUtcNow());
+
+    return new DiscoveryGeometryObservationResult(
+        spatial,
+        persistence,
+        recognition);
+}
+        private IDiscoveryClusterMapping Mapping(string key){if(!_mappings.TryGetBySemanticKey(key,out var m)||m==null)throw new KeyNotFoundException("No cluster mapping is registered for semantic key: "+key);return m;}
+        private IDiscoveryGeometryRegistration RegisterSnapshot(Guid pid,string slug,string version,string scope,IReadOnlyList<IDiscoveryClusterMapping> maps){var ids=new Guid[maps.Count];for(var i=0;i<maps.Count;i++)ids[i]=maps[i].Id;var id=Guid.NewGuid();var reg=new DiscoveryGeometryRegistration(id,"geometry-registration-"+id.ToString("N"),pid,slug,version,scope,_clock.GetUtcNow(),ids);_registrations.Register(reg);return reg;}
+        
+        private static IReadOnlyList<IDiscoveryClusterObservation>
+            GetCurrentOccupancyObservations(
+                IReadOnlyList<IDiscoveryClusterObservation> observations)
+        {
+            if (observations == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(observations));
+            }
+
+            if (observations.Count == 0)
+            {
+                throw new ArgumentException(
+                    "At least one observation is required.",
+                    nameof(observations));
+            }
+
+            var current =
+                observations[observations.Count - 1];
+
+            var currentIsInside =
+                current.Relationship.IsInside ||
+                current.Relationship.IsOnBoundary;
+
+            // There is no active occupancy interval.
+            //
+            // Preserve the current observation for the metric rather
+            // than treating previous occupancy as current stability.
+            if (!currentIsInside)
+            {
+                return new[]
+                {
+                    current
+                };
+            }
+
+            var startIndex =
+                observations.Count - 1;
+
+            while (startIndex > 0)
+            {
+                var previous =
+                    observations[startIndex - 1];
+
+                var previousIsInside =
+                    previous.Relationship.IsInside ||
+                    previous.Relationship.IsOnBoundary;
+
+                if (!previousIsInside)
+                {
+                    break;
+                }
+
+                startIndex--;
+            }
+
+            var result =
+                new List<IDiscoveryClusterObservation>(
+                    observations.Count - startIndex);
+
+            for (var index = startIndex;
+                 index < observations.Count;
+                 index++)
+            {
+                result.Add(
+                    observations[index]);
+            }
+
+            return result.AsReadOnly();
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\DiscoveryNarrativeSurface.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Narratives;
+using WildsEngine.Discoveries.Abstractions.Surface;
+
+namespace WildsEngine.Discoveries.Surface
+{
+    internal sealed class DiscoveryNarrativeSurface : IDiscoveryNarrativeSurface
+    {
+        private readonly IDiscoveryGeometrySurface _geometry;
+        private readonly IDiscoveryRecognizedGeometryPopulationFactory _populations;
+
+        public DiscoveryNarrativeSurface(
+            IDiscoveryGeometrySurface geometry,
+            IDiscoveryRecognizedGeometryPopulationFactory populations)
+        {
+            _geometry = geometry ?? throw new ArgumentNullException(nameof(geometry));
+            _populations = populations ?? throw new ArgumentNullException(nameof(populations));
+        }
+
+        public IDiscoveryRecognizedGeometryPopulation CreatePopulation(
+            Guid geometryRegistrationId,
+            IReadOnlyList<IDiscoveryClusterRecognitionResult> recognizedGeometry)
+        {
+            if (!_geometry.TryGetRegistration(geometryRegistrationId, out var registration) || registration == null)
+                throw new KeyNotFoundException("No geometry registration exists for ID: " + geometryRegistrationId);
+            return _populations.Create(registration, recognizedGeometry);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\WildsDiscoveries.cs
+using WildsEngine.Discoveries.Abstractions.Services;
+using WildsEngine.Discoveries.Abstractions.Surface;
+using WildsEngine.Discoveries.Clusters;
+using WildsEngine.Discoveries.Narratives;
+using WildsEngine.Discoveries.Registries;
+using WildsEngine.Discoveries.Services;
+
+namespace WildsEngine.Discoveries.Surface
+{
+    public sealed class WildsDiscoveries : IWildsDiscoveries
+    {
+        public WildsDiscoveries(WildsDiscoveriesOptions? options = null)
+        {
+            Options = options ?? new WildsDiscoveriesOptions();
+            var clock = new SystemWildsServiceClock();
+            var journal = new WildsServiceExecutionJournal();
+            var contexts = new WildsServiceContextFactory(clock);
+            var mappings = new DiscoveryClusterMappingRegistry();
+            var imports = new DiscoveryClusterMappingImportService(
+                "cluster-mapping-import", mappings, contexts, journal, clock);
+            Geometry = new DiscoveryGeometrySurface(
+                mappings,
+                imports,
+                new HypersphereDiscoveryClusterRelationshipProjector(Options.GeometryEpsilon),
+                clock,
+                new DiscoveryGeometryRegistrationCatalog());
+            Narratives = new DiscoveryNarrativeSurface(
+                Geometry,
+                new DiscoveryRecognizedGeometryPopulationFactory(clock));
+            Executions = journal;
+        }
+
+        public WildsDiscoveriesOptions Options { get; }
+        public IDiscoveryGeometrySurface Geometry { get; }
+        public IDiscoveryNarrativeSurface Narratives { get; }
+        public IWildsServiceExecutionJournal Executions { get; }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Surface\WildsDiscoveriesOptions.cs
+using System;
+
+namespace WildsEngine.Discoveries.Surface
+{
+    public sealed class WildsDiscoveriesOptions
+    {
+        private double _geometryEpsilon = 1e-10;
+
+        public double GeometryEpsilon
+        {
+            get => _geometryEpsilon;
+            set
+            {
+                if (double.IsNaN(value) || double.IsInfinity(value) || value < 0.0)
+                    throw new ArgumentOutOfRangeException(nameof(value));
+                _geometryEpsilon = value;
+            }
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Vectorization\DiscoveryVectorizer.cs
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Abstractions.Vectorization;
+using WildsEngine.Discoveries.Vectors;
+
+namespace WildsEngine.Discoveries.Vectorization
+{
+    internal sealed class DiscoveryVectorizer : IDiscoveryVectorizer
+    {
+        private readonly IDiscoveryVectorizationService _service;
+        private readonly IDiscoveryVectorMetric _metric;
+
+        public DiscoveryVectorizer(
+            IDiscoveryVectorizationService service,
+            IDiscoveryVectorMetric metric)
+        {
+            _service = service ?? throw new ArgumentNullException(nameof(service));
+            _metric = metric ?? throw new ArgumentNullException(nameof(metric));
+        }
+
+        public async Task<IDiscoveryVectorizationResult> VectorizeAsync(
+            IDiscoveryVectorInput input,
+            object? provenance = null,
+            Guid? parentExecutionId = null,
+            Guid? pulseId = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (input == null) throw new ArgumentNullException(nameof(input));
+            var serviceResult = await _service.ExecuteAsync(
+                new DiscoveryVectorizationRequest(input),
+                provenance,
+                parentExecutionId,
+                pulseId,
+                cancellationToken);
+
+            var contributions = serviceResult.Value.Contributions;
+            ValidateExactInput(input, contributions);
+            var components = Aggregate(contributions);
+            var vector = new DiscoveryVector(
+                components,
+                contributions,
+                new List<IDiscoveryVectorMotion>(),
+                _metric,
+                DateTimeOffset.UtcNow);
+            return new DiscoveryVectorizationResult(serviceResult.ExecutionId, vector);
+        }
+
+        private static void ValidateExactInput(
+            IDiscoveryVectorInput input,
+            IReadOnlyList<IDiscoveryVectorContribution> contributions)
+        {
+            if (contributions.Count == 0)
+                throw new InvalidOperationException("Vectorization service returned no contributions.");
+            for (var index = 0; index < contributions.Count; index++)
+                if (!ReferenceEquals(input, contributions[index].Input))
+                    throw new InvalidOperationException(
+                        "Every vectorization contribution must reference the exact requested input.");
+        }
+
+        private static IReadOnlyList<IDiscoveryVectorComponent> Aggregate(
+            IReadOnlyList<IDiscoveryVectorContribution> contributions)
+        {
+            var totals = new SortedDictionary<string, double>(StringComparer.Ordinal);
+            for (var index = 0; index < contributions.Count; index++)
+            {
+                var contribution = contributions[index];
+                if (string.IsNullOrWhiteSpace(contribution.Dimension))
+                    throw new ArgumentException("Contribution dimension cannot be empty.", nameof(contributions));
+                if (double.IsNaN(contribution.Value) || double.IsInfinity(contribution.Value))
+                    throw new ArgumentOutOfRangeException(nameof(contributions), "Contribution value must be finite.");
+                if (double.IsNaN(contribution.Weight) || double.IsInfinity(contribution.Weight) || contribution.Weight < 0.0)
+                    throw new ArgumentOutOfRangeException(nameof(contributions), "Contribution weight must be finite and non-negative.");
+                var weighted = contribution.Value * contribution.Weight;
+                if (double.IsNaN(weighted) || double.IsInfinity(weighted))
+                    throw new ArgumentOutOfRangeException(nameof(contributions), "Weighted contribution must be finite.");
+                totals.TryGetValue(contribution.Dimension, out var current);
+                var next = current + weighted;
+                if (double.IsNaN(next) || double.IsInfinity(next))
+                    throw new ArgumentOutOfRangeException(nameof(contributions), "Aggregated component must be finite.");
+                totals[contribution.Dimension] = next;
+            }
+            var components = new List<IDiscoveryVectorComponent>(totals.Count);
+            foreach (var pair in totals)
+                components.Add(new DiscoveryVectorComponent(pair.Key, pair.Value));
+            return components;
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Vectorization\DiscoveryVectorizerFactory.cs
+using System;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Abstractions.Vectorization;
+
+namespace WildsEngine.Discoveries.Vectorization
+{
+    public sealed class DiscoveryVectorizerFactory : IDiscoveryVectorizerFactory
+    {
+        public IDiscoveryVectorizer Create(
+            IDiscoveryVectorizationService service,
+            IDiscoveryVectorMetric metric)
+        {
+            if (service == null) throw new ArgumentNullException(nameof(service));
+            if (metric == null) throw new ArgumentNullException(nameof(metric));
+            return new DiscoveryVectorizer(service, metric);
+        }
+    }
+}
+
+FILE: WildsEngine.Discoveries\Vectors\DiscoveryVector.cs
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Base;
+
+namespace WildsEngine.Discoveries.Vectors
+{
+    /// <summary>
+    /// Concrete immutable evaluation of Discovery geometry.
+    ///
+    /// Structural validation, immutable snapshots, and magnitude
+    /// calculation remain owned by DiscoveryVectorBase.
+    /// </summary>
+    public sealed class DiscoveryVector :
+        DiscoveryVectorBase
+    {
+        public DiscoveryVector(
+            IReadOnlyList<IDiscoveryVectorComponent> components,
+            IReadOnlyList<IDiscoveryVectorContribution> contributions,
+            IReadOnlyList<IDiscoveryVectorMotion> motion,
+            IDiscoveryVectorMetric metric,
+            DateTimeOffset evaluatedAt)
+            : base(
+                components,
+                contributions,
+                motion,
+                metric,
+                evaluatedAt)
+        {
+        }
+    }
+}
+
+REQUIRED H4S2 QUESTIONS
+1. Which H4 values are derivable from certified geometry?
+2. Which H4 meanings/relationships must be supplied by the designer?
+3. Which decisions require policies?
+4. Which measurements require consumer metrics?
+5. Which supplied items require profile + immutable registration identity?
+6. Which results must retain source recognition and configuration provenance?

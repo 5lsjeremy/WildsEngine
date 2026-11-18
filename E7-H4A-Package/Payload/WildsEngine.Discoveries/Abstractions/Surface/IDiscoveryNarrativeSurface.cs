@@ -1,0 +1,14 @@
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions.Clusters;
+using WildsEngine.Discoveries.Abstractions.Narratives;
+
+namespace WildsEngine.Discoveries.Abstractions.Surface
+{
+    public interface IDiscoveryNarrativeSurface
+    {
+        IDiscoveryRecognizedGeometryPopulation CreatePopulation(
+            Guid geometryRegistrationId,
+            IReadOnlyList<IDiscoveryClusterRecognitionResult> recognizedGeometry);
+    }
+}

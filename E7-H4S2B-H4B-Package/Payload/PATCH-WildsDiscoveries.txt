@@ -1,0 +1,4 @@
+In WildsDiscoveries constructor change:
+new DiscoveryNarrativeSurface(Geometry, new DiscoveryRecognizedGeometryPopulationFactory(clock))
+to:
+new DiscoveryNarrativeSurface(Geometry, new DiscoveryRecognizedGeometryPopulationFactory(clock), clock)
