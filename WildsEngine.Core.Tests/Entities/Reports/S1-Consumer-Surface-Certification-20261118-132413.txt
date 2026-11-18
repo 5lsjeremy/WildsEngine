@@ -1,0 +1,51 @@
+﻿WILDS DISCOVERIES S1 CONSUMER SURFACE CERTIFICATION
+Core guard: PASS
+
+RELEASE BUILD
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Release\netstandard2.1\WildsEngine.Core.dll
+  QSL -> C:\Users\jmatt\source\QSL\bin\Release\netstandard2.1\QSL.dll
+  WildsEngine.Discoveries -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Discoveries\bin\Release\netstandard2.1\WildsEngine.Discoveries.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Release\netstandard2.1\WildsEngine.Qsl.dll
+  WildsEngine.Core.Tests -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.23
+
+S1 ASSERTION TESTS
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     6, Skipped:     0, Total:     6, Duration: 53 ms - WildsEngine.Core.Tests.dll (net10.0)
+
+S1 READABLE TEST
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.08]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.14]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.16]   Starting:    WildsEngine.Core.Tests
+============================================
+ S1 - DISCOVERIES CONSUMER SURFACE
+============================================
+    [STATE] Profile = machine-health v1.0
+    [STATE] Scope = equipment
+    [STATE] Registration = 63d360ef-0f28-483f-8a22-cd1bf716d5d7
+    [STATE] Semantic key = MaintenanceConcern
+    [STATE] Distance to centroid = 3
+    [STATE] Signed boundary distance = 2
+[PASS] Consumer options, typed profile, immutable registration, and geometry evaluation are available through one Discoveries-facing surface without constructing internal registries or projectors.
+[xUnit.net 00:00:00.22]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.WildsDiscoveriesSurfaceReadableTests.ConsumerProfileBecomesRegisteredQueryableGeometry [22 ms]
+
+Test Run Successful.
+Total tests: 1
+     Passed: 1
+ Total time: 0.6320 Seconds
+RESULT: PASS
+Core unchanged. S1 options, typed geometry profile, immutable registration, document/programmatic registration, and Discoveries consumer surface certified.
