@@ -1,0 +1,62 @@
+﻿============================================================
+WILDS DISCOVERIES E7-H1B VECTORIZATION CERTIFICATION
+============================================================
+Started : 2026-11-18 10:57:52 -05:00
+Core guard: PASS
+
+============================================================
+E7-H1B RELEASE BUILD
+============================================================
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  QSL -> C:\Users\jmatt\source\QSL\bin\Release\netstandard2.1\QSL.dll
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Release\netstandard2.1\WildsEngine.Core.dll
+  WildsEngine.Discoveries -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Discoveries\bin\Release\netstandard2.1\WildsEngine.Discoveries.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Release\netstandard2.1\WildsEngine.Qsl.dll
+  WildsEngine.Core.Tests -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.22
+
+============================================================
+E7-H1B ASSERTION TESTS
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     6, Skipped:     0, Total:     6, Duration: 51 ms - WildsEngine.Core.Tests.dll (net10.0)
+
+============================================================
+E7-H1B READABLE TESTS
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.07]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.14]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.16]   Starting:    WildsEngine.Core.Tests
+============================================
+ E7-H1B - ASYNC DISCOVERY VECTORIZATION
+============================================
+    [STATE] Service = soup-risk-vectorization
+    [STATE] Execution = a1a77066-90e9-4355-a971-774e4cbc0459
+    [STATE] Pulse = c4251881-2204-4f6c-b00f-2ad323db9e21
+    [STATE] Discovery resolved = False
+    [STATE] Risk = 0.8
+    [STATE] Trust = 0.4
+    [STATE] Magnitude = 1.2000000000000002
+[PASS] The consumer-provided async service produced exact contributions; Discoveries validated and aggregated them into attributable geometry without resolving the source Discovery.
+[xUnit.net 00:00:00.22]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.DiscoveryVectorizationServiceReadableTests.AsyncConsumerServiceTurnsKnowledgeIntoAttributedGeometry [27 ms]
+
+Test Run Successful.
+Total tests: 1
+     Passed: 1
+ Total time: 0.6412 Seconds
+
+RESULT: PASS
+Core unchanged. Async vectorization certified.

@@ -1,0 +1,108 @@
+﻿============================================================
+WILDS DISCOVERIES E7-H0 CERTIFICATION
+============================================================
+Gate       : E7-H0
+Title      : Geometry Foundation
+Project    : C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj
+Started    : 2026-11-18 09:47:47 -05:00
+Core guard : PASS
+
+============================================================
+E7-H0 RELEASE BUILD
+============================================================
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  QSL -> C:\Users\jmatt\source\QSL\bin\Release\netstandard2.1\QSL.dll
+  WildsEngine.Core -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core\bin\Release\netstandard2.1\WildsEngine.Core.dll
+  WildsEngine.Discoveries -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Discoveries\bin\Release\netstandard2.1\WildsEngine.Discoveries.dll
+  WildsEngine.Qsl -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Qsl\bin\Release\netstandard2.1\WildsEngine.Qsl.dll
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(99,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(110,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(114,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Temporal\WorkUnitRaceCertificationTests.cs(98,22): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(254,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(263,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(310,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(452,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(464,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Temporal\WorkUnitRaceCertificationTests.cs(288,22): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WildsEngineDecompositionIntegrationTests.cs(146,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(572,10): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(639,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Temporal\WorkUnitRaceCertificationTests.cs(636,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(804,10): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(880,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WildsEngineExecuteIntegrationTests.cs(721,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+  WildsEngine.Core.Tests -> C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+
+Build succeeded.
+
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(99,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(110,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(114,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Temporal\WorkUnitRaceCertificationTests.cs(98,22): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(254,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(263,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(310,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(452,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(464,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Temporal\WorkUnitRaceCertificationTests.cs(288,22): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WildsEngineDecompositionIntegrationTests.cs(146,18): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(572,10): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(639,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Temporal\WorkUnitRaceCertificationTests.cs(636,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(804,10): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WIldsEngineActiveCancellationTests.cs(880,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\Integration\WildsEngineExecuteIntegrationTests.cs(721,14): warning xUnit1030: Test methods should not call ConfigureAwait(false), as it may bypass parallelization limits. Omit ConfigureAwait, or use ConfigureAwait(true) to avoid CA2007. (https://xunit.net/xunit.analyzers/rules/xUnit1030) [C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\WildsEngine.Core.Tests.csproj]
+    17 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.08
+
+============================================================
+E7-H0 ASSERTION TESTS
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    13, Skipped:     0, Total:    13, Duration: 52 ms - WildsEngine.Core.Tests.dll (net10.0)
+
+============================================================
+E7-H0 READABLE TESTS
+============================================================
+Test run for C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+C:\Users\jmatt\source\WildsEngine\WildsEngine.Core.Tests\bin\Release\net10.0\WildsEngine.Core.Tests.dll
+[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.14)
+[xUnit.net 00:00:00.07]   Discovering: WildsEngine.Core.Tests
+[xUnit.net 00:00:00.13]   Discovered:  WildsEngine.Core.Tests
+[xUnit.net 00:00:00.15]   Starting:    WildsEngine.Core.Tests
+============================================
+ E7-H0 - POSITION IS NOT TRAJECTORY
+============================================
+    [STATE] Shared position = 0.67
+    [STATE] Rising velocity = 0.2
+    [STATE] Falling velocity = -0.2
+[PASS] Equal positions retained different trajectories.
+============================================
+ E7-H0 - PARTIAL DISCOVERY GEOMETRY
+============================================
+    [STATE] Required Facts = 3
+    [STATE] Current contributing Facts = 2
+    [STATE] Discovery percentage = 0.6666666666666666
+    [STATE] Discovery resolved = False
+    [STATE] Risk position = 0.6666666666666666
+    [STATE] Risk velocity = 0.25
+    [STATE] Risk acceleration = 0.05
+[PASS] Two proven contributing Facts out of three required produced attributable geometry and momentum without falsely resolving the Discovery.
+[xUnit.net 00:00:00.21]   Finished:    WildsEngine.Core.Tests
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityDiscoveryGeometryFoundationReadableTests.SamePositionCanCarryDifferentMotion [13 ms]
+  Passed WildsEngine.Core.Tests.Entities.Certifications.EntityDiscoveryGeometryFoundationReadableTests.TwoOfThreeProvenFactsCreateGeometryWithoutCreatingResolution [10 ms]
+
+Test Run Successful.
+Total tests: 2
+     Passed: 2
+ Total time: 0.6307 Seconds
+
+RESULT: PASS
+Core unchanged. Geometry foundation certified.
