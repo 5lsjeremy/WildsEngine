@@ -1,2 +1,0 @@
-using WildsEngine.Discoveries.Abstractions.Consequences;using WildsEngine.Discoveries.Abstractions.Narratives;using WildsEngine.Discoveries.Abstractions.Truths;
-namespace WildsEngine.Discoveries.Abstractions.Outcomes { public interface IDiscoveryOutcomeSurface { IDiscoveryCompetingNarrativesResult Relate(IDiscoveryNarrativeCompositionResult composition);IDiscoveryTruthSurface Truths{get;}IDiscoveryConsequenceSurface Consequences{get;} } }
