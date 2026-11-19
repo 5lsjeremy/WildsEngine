@@ -1,0 +1,631 @@
+﻿H5 / H6 FIXTURE CRAWL
+Repo: C:\Users\jmatt\source\WildsEngine
+Generated: 2026-11-18T19:19:32.6726278-05:00
+
+============================================================
+FILE: WildsEngine.Discoveries\Abstractions\IDiscoveryCluster.cs
+============================================================
+
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents one geometrically coherent region found within
+    /// a Discovery-vector sample.
+    ///
+    /// A cluster is a derived result and has no independent
+    /// domain or Wilds runtime identity.
+    /// </summary>
+    public interface IDiscoveryCluster
+    {
+        IReadOnlyList<IDiscoveryVector> Members { get; }
+
+        IDiscoveryVectorPoint Centroid { get; }
+
+        double Density { get; }
+
+        double Dispersion { get; }
+
+        double Coherence { get; }
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Base\DiscoveryClusterBase.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    /// <summary>
+    /// Reusable immutable geometric cluster over Discovery
+    /// vectors.
+    ///
+    /// The centroid is a geometric point, not a complete
+    /// provenance-bearing vector evaluation.
+    /// </summary>
+    public abstract class DiscoveryClusterBase :
+        IDiscoveryCluster
+    {
+        protected DiscoveryClusterBase(
+            IReadOnlyList<IDiscoveryVector> members,
+            IDiscoveryVectorPoint centroid,
+            double density,
+            double dispersion,
+            double coherence)
+        {
+            if (members == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(members));
+            }
+
+            if (members.Count == 0)
+            {
+                throw new ArgumentException(
+                    "A Discovery cluster requires at least one member.",
+                    nameof(members));
+            }
+
+            Members =
+                DiscoverySnapshots.Required(
+                    members,
+                    nameof(members));
+
+            Centroid =
+                centroid ??
+                throw new ArgumentNullException(
+                    nameof(centroid));
+
+            Density =
+                DiscoveryNumbers.Unit(
+                    density,
+                    nameof(density));
+
+            Dispersion =
+                DiscoveryNumbers.NonNegative(
+                    dispersion,
+                    nameof(dispersion));
+
+            Coherence =
+                DiscoveryNumbers.Unit(
+                    coherence,
+                    nameof(coherence));
+        }
+
+        public IReadOnlyList<IDiscoveryVector> Members { get; }
+
+        public IDiscoveryVectorPoint Centroid { get; }
+
+        public double Density { get; }
+
+        public double Dispersion { get; }
+
+        public double Coherence { get; }
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Abstractions\ITruth.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents scoped knowledge that has congealed from the
+    /// composition of Discoveries and their geometric clusters.
+    ///
+    /// Truth remains attributable and scoped.
+    ///
+    /// It is not an assertion of universal consumer reality.
+    /// </summary>
+    public interface ITruth :
+        IIdentifier
+    {
+        string Name { get; }
+
+        object? Value { get; }
+
+        IDiscoveryVectorSeries Series { get; }
+
+        IReadOnlyList<IDiscoveryCluster> Clusters { get; }
+
+        IReadOnlyList<IDiscovery> Discoveries { get; }
+
+        double Stability { get; }
+
+        double Confidence { get; }
+
+        DateTimeOffset CongealedAt { get; }
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Abstractions\ITruthCongealmentPolicy.cs
+============================================================
+
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Consumer-supplied policy that determines whether Discovery
+    /// geometry has become stable enough to produce a scoped
+    /// Truth.
+    /// </summary>
+    public interface ITruthCongealmentPolicy
+    {
+        bool CanCongeal(
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IDiscoveryVectorSeries series);
+
+        ITruth Congeal(
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IDiscoveryVectorSeries series);
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Base\TruthBase.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    /// <summary>
+    /// Reusable base for scoped Truths congealed from Discovery
+    /// composition.
+    ///
+    /// Truth reuses established Discoveries identity and retains
+    /// the exact scoped vector series whose composition
+    /// congealed.
+    /// </summary>
+    public abstract class TruthBase :
+        IdentifierBase,
+        ITruth
+    {
+        protected TruthBase(
+            string slug,
+            string name,
+            object? value,
+            IDiscoveryVectorSeries series,
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IReadOnlyList<IDiscovery> discoveries,
+            double stability,
+            double confidence,
+            DateTimeOffset congealedAt)
+            : base(
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                series,
+                clusters,
+                discoveries,
+                stability,
+                confidence,
+                congealedAt);
+        }
+
+        protected TruthBase(
+            Guid id,
+            string slug,
+            string name,
+            object? value,
+            IDiscoveryVectorSeries series,
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IReadOnlyList<IDiscovery> discoveries,
+            double stability,
+            double confidence,
+            DateTimeOffset congealedAt)
+            : base(
+                id,
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                series,
+                clusters,
+                discoveries,
+                stability,
+                confidence,
+                congealedAt);
+        }
+
+        public string Name { get; private set; } = null!;
+
+        public object? Value { get; private set; }
+
+        public IDiscoveryVectorSeries Series
+        {
+            get;
+            private set;
+        } = null!;
+
+        public IReadOnlyList<IDiscoveryCluster> Clusters
+        {
+            get;
+            private set;
+        } = null!;
+
+        public IReadOnlyList<IDiscovery> Discoveries
+        {
+            get;
+            private set;
+        } = null!;
+
+        public double Stability { get; private set; }
+
+        public double Confidence { get; private set; }
+
+        public DateTimeOffset CongealedAt { get; private set; }
+
+        private void Initialize(
+            string name,
+            object? value,
+            IDiscoveryVectorSeries series,
+            IReadOnlyList<IDiscoveryCluster> clusters,
+            IReadOnlyList<IDiscovery> discoveries,
+            double stability,
+            double confidence,
+            DateTimeOffset congealedAt)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException(
+                    "Truth name cannot be empty.",
+                    nameof(name));
+            }
+
+            Name =
+                name.Trim();
+
+            Value =
+                value;
+
+            Series =
+                series ??
+                throw new ArgumentNullException(
+                    nameof(series));
+
+            if (string.IsNullOrWhiteSpace(
+                    Series.Scope))
+            {
+                throw new ArgumentException(
+                    "Truth requires a scoped Discovery-vector series.",
+                    nameof(series));
+            }
+
+            if (Series.Inputs == null)
+            {
+                throw new ArgumentException(
+                    "Truth requires a series with an input population.",
+                    nameof(series));
+            }
+
+            if (Series.Vectors == null)
+            {
+                throw new ArgumentException(
+                    "Truth requires a series with vector evaluations.",
+                    nameof(series));
+            }
+
+            Clusters =
+                DiscoverySnapshots.Required(
+                    clusters,
+                    nameof(clusters));
+
+            Discoveries =
+                DiscoverySnapshots.Required(
+                    discoveries,
+                    nameof(discoveries));
+
+            ValidateDiscoveriesBelongToSeries(
+                Discoveries,
+                Series);
+
+            Stability =
+                DiscoveryNumbers.Unit(
+                    stability,
+                    nameof(stability));
+
+            Confidence =
+                DiscoveryNumbers.Unit(
+                    confidence,
+                    nameof(confidence));
+
+            CongealedAt =
+                congealedAt;
+        }
+
+        private static void ValidateDiscoveriesBelongToSeries(
+            IReadOnlyList<IDiscovery> discoveries,
+            IDiscoveryVectorSeries series)
+        {
+            for (var discoveryIndex = 0;
+                 discoveryIndex < discoveries.Count;
+                 discoveryIndex++)
+            {
+                var discovery =
+                    discoveries[discoveryIndex];
+
+                var found =
+                    false;
+
+                for (var inputIndex = 0;
+                     inputIndex < series.Inputs.Count;
+                     inputIndex++)
+                {
+                    var input =
+                        series.Inputs[inputIndex];
+
+                    if (input == null)
+                    {
+                        throw new ArgumentException(
+                            "Truth series inputs cannot contain null items.",
+                            nameof(series));
+                    }
+
+                    if (ReferenceEquals(
+                            discovery,
+                            input.Discovery))
+                    {
+                        found =
+                            true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    throw new ArgumentException(
+                        "Every Truth Discovery must belong to the exact congealment series.",
+                        nameof(discoveries));
+                }
+            }
+        }
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Abstractions\IConsequence.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents a consumer-defined projected outcome derived
+    /// from one or more scoped Truths.
+    ///
+    /// A Consequence describes what may result. It does not
+    /// prescribe behavior.
+    /// </summary>
+    public interface IConsequence :
+        IIdentifier
+    {
+        string Name { get; }
+
+        object? Value { get; }
+
+        IReadOnlyList<ITruth> Truths { get; }
+
+        double Magnitude { get; }
+
+        double Confidence { get; }
+
+        DateTimeOffset ProjectedAt { get; }
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Abstractions\IConsequenceProjectionPolicy.cs
+============================================================
+
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Consumer-supplied policy that projects possible
+    /// Consequences from scoped Truths.
+    /// </summary>
+    public interface IConsequenceProjectionPolicy
+    {
+        IReadOnlyList<IConsequence> Project(
+            IReadOnlyList<ITruth> truths);
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Base\ConsequenceBase.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+using WildsEngine.Discoveries.Abstractions;
+
+namespace WildsEngine.Discoveries.Base
+{
+    /// <summary>
+    /// Reusable base for projected Consequences.
+    ///
+    /// Consequence uses the established Discoveries identity
+    /// model and remains knowledge rather than behavior.
+    /// </summary>
+    public abstract class ConsequenceBase :
+        IdentifierBase,
+        IConsequence
+    {
+        protected ConsequenceBase(
+            string slug,
+            string name,
+            object? value,
+            IReadOnlyList<ITruth> truths,
+            double magnitude,
+            double confidence,
+            DateTimeOffset projectedAt)
+            : base(
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                truths,
+                magnitude,
+                confidence,
+                projectedAt);
+        }
+
+        protected ConsequenceBase(
+            Guid id,
+            string slug,
+            string name,
+            object? value,
+            IReadOnlyList<ITruth> truths,
+            double magnitude,
+            double confidence,
+            DateTimeOffset projectedAt)
+            : base(
+                id,
+                slug)
+        {
+            Initialize(
+                name,
+                value,
+                truths,
+                magnitude,
+                confidence,
+                projectedAt);
+        }
+
+        public string Name { get; private set; } = null!;
+
+        public object? Value { get; private set; }
+
+        public IReadOnlyList<ITruth> Truths
+        {
+            get;
+            private set;
+        } = null!;
+
+        public double Magnitude { get; private set; }
+
+        public double Confidence { get; private set; }
+
+        public DateTimeOffset ProjectedAt { get; private set; }
+
+        private void Initialize(
+            string name,
+            object? value,
+            IReadOnlyList<ITruth> truths,
+            double magnitude,
+            double confidence,
+            DateTimeOffset projectedAt)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException(
+                    "Consequence name cannot be empty.",
+                    nameof(name));
+            }
+
+            Name =
+                name.Trim();
+
+            Value =
+                value;
+
+            Truths =
+                DiscoverySnapshots.Required(
+                    truths,
+                    nameof(truths));
+
+            Magnitude =
+                DiscoveryNumbers.NonNegative(
+                    magnitude,
+                    nameof(magnitude));
+
+            Confidence =
+                DiscoveryNumbers.Unit(
+                    confidence,
+                    nameof(confidence));
+
+            ProjectedAt =
+                projectedAt;
+        }
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Abstractions\IDiscoveryVectorInput.cs
+============================================================
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents one authoritative Discovery selected for
+    /// vectorization.
+    ///
+    /// Provenance may carry the external source that caused this
+    /// Discovery to enter the sample.
+    ///
+    /// Discoveries preserves that object without interpreting
+    /// or owning it.
+    /// </summary>
+    public interface IDiscoveryVectorInput
+    {
+        IDiscovery Discovery { get; }
+
+        object? Provenance { get; }
+    }
+}
+
+============================================================
+FILE: WildsEngine.Discoveries\Abstractions\IDiscoveryVector.cs
+============================================================
+
+using System;
+using System.Collections.Generic;
+
+namespace WildsEngine.Discoveries.Abstractions
+{
+    /// <summary>
+    /// Represents one immutable, provenance-bearing evaluation
+    /// of Discovery geometry.
+    ///
+    /// A Discovery vector is not independently identifiable.
+    /// It is an evaluation result over authoritative sources.
+    /// </summary>
+    public interface IDiscoveryVector :
+        IDiscoveryVectorPoint
+    {
+        IReadOnlyList<IDiscoveryVectorContribution> Contributions { get; }
+
+        IReadOnlyList<IDiscoveryVectorMotion> Motion { get; }
+
+        IDiscoveryVectorMetric Metric { get; }
+
+        double Magnitude { get; }
+
+        DateTimeOffset EvaluatedAt { get; }
+    }
+}
+
+============================================================
+CRAWL COMPLETE
+Files captured: 10
