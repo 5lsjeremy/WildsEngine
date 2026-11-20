@@ -29,6 +29,8 @@ namespace WildsEngine.Core.Tests
     /// Wilds owns request processing and temporal resolution.
     /// QSL performs delegated language work inside that route.
     /// </summary>
+    [Collection(
+    WildsQslIntegrationTestCollection.Name)]
     public sealed class WildsQslEndToEndTests
     {
         [Fact]

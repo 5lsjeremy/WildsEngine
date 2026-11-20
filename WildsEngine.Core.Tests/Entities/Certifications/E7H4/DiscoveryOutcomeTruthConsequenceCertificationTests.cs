@@ -269,6 +269,103 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
         }
 
         [Fact]
+        public void
+            D3_RefusedTruthCannotInvokeConsequenceProjection()
+        {
+            var fixture =
+                Fixture.Create();
+
+            var competing =
+                fixture.Competing();
+
+            var evaluationSeries =
+                fixture.Series();
+
+            var series =
+                Assert.IsAssignableFrom<
+                    IDiscoveryVectorSeries>(
+                        evaluationSeries);
+
+            var clusters =
+                fixture.Clusters(
+                    series);
+
+            // The consumer explicitly refuses to congeal Truth.
+            var truthPolicy =
+                new TestTruthPolicy(
+                    false);
+
+            var truthProfile =
+                new DiscoveryTruthProfile(
+                    Guid.NewGuid(),
+                    "gobbo-refused-truth",
+                    "1.0",
+                    fixture.Scope,
+                    truthPolicy);
+
+            var truthRegistration =
+                fixture.Discoveries
+                    .Outcomes
+                    .Truths
+                    .Register(
+                        truthProfile);
+
+            var truthResult =
+                fixture.Discoveries
+                    .Outcomes
+                    .Truths
+                    .Congeal(
+                        competing,
+                        truthRegistration.Id,
+                        series,
+                        clusters);
+
+            // Establish the exact D3 precondition:
+            // no authoritative Truth congealed.
+            Assert.False(
+                truthResult.Congealed);
+
+            Assert.Empty(
+                truthResult.Truths);
+
+            Assert.False(
+                truthPolicy.CongealCalled);
+
+            var consequencePolicy =
+                new TestConsequencePolicy(
+                    project: true);
+
+            var consequenceProfile =
+                new DiscoveryConsequenceProfile(
+                    Guid.NewGuid(),
+                    "gobbo-refused-consequence",
+                    "1.0",
+                    fixture.Scope,
+                    consequencePolicy);
+
+            var consequenceRegistration =
+                fixture.Discoveries
+                    .Outcomes
+                    .Consequences
+                    .Register(
+                        consequenceProfile);
+
+            // Refused Truth is terminal for this derivation.
+            Assert.Throws<InvalidOperationException>(
+                () =>
+                    fixture.Discoveries
+                        .Outcomes
+                        .Consequences
+                        .Project(
+                            truthResult,
+                            consequenceRegistration.Id));
+
+            // The surface must stop before consumer projection logic.
+            Assert.False(
+                consequencePolicy.ProjectCalled);
+        }
+
+        [Fact]
         public void H6_EmptyConsumerProjectionIsValid()
         {
             var fixture =
@@ -303,6 +400,11 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                     .Project(
                         truthResult,
                         registration.Id);
+
+            // Truth congealed, so the consumer policy was allowed
+            // to decide that no Consequence follows.
+            Assert.True(
+                policy.ProjectCalled);
 
             Assert.Empty(
                 result.Consequences);
@@ -351,6 +453,9 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                     .Project(
                         truthResult,
                         registration.Id);
+
+            Assert.True(
+                policy.ProjectCalled);
 
             Assert.Single(
                 result.Consequences);
@@ -888,9 +993,18 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             public string Slug =>
                 "test-consequence-policy";
 
+            public bool ProjectCalled
+            {
+                get;
+                private set;
+            }
+
             public IReadOnlyList<IConsequence> Project(
                 IReadOnlyList<ITruth> truths)
             {
+                ProjectCalled =
+                    true;
+
                 if (!_project)
                 {
                     return new List<IConsequence>();

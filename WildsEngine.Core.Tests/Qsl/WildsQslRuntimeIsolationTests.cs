@@ -13,6 +13,8 @@ using Xunit;
 
 namespace WildsEngine.Core.Tests;
 
+[Collection(
+    WildsQslIntegrationTestCollection.Name)]
 public sealed class WildsQslRuntimeIsolationTests
 {
     [Fact]
