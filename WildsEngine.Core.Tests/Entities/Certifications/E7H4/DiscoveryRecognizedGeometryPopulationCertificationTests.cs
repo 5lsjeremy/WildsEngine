@@ -46,8 +46,12 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
         {
             var fixture = CreateSurface(minimumConsecutive: 2);
             var result = fixture.Discoveries.Geometry.Observe(
-                fixture.Vector.Eval(DateTimeOffset.UtcNow, ("x", 0.1), ("y", 0.0)),
-                fixture.FirstKey);
+                fixture.Vector.Eval(
+                    DateTimeOffset.UtcNow,
+                    ("x", 0.1),
+                    ("y", 0.0)),
+                fixture.FirstKey,
+                "unrecognized-subject");
             Assert.False(result.Recognition.IsRecognized);
             Assert.Throws<ArgumentException>(() =>
                 fixture.Discoveries.Narratives.CreatePopulation(
@@ -91,11 +95,26 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             Assert.NotEqual(Guid.Empty, population.Id);
         }
 
-        private static IDiscoveryClusterRecognitionResult Recognize(WildsDiscoveries discoveries, string key, double x)
+        private static IDiscoveryClusterRecognitionResult Recognize(
+            WildsDiscoveries discoveries,
+            string key,
+            double x)
         {
-            var vectors = new H2TestFixture();
+            var vectors =
+                new H2TestFixture();
+
+            var historyKey =
+                "recognition-" +
+                Guid.NewGuid().ToString("N");
+
             return discoveries.Geometry.Observe(
-                vectors.Eval(DateTimeOffset.UtcNow, ("x", x), ("y", 0.0)), key).Recognition;
+                    vectors.Eval(
+                        DateTimeOffset.UtcNow,
+                        ("x", x),
+                        ("y", 0.0)),
+                    key,
+                    historyKey)
+                .Recognition;
         }
 
         private static Fixture CreateSurface(int minimumConsecutive = 1)

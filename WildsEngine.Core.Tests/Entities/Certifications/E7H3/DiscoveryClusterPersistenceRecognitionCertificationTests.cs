@@ -21,26 +21,32 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             var fixture = new H2TestFixture();
             var timestamp = DateTimeOffset.UtcNow;
 
+            const string historyKey =
+                "persistence-subject";
+
             discoveries.Geometry.Observe(
                 fixture.Eval(
                     timestamp,
                     ("x", 2.0),
                     ("y", 0.0)),
-                "Concern");
+                "Concern",
+                historyKey);
 
             discoveries.Geometry.Observe(
                 fixture.Eval(
                     timestamp.AddSeconds(1),
                     ("x", 0.5),
                     ("y", 0.0)),
-                "Concern");
+                "Concern",
+                historyKey);
 
             discoveries.Geometry.Observe(
                 fixture.Eval(
                     timestamp.AddSeconds(2),
                     ("x", 0.4),
                     ("y", 0.0)),
-                "Concern");
+                "Concern",
+                historyKey);
 
             var result =
                 discoveries.Geometry.Observe(
@@ -48,7 +54,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         timestamp.AddSeconds(3),
                         ("x", 0.3),
                         ("y", 0.0)),
-                    "Concern");
+                    "Concern",
+                    historyKey);
 
             Assert.Equal(
                 3,
@@ -89,12 +96,16 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             var fixture = new H2TestFixture();
             var timestamp = DateTimeOffset.UtcNow;
 
+            const string historyKey =
+                "transient-subject";
+
             discoveries.Geometry.Observe(
                 fixture.Eval(
                     timestamp,
                     ("x", 0.5),
                     ("y", 0.0)),
-                "Concern");
+                "Concern",
+                historyKey);
 
             var result =
                 discoveries.Geometry.Observe(
@@ -102,10 +113,14 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         timestamp.AddSeconds(1),
                         ("x", 2.0),
                         ("y", 0.0)),
-                    "Concern");
+                    "Concern",
+                    historyKey);
 
-            Assert.False(result.Persistence.IsPersistent);
-            Assert.False(result.Recognition.IsRecognized);
+            Assert.False(
+                result.Persistence.IsPersistent);
+
+            Assert.False(
+                result.Recognition.IsRecognized);
 
             Assert.Equal(
                 0,
@@ -123,19 +138,24 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             var fixture = new H2TestFixture();
             var timestamp = DateTimeOffset.UtcNow;
 
+            const string historyKey =
+                "exit-subject";
+
             discoveries.Geometry.Observe(
                 fixture.Eval(
                     timestamp,
                     ("x", 0.5),
                     ("y", 0.0)),
-                "Concern");
+                "Concern",
+                historyKey);
 
             discoveries.Geometry.Observe(
                 fixture.Eval(
                     timestamp.AddSeconds(1),
                     ("x", 0.4),
                     ("y", 0.0)),
-                "Concern");
+                "Concern",
+                historyKey);
 
             var result =
                 discoveries.Geometry.Observe(
@@ -143,7 +163,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         timestamp.AddSeconds(2),
                         ("x", 2.0),
                         ("y", 0.0)),
-                    "Concern");
+                    "Concern",
+                    historyKey);
 
             Assert.NotNull(
                 result.Persistence.ObservedExitAt);
@@ -176,10 +197,12 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                     -0.9);
 
             var stableScore =
-                metric.GetStability(stable);
+                metric.GetStability(
+                    stable);
 
             var variableScore =
-                metric.GetStability(variable);
+                metric.GetStability(
+                    variable);
 
             Assert.True(
                 stableScore > variableScore,
@@ -196,7 +219,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 occupancy: 0.0,
                 stability: 0.0);
 
-            var fixture = new H2TestFixture();
+            var fixture =
+                new H2TestFixture();
 
             var result =
                 discoveries.Geometry.Observe(
@@ -204,7 +228,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         DateTimeOffset.UtcNow,
                         ("x", 0.5),
                         ("y", 0.0)),
-                    "Concern");
+                    "Concern",
+                    "policy-identity-subject");
 
             Assert.NotEqual(
                 Guid.Empty,
@@ -222,8 +247,11 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
         [Fact]
         public void ObserveRequiresProfilePersistenceAndRecognitionConfiguration()
         {
-            var profileId = Guid.NewGuid();
-            var discoveries = new WildsDiscoveries();
+            var profileId =
+                Guid.NewGuid();
+
+            var discoveries =
+                new WildsDiscoveries();
 
             discoveries.Geometry.Register(
                 new DiscoveryGeometryProfile(
@@ -233,10 +261,12 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                     "scope",
                     new List<IDiscoveryClusterMapping>
                     {
-                        Map(profileId)
+                        Map(
+                            profileId)
                     }));
 
-            var fixture = new H2TestFixture();
+            var fixture =
+                new H2TestFixture();
 
             Assert.Throws<InvalidOperationException>(
                 () =>
@@ -245,7 +275,186 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                             DateTimeOffset.UtcNow,
                             ("x", 0.0),
                             ("y", 0.0)),
-                        "Concern"));
+                        "Concern",
+                        "unconfigured-subject"));
+        }
+
+        [Fact]
+        public void
+            DifferentHistoriesSharingOneMappingDoNotSharePersistenceOrRecognition()
+        {
+            var discoveries =
+                Create(
+                    consecutive: 3,
+                    occupancy: 1.0,
+                    stability: 0.0);
+
+            var machineA =
+                new H2TestFixture();
+
+            var machineB =
+                new H2TestFixture();
+
+            var timestamp =
+                DateTimeOffset.UtcNow;
+
+            const string machineAHistory =
+                "machine-a";
+
+            const string machineBHistory =
+                "machine-b";
+
+            var a1 =
+                discoveries.Geometry.Observe(
+                    machineA.Eval(
+                        timestamp,
+                        ("x", 0.5),
+                        ("y", 0.0)),
+                    "Concern",
+                    machineAHistory);
+
+            var b1 =
+                discoveries.Geometry.Observe(
+                    machineB.Eval(
+                        timestamp,
+                        ("x", 0.4),
+                        ("y", 0.0)),
+                    "Concern",
+                    machineBHistory);
+
+            var a2 =
+                discoveries.Geometry.Observe(
+                    machineA.Eval(
+                        timestamp.AddSeconds(1),
+                        ("x", 0.3),
+                        ("y", 0.0)),
+                    "Concern",
+                    machineAHistory);
+
+            var b2 =
+                discoveries.Geometry.Observe(
+                    machineB.Eval(
+                        timestamp.AddSeconds(1),
+                        ("x", 0.2),
+                        ("y", 0.0)),
+                    "Concern",
+                    machineBHistory);
+
+            Assert.Equal(
+                1,
+                a1.Persistence.ObservationCount);
+
+            Assert.Equal(
+                1,
+                b1.Persistence.ObservationCount);
+
+            Assert.Equal(
+                2,
+                a2.Persistence.ObservationCount);
+
+            Assert.Equal(
+                2,
+                b2.Persistence.ObservationCount);
+
+            Assert.False(
+                a2.Persistence.IsPersistent);
+
+            Assert.False(
+                b2.Persistence.IsPersistent);
+
+            Assert.False(
+                a2.Recognition.IsRecognized);
+
+            Assert.False(
+                b2.Recognition.IsRecognized);
+
+            var a3 =
+                discoveries.Geometry.Observe(
+                    machineA.Eval(
+                        timestamp.AddSeconds(2),
+                        ("x", 0.1),
+                        ("y", 0.0)),
+                    "Concern",
+                    machineAHistory);
+
+            Assert.Equal(
+                3,
+                a3.Persistence.ObservationCount);
+
+            Assert.Equal(
+                3,
+                a3.Persistence.ConsecutiveInsideCount);
+
+            Assert.True(
+                a3.Persistence.IsPersistent);
+
+            Assert.True(
+                a3.Recognition.IsRecognized);
+
+            Assert.Equal(
+                2,
+                b2.Persistence.ObservationCount);
+
+            Assert.Equal(
+                2,
+                b2.Persistence.ConsecutiveInsideCount);
+
+            Assert.False(
+                b2.Persistence.IsPersistent);
+
+            Assert.False(
+                b2.Recognition.IsRecognized);
+        }
+
+        [Fact]
+        public void
+            TimestampOrderingIsEnforcedWithinHistoryButNotAcrossHistories()
+        {
+            var discoveries =
+                Create(
+                    consecutive: 2,
+                    occupancy: 0.0,
+                    stability: 0.0);
+
+            var machineA =
+                new H2TestFixture();
+
+            var machineB =
+                new H2TestFixture();
+
+            var timestamp =
+                DateTimeOffset.UtcNow;
+
+            discoveries.Geometry.Observe(
+                machineA.Eval(
+                    timestamp.AddSeconds(10),
+                    ("x", 0.5),
+                    ("y", 0.0)),
+                "Concern",
+                "machine-a");
+
+            var machineBResult =
+                discoveries.Geometry.Observe(
+                    machineB.Eval(
+                        timestamp,
+                        ("x", 0.5),
+                        ("y", 0.0)),
+                    "Concern",
+                    "machine-b");
+
+            Assert.Equal(
+                1,
+                machineBResult.Persistence.ObservationCount);
+
+            Assert.Throws<InvalidOperationException>(
+                () =>
+                    discoveries.Geometry.Observe(
+                        machineA.Eval(
+                            timestamp.AddSeconds(5),
+                            ("x", 0.4),
+                            ("y", 0.0)),
+                        "Concern",
+                        "machine-a"));
         }
 
         private static WildsDiscoveries Create(
@@ -253,8 +462,11 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             double occupancy,
             double stability)
         {
-            var profileId = Guid.NewGuid();
-            var discoveries = new WildsDiscoveries();
+            var profileId =
+                Guid.NewGuid();
+
+            var discoveries =
+                new WildsDiscoveries();
 
             discoveries.Geometry.Register(
                 new DiscoveryGeometryProfile(
@@ -264,7 +476,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                     "scope",
                     new List<IDiscoveryClusterMapping>
                     {
-                        Map(profileId)
+                        Map(
+                            profileId)
                     },
                     new MinimumClusterPersistencePolicy(
                         "persist",
@@ -296,12 +509,19 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 1.0);
         }
 
-        private static IReadOnlyList<IDiscoveryClusterObservation> MetricSeries(
-            params double[] signedDistances)
+        private static IReadOnlyList<IDiscoveryClusterObservation>
+            MetricSeries(
+                params double[] signedDistances)
         {
-            var profileId = Guid.NewGuid();
-            var mapping = Map(profileId);
-            var fixture = new H2TestFixture();
+            var profileId =
+                Guid.NewGuid();
+
+            var mapping =
+                Map(
+                    profileId);
+
+            var fixture =
+                new H2TestFixture();
 
             var observations =
                 new List<IDiscoveryClusterObservation>();
@@ -317,7 +537,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                  index++)
             {
                 var x =
-                    1.0 + signedDistances[index];
+                    1.0 +
+                    signedDistances[index];
 
                 var evaluation =
                     fixture.Eval(

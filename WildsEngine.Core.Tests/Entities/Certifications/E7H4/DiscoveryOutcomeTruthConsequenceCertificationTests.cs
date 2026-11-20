@@ -503,15 +503,17 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
 
                 var first =
                     discoveries.Geometry.Observe(
-                        firstEvaluation,
-                        firstKey)
-                    .Recognition;
+                            firstEvaluation,
+                            firstKey,
+                            "gobbo-escape-history")
+                        .Recognition;
 
                 var second =
                     discoveries.Geometry.Observe(
-                        secondEvaluation,
-                        secondKey)
-                    .Recognition;
+                            secondEvaluation,
+                            secondKey,
+                            "gobbo-failure-history")
+                        .Recognition;
 
                 var population =
                     discoveries.Narratives.CreatePopulation(

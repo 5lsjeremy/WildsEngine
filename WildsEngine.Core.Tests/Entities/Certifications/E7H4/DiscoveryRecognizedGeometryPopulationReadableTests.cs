@@ -31,11 +31,20 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             var vectorsA = new H2TestFixture();
             var vectorsB = new H2TestFixture();
             var first = discoveries.Geometry.Observe(
-                vectorsA.Eval(DateTimeOffset.UtcNow, ("x", 0.1), ("y", 0.0)),
-                "PepperoniOliveMushroomOnion").Recognition;
+                vectorsA.Eval(
+                    DateTimeOffset.UtcNow,
+                    ("x", 0.1),
+                    ("y", 0.0)),
+                "PepperoniOliveMushroomOnion",
+                "pizza-subject-a").Recognition;
+
             var second = discoveries.Geometry.Observe(
-                vectorsB.Eval(DateTimeOffset.UtcNow, ("x", 9.9), ("y", 0.0)),
-                "PepperoniSausageJalapenoOnion").Recognition;
+                vectorsB.Eval(
+                    DateTimeOffset.UtcNow,
+                    ("x", 9.9),
+                    ("y", 0.0)),
+                "PepperoniSausageJalapenoOnion",
+                "pizza-subject-b").Recognition;
 
             var population = discoveries.Narratives.CreatePopulation(
                 registration.Id,
