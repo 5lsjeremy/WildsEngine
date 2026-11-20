@@ -8,6 +8,21 @@ using WildsEngine.Discoveries.Abstractions.Truths;
 
 namespace WildsEngine.Discoveries.Truths
 {
+    /// <summary>
+    /// Coordinates the boundary where structured Discovery knowledge
+    /// is delivered to a consumer-owned Truth policy.
+    ///
+    /// Discoveries does not decide what Truth means.
+    ///
+    /// It validates and delivers:
+    ///
+    /// - the competing narrative context,
+    /// - the underlying clusters, and
+    /// - the authoritative vector series.
+    ///
+    /// The consumer policy decides whether that knowledge is
+    /// sufficient to congeal Truth and, if so, what Truth it returns.
+    /// </summary>
     internal sealed class DiscoveryTruthSurface :
         IDiscoveryTruthSurface
     {
@@ -90,6 +105,17 @@ namespace WildsEngine.Discoveries.Truths
             return registration;
         }
 
+        /// <summary>
+        /// Delivers the complete scoped knowledge context to the
+        /// consumer-owned Truth congealment policy.
+        ///
+        /// D4 intentionally preserves competing narratives as part
+        /// of that decision context.
+        ///
+        /// Narratives inform Truth.
+        /// They do not automatically become Truth and they do not
+        /// choose which Truth wins.
+        /// </summary>
         public IDiscoveryTruthCongealmentResult Congeal(
             IDiscoveryCompetingNarrativesResult narratives,
             Guid registrationId,
@@ -140,8 +166,21 @@ namespace WildsEngine.Discoveries.Truths
             ValidateClusters(
                 clusters);
 
+            // D4 - COMPLETE TRUTH DECISION CONTEXT
+            //
+            // The consumer is not asked to decide Truth from
+            // geometry alone.
+            //
+            // We deliver the exact competing narrative result
+            // alongside the exact clusters and authoritative
+            // vector series that were already supplied to this
+            // Truth boundary.
+            //
+            // Discoveries still does not interpret this context
+            // into Truth. The consumer policy owns that decision.
             var canCongeal =
                 profile.CongealmentPolicy.CanCongeal(
+                    narratives,
                     clusters,
                     series);
 
@@ -150,8 +189,12 @@ namespace WildsEngine.Discoveries.Truths
 
             if (canCongeal)
             {
+                // The same complete context used to authorize
+                // congealment is supplied when the consumer
+                // actually produces Truth.
                 var truth =
                     profile.CongealmentPolicy.Congeal(
+                        narratives,
                         clusters,
                         series);
 
@@ -171,6 +214,9 @@ namespace WildsEngine.Discoveries.Truths
                     truth);
             }
 
+            // The result retains the exact narrative context,
+            // authoritative series, clusters, and any consumer-
+            // produced Truth.
             return new DiscoveryTruthCongealmentResult(
                 Guid.NewGuid(),
                 narratives,
@@ -239,6 +285,13 @@ namespace WildsEngine.Discoveries.Truths
             }
         }
 
+        /// <summary>
+        /// Validates attribution of the consumer-produced Truth.
+        ///
+        /// The consumer owns the meaning of Truth, but it may not
+        /// replace the authoritative series or reference clusters
+        /// outside the context supplied for congealment.
+        /// </summary>
         private static void ValidateCongealedTruth(
             ITruth truth,
             IDiscoveryVectorSeries authoritativeSeries,

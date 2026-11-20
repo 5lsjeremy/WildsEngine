@@ -44,8 +44,7 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                     new RelationshipKeyNarrativeCompositionPolicy(
                         "ReinforcingOutcome"),
                     new RecognitionCentroidDistanceNarrativeMetric(),
-                    new List<
-                        IDiscoveryNarrativeRelationshipDefinition>
+                    new List<IDiscoveryNarrativeRelationshipDefinition>
                     {
                         relationship
                     });
@@ -112,9 +111,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 fixture.Series();
 
             var series =
-                Assert.IsAssignableFrom<
-                    IDiscoveryVectorSeries>(
-                        evaluationSeries);
+                Assert.IsAssignableFrom<IDiscoveryVectorSeries>(
+                    evaluationSeries);
 
             var clusters =
                 fixture.Clusters(
@@ -159,6 +157,27 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 policy.CongealCalled);
 
             Assert.Same(
+                competing,
+                policy.CanCongealNarratives);
+
+            Assert.Same(
+                clusters,
+                policy.CanCongealClusters);
+
+            Assert.Same(
+                series,
+                policy.CanCongealSeries);
+
+            Assert.Null(
+                policy.CongealNarratives);
+
+            Assert.Null(
+                policy.CongealClusters);
+
+            Assert.Null(
+                policy.CongealSeries);
+
+            Assert.Same(
                 evaluationSeries,
                 result.Series);
 
@@ -189,9 +208,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 fixture.Series();
 
             var series =
-                Assert.IsAssignableFrom<
-                    IDiscoveryVectorSeries>(
-                        evaluationSeries);
+                Assert.IsAssignableFrom<IDiscoveryVectorSeries>(
+                    evaluationSeries);
 
             var clusters =
                 fixture.Clusters(
@@ -236,6 +254,30 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 policy.CongealCalled);
 
             Assert.Same(
+                competing,
+                policy.CanCongealNarratives);
+
+            Assert.Same(
+                competing,
+                policy.CongealNarratives);
+
+            Assert.Same(
+                clusters,
+                policy.CanCongealClusters);
+
+            Assert.Same(
+                clusters,
+                policy.CongealClusters);
+
+            Assert.Same(
+                series,
+                policy.CanCongealSeries);
+
+            Assert.Same(
+                series,
+                policy.CongealSeries);
+
+            Assert.Same(
                 evaluationSeries,
                 result.Series);
 
@@ -270,6 +312,195 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
 
         [Fact]
         public void
+            D4_CompetingNarrativesInformConsumerTruthDecision()
+        {
+            var fixture =
+                Fixture.Create();
+
+            // Both calls begin with the same recognized population,
+            // scope, geometry, series, and clusters.
+            //
+            // Each call produces a distinct competing-narrative
+            // result, allowing the consumer policy to distinguish
+            // the supplied narrative contexts.
+            var acceptedNarratives =
+                fixture.Competing();
+
+            var refusedNarratives =
+                fixture.Competing();
+
+            Assert.NotSame(
+                acceptedNarratives,
+                refusedNarratives);
+
+            var evaluationSeries =
+                fixture.Series();
+
+            var series =
+                Assert.IsAssignableFrom<IDiscoveryVectorSeries>(
+                    evaluationSeries);
+
+            var clusters =
+                fixture.Clusters(
+                    series);
+
+            // This consumer accepts one exact narrative context and
+            // refuses another.
+            //
+            // Discoveries delivers the context. It does not decide
+            // what the narratives mean or whether Truth follows.
+            var policy =
+                new NarrativeSensitiveTruthPolicy(
+                    acceptedNarratives);
+
+            var profile =
+                new DiscoveryTruthProfile(
+                    Guid.NewGuid(),
+                    "gobbo-narrative-sensitive-truth",
+                    "1.0",
+                    fixture.Scope,
+                    policy);
+
+            var registration =
+                fixture.Discoveries
+                    .Outcomes
+                    .Truths
+                    .Register(
+                        profile);
+
+            var acceptedResult =
+                fixture.Discoveries
+                    .Outcomes
+                    .Truths
+                    .Congeal(
+                        acceptedNarratives,
+                        registration.Id,
+                        series,
+                        clusters);
+
+            Assert.True(
+                acceptedResult.Congealed);
+
+            Assert.Single(
+                acceptedResult.Truths);
+
+            Assert.True(
+                policy.CongealCalled);
+
+            Assert.Same(
+                acceptedNarratives,
+                policy.CanCongealNarratives);
+
+            Assert.Same(
+                acceptedNarratives,
+                policy.CongealNarratives);
+
+            Assert.Same(
+                clusters,
+                policy.CanCongealClusters);
+
+            Assert.Same(
+                clusters,
+                policy.CongealClusters);
+
+            Assert.Same(
+                series,
+                policy.CanCongealSeries);
+
+            Assert.Same(
+                series,
+                policy.CongealSeries);
+
+            for (var index = 0;
+                 index < clusters.Count;
+                 index++)
+            {
+                Assert.Same(
+                    clusters[index],
+                    policy.CanCongealClusters![index]);
+
+                Assert.Same(
+                    clusters[index],
+                    policy.CongealClusters![index]);
+            }
+
+            Assert.Same(
+                acceptedNarratives,
+                acceptedResult.Narratives);
+
+            Assert.Same(
+                series,
+                acceptedResult.Series);
+
+            policy.ResetCallEvidence();
+
+            var refusedResult =
+                fixture.Discoveries
+                    .Outcomes
+                    .Truths
+                    .Congeal(
+                        refusedNarratives,
+                        registration.Id,
+                        series,
+                        clusters);
+
+            // The exact clusters and exact vector series are
+            // unchanged. Only the narrative context differs.
+            //
+            // The consumer is allowed to refuse Truth for that
+            // reason.
+            Assert.False(
+                refusedResult.Congealed);
+
+            Assert.Empty(
+                refusedResult.Truths);
+
+            Assert.False(
+                policy.CongealCalled);
+
+            Assert.Same(
+                refusedNarratives,
+                policy.CanCongealNarratives);
+
+            Assert.Same(
+                clusters,
+                policy.CanCongealClusters);
+
+            Assert.Same(
+                series,
+                policy.CanCongealSeries);
+
+            for (var index = 0;
+                 index < clusters.Count;
+                 index++)
+            {
+                Assert.Same(
+                    clusters[index],
+                    policy.CanCongealClusters![index]);
+            }
+
+            // CanCongeal refused the context, so the policy must not
+            // be asked to produce Truth.
+            Assert.Null(
+                policy.CongealNarratives);
+
+            Assert.Null(
+                policy.CongealClusters);
+
+            Assert.Null(
+                policy.CongealSeries);
+
+            Assert.Same(
+                refusedNarratives,
+                refusedResult.Narratives);
+
+            Assert.Same(
+                series,
+                refusedResult.Series);
+        }
+
+        [Fact]
+        public void
             D3_RefusedTruthCannotInvokeConsequenceProjection()
         {
             var fixture =
@@ -282,15 +513,13 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 fixture.Series();
 
             var series =
-                Assert.IsAssignableFrom<
-                    IDiscoveryVectorSeries>(
-                        evaluationSeries);
+                Assert.IsAssignableFrom<IDiscoveryVectorSeries>(
+                    evaluationSeries);
 
             var clusters =
                 fixture.Clusters(
                     series);
 
-            // The consumer explicitly refuses to congeal Truth.
             var truthPolicy =
                 new TestTruthPolicy(
                     false);
@@ -320,8 +549,6 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         series,
                         clusters);
 
-            // Establish the exact D3 precondition:
-            // no authoritative Truth congealed.
             Assert.False(
                 truthResult.Congealed);
 
@@ -330,6 +557,10 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
 
             Assert.False(
                 truthPolicy.CongealCalled);
+
+            Assert.Same(
+                competing,
+                truthPolicy.CanCongealNarratives);
 
             var consequencePolicy =
                 new TestConsequencePolicy(
@@ -350,7 +581,6 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                     .Register(
                         consequenceProfile);
 
-            // Refused Truth is terminal for this derivation.
             Assert.Throws<InvalidOperationException>(
                 () =>
                     fixture.Discoveries
@@ -360,7 +590,6 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                             truthResult,
                             consequenceRegistration.Id));
 
-            // The surface must stop before consumer projection logic.
             Assert.False(
                 consequencePolicy.ProjectCalled);
         }
@@ -401,8 +630,6 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         truthResult,
                         registration.Id);
 
-            // Truth congealed, so the consumer policy was allowed
-            // to decide that no Consequence follows.
             Assert.True(
                 policy.ProjectCalled);
 
@@ -901,23 +1128,187 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 private set;
             }
 
+            public IDiscoveryCompetingNarrativesResult?
+                CanCongealNarratives { get; private set; }
+
+            public IReadOnlyList<IDiscoveryCluster>?
+                CanCongealClusters { get; private set; }
+
+            public IDiscoveryVectorSeries?
+                CanCongealSeries { get; private set; }
+
+            public IDiscoveryCompetingNarrativesResult?
+                CongealNarratives { get; private set; }
+
+            public IReadOnlyList<IDiscoveryCluster>?
+                CongealClusters { get; private set; }
+
+            public IDiscoveryVectorSeries?
+                CongealSeries { get; private set; }
+
             public bool CanCongeal(
+                IDiscoveryCompetingNarrativesResult narratives,
                 IReadOnlyList<IDiscoveryCluster> clusters,
                 IDiscoveryVectorSeries series)
             {
+                CanCongealNarratives =
+                    narratives;
+
+                CanCongealClusters =
+                    clusters;
+
+                CanCongealSeries =
+                    series;
+
                 return _can;
             }
 
             public ITruth Congeal(
+                IDiscoveryCompetingNarrativesResult narratives,
                 IReadOnlyList<IDiscoveryCluster> clusters,
                 IDiscoveryVectorSeries series)
             {
                 CongealCalled =
                     true;
 
+                CongealNarratives =
+                    narratives;
+
+                CongealClusters =
+                    clusters;
+
+                CongealSeries =
+                    series;
+
                 return new TestTruth(
                     series,
                     clusters);
+            }
+        }
+
+        /// <summary>
+        /// Consumer policy proving that narrative context may
+        /// materially inform the consumer-owned Truth decision.
+        ///
+        /// Discoveries supplies the context. This policy decides
+        /// what that context means.
+        /// </summary>
+        private sealed class NarrativeSensitiveTruthPolicy :
+            IIdentifiedTruthCongealmentPolicy
+        {
+            private readonly
+                IDiscoveryCompetingNarrativesResult
+                _acceptedNarratives;
+
+            public NarrativeSensitiveTruthPolicy(
+                IDiscoveryCompetingNarrativesResult acceptedNarratives)
+            {
+                _acceptedNarratives =
+                    acceptedNarratives ??
+                    throw new ArgumentNullException(
+                        nameof(acceptedNarratives));
+
+                Id =
+                    Guid.NewGuid();
+            }
+
+            public Guid Id { get; }
+
+            public string Slug =>
+                "narrative-sensitive-truth-policy";
+
+            public bool CongealCalled
+            {
+                get;
+                private set;
+            }
+
+            public IDiscoveryCompetingNarrativesResult?
+                CanCongealNarratives { get; private set; }
+
+            public IReadOnlyList<IDiscoveryCluster>?
+                CanCongealClusters { get; private set; }
+
+            public IDiscoveryVectorSeries?
+                CanCongealSeries { get; private set; }
+
+            public IDiscoveryCompetingNarrativesResult?
+                CongealNarratives { get; private set; }
+
+            public IReadOnlyList<IDiscoveryCluster>?
+                CongealClusters { get; private set; }
+
+            public IDiscoveryVectorSeries?
+                CongealSeries { get; private set; }
+
+            public bool CanCongeal(
+                IDiscoveryCompetingNarrativesResult narratives,
+                IReadOnlyList<IDiscoveryCluster> clusters,
+                IDiscoveryVectorSeries series)
+            {
+                CanCongealNarratives =
+                    narratives;
+
+                CanCongealClusters =
+                    clusters;
+
+                CanCongealSeries =
+                    series;
+
+                // This decision belongs to the consumer.
+                //
+                // The exact same clusters and vector series can
+                // produce a different decision when the consumer is
+                // given a different narrative context.
+                return ReferenceEquals(
+                    narratives,
+                    _acceptedNarratives);
+            }
+
+            public ITruth Congeal(
+                IDiscoveryCompetingNarrativesResult narratives,
+                IReadOnlyList<IDiscoveryCluster> clusters,
+                IDiscoveryVectorSeries series)
+            {
+                CongealCalled =
+                    true;
+
+                CongealNarratives =
+                    narratives;
+
+                CongealClusters =
+                    clusters;
+
+                CongealSeries =
+                    series;
+
+                return new TestTruth(
+                    series,
+                    clusters);
+            }
+
+            public void ResetCallEvidence()
+            {
+                CongealCalled =
+                    false;
+
+                CanCongealNarratives =
+                    null;
+
+                CanCongealClusters =
+                    null;
+
+                CanCongealSeries =
+                    null;
+
+                CongealNarratives =
+                    null;
+
+                CongealClusters =
+                    null;
+
+                CongealSeries =
+                    null;
             }
         }
 
