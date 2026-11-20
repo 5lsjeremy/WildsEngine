@@ -30,28 +30,15 @@ using Xunit;
 namespace WildsEngine.Core.Tests.Entities.Certifications
 {
     /// <summary>
-    /// D5 readable end-to-end certification.
+    /// D5 readable end-to-end certifications.
     ///
-    /// Kid 5 observes four nearby chocolate choices while retaining
-    /// a separate personal preference for vanilla.
+    /// Test one certifies the full individual knowledge path through
+    /// Consequence projection.
     ///
-    /// This test follows the production Discoveries path:
-    ///
-    /// Consumer Reality
-    ///     -> Evidence
-    ///     -> Proof
-    ///     -> Fact
-    ///     -> Discovery
-    ///     -> Vectorization
-    ///     -> Geometry
-    ///     -> Persistence / Recognition
-    ///     -> Competing Narratives
-    ///     -> Consumer-defined Truth
-    ///     -> Consumer-defined Consequence
-    ///     -> STOP
-    ///
-    /// Discoveries carries and organizes knowledge. It never chooses
-    /// an ice-cream flavor or executes behavior for Kid 5.
+    /// Test two certifies the explicit feedback boundary:
+    /// a Truth congealed for a group may become Evidence owned by an
+    /// individual without transferring group ownership, history, or
+    /// decision authority.
     /// </summary>
     public sealed class DiscoveryEndToEndReadableTests
     {
@@ -73,17 +60,8 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 new TestEntity(
                     "kid-5");
 
-            // ---------------------------------------------------------
-            // CONSUMER REALITY -> KID-5-OWNED EVIDENCE
-            // ---------------------------------------------------------
-            //
-            // The other children do not donate their Evidence,
-            // Discoveries, or geometry histories to Kid 5.
-            //
-            // Kid 5 owns Evidence describing what Kid 5 observed
-            // about the surrounding world.
             var chocolateEvidence =
-                new DiscoveryEvidence(
+                CreateValidatedEvidence(
                     kidFive,
                     new Dictionary<string, object?>
                     {
@@ -91,23 +69,13 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         ["ObservedFlavor"] = "Chocolate",
                         ["Location"] = "IceCreamStand"
                     },
-                    outcome:
-                        "Four nearby kids selected chocolate",
-                    strength:
-                        4.0,
-                    normalizedStrength:
-                        1.0,
-                    neighbors:
-                        new List<IBaseObject>(),
-                    source:
-                        null,
-                    externalId:
-                        "kid-5-observation-chocolate-4",
-                    name:
-                        "Nearby chocolate choices");
+                    "Four nearby kids selected chocolate",
+                    4.0,
+                    "kid-5-observation-chocolate-4",
+                    "Nearby chocolate choices");
 
             var vanillaEvidence =
-                new DiscoveryEvidence(
+                CreateValidatedEvidence(
                     kidFive,
                     new Dictionary<string, object?>
                     {
@@ -115,272 +83,92 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         ["PreferredFlavor"] = "Vanilla",
                         ["PreferenceSource"] = "Personal"
                     },
-                    outcome:
-                        "Kid 5 personally prefers vanilla",
-                    strength:
-                        1.0,
-                    normalizedStrength:
-                        1.0,
-                    neighbors:
-                        new List<IBaseObject>(),
-                    source:
-                        null,
-                    externalId:
-                        "kid-5-personal-vanilla",
-                    name:
-                        "Kid 5 vanilla preference");
+                    "Kid 5 personally prefers vanilla",
+                    1.0,
+                    "kid-5-personal-vanilla",
+                    "Kid 5 vanilla preference");
 
-            Assert.Same(
-                kidFive,
-                chocolateEvidence.Entity);
-
-            Assert.Same(
-                kidFive,
-                vanillaEvidence.Entity);
+            Assert.Same(kidFive, chocolateEvidence.Entity);
+            Assert.Same(kidFive, vanillaEvidence.Entity);
 
             TestLog.State(
                 "Nearby kids choosing chocolate = " +
                 chocolateEvidence.Conditions["NearbyKidCount"]);
 
-            TestLog.State(
-                "Chocolate observation belongs to Kid 5 = " +
-                ReferenceEquals(
-                    kidFive,
-                    chocolateEvidence.Entity));
-
-            TestLog.State(
-                "Vanilla preference Evidence belongs to Kid 5 = " +
-                ReferenceEquals(
-                    kidFive,
-                    vanillaEvidence.Entity));
-
-            // ---------------------------------------------------------
-            // EVIDENCE -> PROOF
-            // ---------------------------------------------------------
-            //
-            // Proof remains consumer supplied. Discoveries does not
-            // decide whether either observation is true or believable.
-            var chocolateProof =
-                new TestProof(
-                    1.0,
-                    true,
-                    "Kid 5 directly observed four chocolate choices.");
-
-            var vanillaProof =
-                new TestProof(
-                    1.0,
-                    true,
-                    "Kid 5 directly reports a personal vanilla preference.");
-
-            Assert.True(
-                chocolateEvidence.ApplyProof(
-                    chocolateProof.Validate(
-                        chocolateEvidence)));
-
-            Assert.True(
-                vanillaEvidence.ApplyProof(
-                    vanillaProof.Validate(
-                        vanillaEvidence)));
-
-            Assert.True(
-                chocolateEvidence.IsValidated);
-
-            Assert.True(
-                vanillaEvidence.IsValidated);
-
-            TestLog.State(
-                "Chocolate observation validated = " +
-                chocolateEvidence.IsValidated);
-
-            TestLog.State(
-                "Vanilla preference validated = " +
-                vanillaEvidence.IsValidated);
-
-            // ---------------------------------------------------------
-            // PROOF -> FACT
-            // ---------------------------------------------------------
-            //
-            // These Facts express different kinds of knowledge:
-            //
-            // 1. Chocolate is popular nearby.
-            // 2. Kid 5 personally prefers vanilla.
-            //
-            // They can both be true.
-            var chocolatePopularityFact =
-                new Fact(
+            var chocolateFact =
+                CreateProvenFact(
                     kidFive,
                     "ChocolateIsPopularNearby",
-                    true,
-                    requiredEvidenceCount:
-                        1,
-                    contributionPolicy:
-                        new TrueEvidencePolicy(),
-                    externalId:
-                        "fact-chocolate-popular");
+                    chocolateEvidence,
+                    new TrueEvidencePolicy(),
+                    "fact-chocolate-popular");
 
-            var vanillaPreferenceFact =
-                new Fact(
+            var vanillaFact =
+                CreateProvenFact(
                     kidFive,
                     "VanillaRemainsPersonallyPreferred",
-                    true,
-                    requiredEvidenceCount:
-                        1,
-                    contributionPolicy:
-                        new TrueEvidencePolicy(),
-                    externalId:
-                        "fact-vanilla-preferred");
+                    vanillaEvidence,
+                    new TrueEvidencePolicy(),
+                    "fact-vanilla-preferred");
 
-            Assert.True(
-                chocolatePopularityFact.ReceiveEvidence(
-                    chocolateEvidence));
+            var chocolateDiscovery =
+                CreateAvailableDiscovery(
+                    kidFive,
+                    "ChocolateIsSociallyDominant",
+                    chocolateFact,
+                    "discovery-social-chocolate");
 
-            Assert.True(
-                vanillaPreferenceFact.ReceiveEvidence(
-                    vanillaEvidence));
-
-            Assert.True(
-                chocolatePopularityFact.IsProven);
-
-            Assert.True(
-                vanillaPreferenceFact.IsProven);
-
-            Assert.Same(
-                chocolateEvidence,
-                chocolatePopularityFact.Contributors[0]);
-
-            Assert.Same(
-                vanillaEvidence,
-                vanillaPreferenceFact.Contributors[0]);
+            var vanillaDiscovery =
+                CreateAvailableDiscovery(
+                    kidFive,
+                    "VanillaRemainsPersonallyPreferred",
+                    vanillaFact,
+                    "discovery-personal-vanilla");
 
             TestLog.State(
                 "Chocolate-popularity Fact proven = " +
-                chocolatePopularityFact.IsProven);
+                chocolateFact.IsProven);
 
             TestLog.State(
                 "Vanilla-preference Fact proven = " +
-                vanillaPreferenceFact.IsProven);
+                vanillaFact.IsProven);
 
-            // ---------------------------------------------------------
-            // FACT -> DISCOVERY
-            // ---------------------------------------------------------
-            var chocolateDiscovery =
-                new Discovery(
-                    kidFive,
-                    requiredFactCount:
-                        1,
-                    name:
-                        "ChocolateIsSociallyDominant",
-                    externalId:
-                        "discovery-social-chocolate");
-
-            var vanillaDiscovery =
-                new Discovery(
-                    kidFive,
-                    requiredFactCount:
-                        1,
-                    name:
-                        "VanillaRemainsPersonallyPreferred",
-                    externalId:
-                        "discovery-personal-vanilla");
-
-            Assert.True(
-                chocolateDiscovery.ReceiveFact(
-                    chocolatePopularityFact));
-
-            Assert.True(
-                vanillaDiscovery.ReceiveFact(
-                    vanillaPreferenceFact));
-
-            Assert.True(
-                chocolateDiscovery.IsAvailable);
-
-            Assert.True(
-                vanillaDiscovery.IsAvailable);
-
-            Assert.Same(
-                kidFive,
-                chocolateDiscovery.Entity);
-
-            Assert.Same(
-                kidFive,
-                vanillaDiscovery.Entity);
-
-            TestLog.State(
-                "Discovery A = " +
-                chocolateDiscovery.Name);
-
-            TestLog.State(
-                "Discovery B = " +
-                vanillaDiscovery.Name);
-
-            TestLog.State(
-                "Chocolate Discovery available = " +
-                chocolateDiscovery.IsAvailable);
-
-            TestLog.State(
-                "Vanilla Discovery available = " +
-                vanillaDiscovery.IsAvailable);
-
-            // ---------------------------------------------------------
-            // DISCOVERY -> PRODUCTION VECTORIZATION SERVICE
-            // ---------------------------------------------------------
             var clock =
                 new SystemWildsServiceClock();
 
             var journal =
                 new WildsServiceExecutionJournal();
 
-            var contexts =
-                new WildsServiceContextFactory(
-                    clock);
-
-            var vectorizationService =
-                new IceCreamVectorizationService(
-                    contexts,
-                    journal,
-                    clock);
-
             var vectorizer =
                 new DiscoveryVectorizerFactory()
                     .Create(
-                        vectorizationService,
+                        new IceCreamVectorizationService(
+                            new WildsServiceContextFactory(clock),
+                            journal,
+                            clock),
                         new AbsoluteMagnitudeMetric());
 
             var chocolateInput =
                 new DiscoveryVectorInput(
                     chocolateDiscovery,
-                    provenance:
-                        "Kid 5 social observation");
+                    "Kid 5 social observation");
 
             var vanillaInput =
                 new DiscoveryVectorInput(
                     vanillaDiscovery,
-                    provenance:
-                        "Kid 5 personal preference");
+                    "Kid 5 personal preference");
 
             var chocolateVectorization =
                 await vectorizer.VectorizeAsync(
                     chocolateInput,
-                    provenance:
-                        "D5 chocolate vectorization",
-                    pulseId:
-                        Guid.NewGuid());
+                    provenance: "D5 chocolate vectorization",
+                    pulseId: Guid.NewGuid());
 
             var vanillaVectorization =
                 await vectorizer.VectorizeAsync(
                     vanillaInput,
-                    provenance:
-                        "D5 vanilla vectorization",
-                    pulseId:
-                        Guid.NewGuid());
-
-            Assert.NotEqual(
-                Guid.Empty,
-                chocolateVectorization.ServiceExecutionId);
-
-            Assert.NotEqual(
-                Guid.Empty,
-                vanillaVectorization.ServiceExecutionId);
+                    provenance: "D5 vanilla vectorization",
+                    pulseId: Guid.NewGuid());
 
             Assert.True(
                 journal.TryGet(
@@ -400,55 +188,6 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 WildsServiceExecutionOutcome.Succeeded,
                 vanillaExecution!.Outcome);
 
-            Assert.Same(
-                chocolateInput,
-                chocolateVectorization
-                    .Vector
-                    .Contributions[0]
-                    .Input);
-
-            Assert.Same(
-                vanillaInput,
-                vanillaVectorization
-                    .Vector
-                    .Contributions[0]
-                    .Input);
-
-            TestLog.State(
-                "Chocolate vectorization execution = " +
-                chocolateVectorization.ServiceExecutionId);
-
-            TestLog.State(
-                "Vanilla vectorization execution = " +
-                vanillaVectorization.ServiceExecutionId);
-
-            TestLog.State(
-                "Chocolate vector social-chocolate = " +
-                GetComponent(
-                    chocolateVectorization.Vector,
-                    "social-chocolate"));
-
-            TestLog.State(
-                "Chocolate vector personal-vanilla = " +
-                GetComponent(
-                    chocolateVectorization.Vector,
-                    "personal-vanilla"));
-
-            TestLog.State(
-                "Vanilla vector social-chocolate = " +
-                GetComponent(
-                    vanillaVectorization.Vector,
-                    "social-chocolate"));
-
-            TestLog.State(
-                "Vanilla vector personal-vanilla = " +
-                GetComponent(
-                    vanillaVectorization.Vector,
-                    "personal-vanilla"));
-
-            // ---------------------------------------------------------
-            // VECTOR -> EVALUATION / AUTHORITATIVE SERIES
-            // ---------------------------------------------------------
             var now =
                 DateTimeOffset.UtcNow;
 
@@ -478,237 +217,21 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         vanillaEvaluation
                     });
 
-            Assert.Equal(
-                2,
-                series.Inputs.Count);
-
-            Assert.Same(
-                chocolateDiscovery,
-                series.Inputs[0].Discovery);
-
-            Assert.Same(
-                vanillaDiscovery,
-                series.Inputs[1].Discovery);
-
-            Assert.Same(
-                chocolateInput,
-                series.Inputs[0]);
-
-            Assert.Same(
-                vanillaInput,
-                series.Inputs[1]);
-
-            // ---------------------------------------------------------
-            // EVALUATION -> GEOMETRY / RECOGNITION
-            // ---------------------------------------------------------
             var discoveries =
                 new WildsDiscoveries();
 
-            var geometryProfileId =
-                Guid.NewGuid();
-
-            const string chocolateKey =
-                "ChocolateIsSociallyDominant";
-
-            const string vanillaKey =
-                "VanillaRemainsPersonallyPreferred";
-
-            var mappings =
-                new List<IDiscoveryClusterMapping>
-                {
-                    new DiscoveryClusterMapping(
-                        Guid.NewGuid(),
-                        "social-chocolate",
-                        geometryProfileId,
-                        "kid-five-ice-cream",
-                        "1.0",
-                        chocolateKey,
-                        "hypersphere",
-                        new Dictionary<string, double>
-                        {
-                            ["personal-vanilla"] = 0.0,
-                            ["social-chocolate"] = 1.0
-                        },
-                        radius:
-                            0.25),
-
-                    new DiscoveryClusterMapping(
-                        Guid.NewGuid(),
-                        "personal-vanilla",
-                        geometryProfileId,
-                        "kid-five-ice-cream",
-                        "1.0",
-                        vanillaKey,
-                        "hypersphere",
-                        new Dictionary<string, double>
-                        {
-                            ["personal-vanilla"] = 1.0,
-                            ["social-chocolate"] = 0.0
-                        },
-                        radius:
-                            0.25)
-                };
-
-            var geometryRegistration =
-                discoveries.Geometry.Register(
-                    new DiscoveryGeometryProfile(
-                        geometryProfileId,
-                        "kid-five-ice-cream",
-                        "1.0",
-                        scope,
-                        mappings,
-                        new MinimumClusterPersistencePolicy(
-                            "one-authoritative-observation",
-                            minimumConsecutiveInside:
-                                1,
-                            minimumOccupancyRatio:
-                                0.0,
-                            minimumStability:
-                                0.0),
-                        new BoundaryVarianceClusterStabilityMetric(),
-                        new PersistentClusterRecognitionPolicy(
-                            "recognize-persistent-kid-five-knowledge")));
-
-            const string kidFiveHistory =
-                "kid-5";
-
-            var chocolateObservation =
-                discoveries.Geometry.Observe(
+            var knowledge =
+                BuildCompetingKnowledge(
+                    discoveries,
+                    scope,
+                    "kid-five-ice-cream",
+                    "kid-5",
+                    "ChocolateIsSociallyDominant",
                     chocolateEvaluation,
-                    chocolateKey,
-                    kidFiveHistory);
-
-            var vanillaObservation =
-                discoveries.Geometry.Observe(
+                    "VanillaRemainsPersonallyPreferred",
                     vanillaEvaluation,
-                    vanillaKey,
-                    kidFiveHistory);
-
-            Assert.True(
-                chocolateObservation.Persistence.IsPersistent);
-
-            Assert.True(
-                vanillaObservation.Persistence.IsPersistent);
-
-            Assert.True(
-                chocolateObservation.Recognition.IsRecognized);
-
-            Assert.True(
-                vanillaObservation.Recognition.IsRecognized);
-
-            Assert.Equal(
-                1,
-                chocolateObservation.Persistence.ObservationCount);
-
-            Assert.Equal(
-                1,
-                vanillaObservation.Persistence.ObservationCount);
-
-            TestLog.State(
-                "Geometry history = " +
-                kidFiveHistory);
-
-            TestLog.State(
-                "Social chocolate recognized = " +
-                chocolateObservation.Recognition.IsRecognized);
-
-            TestLog.State(
-                "Personal vanilla recognized = " +
-                vanillaObservation.Recognition.IsRecognized);
-
-            // ---------------------------------------------------------
-            // RECOGNITION -> POPULATION -> COMPETING NARRATIVES
-            // ---------------------------------------------------------
-            var population =
-                discoveries.Narratives.CreatePopulation(
-                    geometryRegistration.Id,
-                    new List<IDiscoveryClusterRecognitionResult>
-                    {
-                        chocolateObservation.Recognition,
-                        vanillaObservation.Recognition
-                    });
-
-            var competingDefinition =
-                new DiscoveryNarrativeRelationshipDefinition(
-                    Guid.NewGuid(),
-                    "social-versus-personal",
-                    chocolateKey,
-                    vanillaKey,
                     "CompetingKnowledge");
 
-            var narrativeProfile =
-                new DiscoveryNarrativeProfile(
-                    Guid.NewGuid(),
-                    "kid-five-competing-narratives",
-                    "1.0",
-                    scope,
-                    new RelationshipKeyNarrativeCompositionPolicy(
-                        "ReinforcingKnowledge"),
-                    new RecognitionCentroidDistanceNarrativeMetric(),
-                    new List<IDiscoveryNarrativeRelationshipDefinition>
-                    {
-                        competingDefinition
-                    });
-
-            var narrativeRegistration =
-                discoveries.Narratives.Register(
-                    narrativeProfile);
-
-            var composition =
-                discoveries.Narratives.Compose(
-                    population,
-                    narrativeRegistration.Id);
-
-            // The supplied relationship is intentionally not accepted
-            // as reinforcing composition, so the two narratives remain
-            // separate and become a cross-group competing relationship.
-            Assert.Equal(
-                2,
-                composition.Groups.Count);
-
-            Assert.Single(
-                composition.Decisions);
-
-            Assert.False(
-                composition.Decisions[0].CanCompose);
-
-            Assert.Same(
-                competingDefinition,
-                composition.Decisions[0].Relationship);
-
-            var competingNarratives =
-                discoveries.Outcomes.Relate(
-                    composition);
-
-            Assert.Single(
-                competingNarratives.GroupRelationships);
-
-            Assert.Single(
-                competingNarratives
-                    .GroupRelationships[0]
-                    .Definitions);
-
-            Assert.Same(
-                competingDefinition,
-                competingNarratives
-                    .GroupRelationships[0]
-                    .Definitions[0]);
-
-            TestLog.State(
-                "Narrative A = " +
-                chocolateKey);
-
-            TestLog.State(
-                "Narrative B = " +
-                vanillaKey);
-
-            TestLog.State(
-                "Narrative relationship = " +
-                competingDefinition.RelationshipKey);
-
-            // ---------------------------------------------------------
-            // NARRATIVES + CLUSTERS + SERIES -> CONSUMER TRUTH
-            // ---------------------------------------------------------
             var clusters =
                 new List<IDiscoveryCluster>
                 {
@@ -717,7 +240,6 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         {
                             chocolateEvaluation.Vector
                         }),
-
                     new ReadableCluster(
                         new List<IDiscoveryVector>
                         {
@@ -726,53 +248,33 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 };
 
             var truthPolicy =
-                new KidFiveTruthPolicy();
+                new TextTruthPolicy(
+                    "kid-five-truth-policy",
+                    "KidFiveUnderstandsSocialAndPersonalPreference",
+                    "Chocolate is socially dominant while " +
+                    "Kid 5 still personally prefers vanilla.");
 
             var truthRegistration =
-                discoveries
-                    .Outcomes
-                    .Truths
-                    .Register(
-                        new DiscoveryTruthProfile(
-                            Guid.NewGuid(),
-                            "kid-five-truth",
-                            "1.0",
-                            scope,
-                            truthPolicy));
+                discoveries.Outcomes.Truths.Register(
+                    new DiscoveryTruthProfile(
+                        Guid.NewGuid(),
+                        "kid-five-truth",
+                        "1.0",
+                        scope,
+                        truthPolicy));
 
             var truthResult =
-                discoveries
-                    .Outcomes
-                    .Truths
-                    .Congeal(
-                        competingNarratives,
-                        truthRegistration.Id,
-                        series,
-                        clusters);
+                discoveries.Outcomes.Truths.Congeal(
+                    knowledge.Narratives,
+                    truthRegistration.Id,
+                    series,
+                    clusters);
 
-            Assert.True(
-                truthResult.Congealed);
-
-            Assert.Single(
-                truthResult.Truths);
-
-            Assert.True(
-                truthPolicy.CanCongealCalled);
-
-            Assert.True(
-                truthPolicy.CongealCalled);
-
-            Assert.Same(
-                competingNarratives,
-                truthPolicy.Narratives);
-
-            Assert.Same(
-                series,
-                truthPolicy.Series);
-
-            Assert.Same(
-                clusters,
-                truthPolicy.Clusters);
+            Assert.True(truthResult.Congealed);
+            Assert.Single(truthResult.Truths);
+            Assert.Same(knowledge.Narratives, truthPolicy.Narratives);
+            Assert.Same(series, truthPolicy.Series);
+            Assert.Same(clusters, truthPolicy.Clusters);
 
             var truth =
                 truthResult.Truths[0];
@@ -782,76 +284,34 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 "Kid 5 still personally prefers vanilla.",
                 truth.Value);
 
-            Assert.Same(
-                series,
-                truth.Series);
-
-            Assert.Equal(
-                2,
-                truth.Discoveries.Count);
-
-            Assert.Same(
-                chocolateDiscovery,
-                truth.Discoveries[0]);
-
-            Assert.Same(
-                vanillaDiscovery,
-                truth.Discoveries[1]);
-
             TestLog.State(
                 "Truth = " +
                 truth.Value);
 
-            // ---------------------------------------------------------
-            // TRUTH -> CONSUMER CONSEQUENCE
-            // ---------------------------------------------------------
             var consequencePolicy =
                 new KidFiveConsequencePolicy();
 
             var consequenceRegistration =
-                discoveries
-                    .Outcomes
-                    .Consequences
-                    .Register(
-                        new DiscoveryConsequenceProfile(
-                            Guid.NewGuid(),
-                            "kid-five-consequence",
-                            "1.0",
-                            scope,
-                            consequencePolicy));
+                discoveries.Outcomes.Consequences.Register(
+                    new DiscoveryConsequenceProfile(
+                        Guid.NewGuid(),
+                        "kid-five-consequence",
+                        "1.0",
+                        scope,
+                        consequencePolicy));
 
             var consequenceResult =
-                discoveries
-                    .Outcomes
-                    .Consequences
-                    .Project(
-                        truthResult,
-                        consequenceRegistration.Id);
+                discoveries.Outcomes.Consequences.Project(
+                    truthResult,
+                    consequenceRegistration.Id);
 
-            Assert.True(
-                consequencePolicy.ProjectCalled);
-
-            Assert.Single(
-                consequenceResult.Consequences);
-
-            var consequence =
-                consequenceResult.Consequences[0];
-
-            Assert.Equal(
-                "Kid 5 may choose vanilla despite surrounding " +
-                "chocolate preference.",
-                consequence.Value);
-
-            Assert.Single(
-                consequence.Truths);
-
-            Assert.Same(
-                truth,
-                consequence.Truths[0]);
+            Assert.True(consequencePolicy.ProjectCalled);
+            Assert.Single(consequenceResult.Consequences);
+            Assert.Same(truth, consequenceResult.Consequences[0].Truths[0]);
 
             TestLog.State(
                 "Consequence = " +
-                consequence.Value);
+                consequenceResult.Consequences[0].Value);
 
             TestLog.Pass(
                 "Discoveries carried Kid 5 from observation through " +
@@ -859,26 +319,743 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 "choosing or executing an action for him.");
         }
 
-        private static double GetComponent(
-            IDiscoveryVectorPoint vector,
-            string dimension)
+        [Fact]
+        public void
+            GroupTruthCanBecomeIndividualEvidenceWithoutOverwritingIndividualPreference()
         {
+            TestLog.Section(
+                "D5B - GROUP TRUTH TO INDIVIDUAL EVIDENCE");
+
+            TestLog.Test(
+                "A Truth congealed through the production Truth surface " +
+                "becomes Evidence available to Kid 5 without automatically " +
+                "becoming Kid 5's own Truth.");
+
+            const string groupScope =
+                "nearby-kids-group";
+
+            var group =
+                CreateCongealedGroupTruth(
+                    groupScope);
+
+            Assert.True(group.TruthResult.Congealed);
+            Assert.Single(group.TruthResult.Truths);
+
+            var groupTruth =
+                group.TruthResult.Truths[0];
+
+            Assert.True(group.Policy.CanCongealCalled);
+            Assert.True(group.Policy.CongealCalled);
+            Assert.Same(group.Narratives, group.Policy.Narratives);
+            Assert.Same(group.Series, group.Policy.Series);
+            Assert.Same(group.Clusters, group.Policy.Clusters);
+            Assert.Same(group.Series, groupTruth.Series);
+            Assert.Equal(
+                "Chocolate is dominant among Kids 1-4.",
+                groupTruth.Value);
+
+            TestLog.State(
+                "Group Truth congealed through Truths.Congeal = " +
+                group.TruthResult.Congealed);
+
+            TestLog.State(
+                "Group Truth = " +
+                groupTruth.Value);
+
+            var kidFive =
+                new TestEntity(
+                    "kid-5");
+
+            Assert.Empty(kidFive.Facts);
+            Assert.Empty(kidFive.Discoveries);
+
+            TestLog.State(
+                "Group Truth automatically changed Kid 5 = False");
+
+            var peerPressureEvidence =
+                new DiscoveryEvidence(
+                    kidFive,
+                    new Dictionary<string, object?>
+                    {
+                        ["ObservedGroupSize"] = 4,
+                        ["ObservedFlavor"] = "Chocolate",
+                        ["ObservationKind"] = "CongealedGroupTruth",
+                        ["GroupScope"] = groupScope
+                    },
+                    groupTruth,
+                    4.0,
+                    1.0,
+                    new List<IBaseObject>(),
+                    null,
+                    "kid-5-observes-group-truth",
+                    "Nearby group preference");
+
+            Assert.Same(kidFive, peerPressureEvidence.Entity);
+            Assert.Same(groupTruth, peerPressureEvidence.Outcome);
+            Assert.Same(group.Series, groupTruth.Series);
+            Assert.Empty(kidFive.Facts);
+            Assert.Empty(kidFive.Discoveries);
+
+            var proof =
+                new TestProof(
+                    1.0,
+                    true,
+                    "Kid 5 directly observed the congealed preference " +
+                    "of the nearby group.");
+
+            Assert.True(
+                peerPressureEvidence.ApplyProof(
+                    proof.Validate(
+                        peerPressureEvidence)));
+
+            var conformingFact =
+                CreateProvenFact(
+                    kidFive,
+                    "ChocolatePeerPressureIsStrong",
+                    peerPressureEvidence,
+                    new GroupTruthPeerPressurePolicy(4),
+                    "fact-peer-pressure-conforming");
+
+            var independentFact =
+                new Fact(
+                    kidFive,
+                    "ChocolatePeerPressureIsStrong",
+                    true,
+                    1,
+                    new RejectGroupTruthPolicy(),
+                    "fact-peer-pressure-independent");
+
+            Assert.True(
+                independentFact.ReceiveEvidence(
+                    peerPressureEvidence));
+
+            Assert.True(
+                conformingFact.IsProven);
+
+            Assert.Equal(
+                1,
+                conformingFact.CurrentEvidenceCount);
+
+            Assert.Single(
+                conformingFact.Contributors);
+
+            Assert.False(
+                independentFact.IsProven);
+
+            Assert.Equal(
+                0,
+                independentFact.CurrentEvidenceCount);
+
+            Assert.Equal(
+                0.0,
+                independentFact.EvidencePercentage);
+
+            Assert.Single(
+                independentFact.Evidence);
+
+            Assert.Same(
+                peerPressureEvidence,
+                conformingFact.Evidence[0]);
+
+            Assert.Same(
+                peerPressureEvidence,
+                independentFact.Evidence[0]);
+
+            TestLog.State(
+                "Conforming policy accepts peer pressure = " +
+                conformingFact.IsProven);
+
+            TestLog.State(
+                "Independent policy accepts peer pressure = " +
+                independentFact.IsProven);
+
+            var vanillaEvidence =
+                CreateValidatedEvidence(
+                    kidFive,
+                    new Dictionary<string, object?>
+                    {
+                        ["PreferredFlavor"] = "Vanilla",
+                        ["PreferenceSource"] = "Personal"
+                    },
+                    "Kid 5 personally prefers vanilla",
+                    1.0,
+                    "kid-5-personal-vanilla-d5b",
+                    "Kid 5 personal preference");
+
+            var vanillaFact =
+                CreateProvenFact(
+                    kidFive,
+                    "VanillaRemainsPersonallyPreferred",
+                    vanillaEvidence,
+                    new TrueEvidencePolicy(),
+                    "fact-vanilla-d5b");
+
+            var peerPressureDiscovery =
+                CreateAvailableDiscovery(
+                    kidFive,
+                    "ChocolatePeerPressureIsStrong",
+                    conformingFact,
+                    "discovery-peer-pressure");
+
+            var vanillaDiscovery =
+                CreateAvailableDiscovery(
+                    kidFive,
+                    "VanillaRemainsPersonallyPreferred",
+                    vanillaFact,
+                    "discovery-vanilla-d5b");
+
+            Assert.True(peerPressureDiscovery.IsAvailable);
+            Assert.True(vanillaDiscovery.IsAvailable);
+            Assert.Same(kidFive, peerPressureDiscovery.Entity);
+            Assert.Same(kidFive, vanillaDiscovery.Entity);
+            Assert.NotSame(group.GroupEntity, kidFive);
+
+            TestLog.State(
+                "Kid 5 received exact group Truth as Evidence = " +
+                ReferenceEquals(groupTruth, peerPressureEvidence.Outcome));
+
+            TestLog.State(
+                "Group ownership merged into Kid 5 = False");
+
+            TestLog.State(
+                "Group history merged into Kid 5 = False");
+
+            TestLog.State(
+                "Group Truth forced a Kid 5 action = False");
+
+            TestLog.Pass(
+                "A real production-congealed group Truth became " +
+                "Kid-5-owned Evidence without merging ownership, " +
+                "history, personal preference, or consumer policy.");
+        }
+
+        private static DiscoveryEvidence CreateValidatedEvidence(
+            IEntity entity,
+            IReadOnlyDictionary<string, object?> conditions,
+            object outcome,
+            double strength,
+            string externalId,
+            string name)
+        {
+            var evidence =
+                new DiscoveryEvidence(
+                    entity,
+                    conditions,
+                    outcome,
+                    strength,
+                    1.0,
+                    new List<IBaseObject>(),
+                    null,
+                    externalId,
+                    name);
+
+            var proof =
+                new TestProof(
+                    1.0,
+                    true,
+                    "Controlled readable proof.");
+
+            Assert.True(
+                evidence.ApplyProof(
+                    proof.Validate(
+                        evidence)));
+
+            return evidence;
+        }
+
+        private static Fact CreateProvenFact(
+            IEntity entity,
+            string name,
+            IDiscoveryEvidence evidence,
+            IEvidenceContributionPolicy policy,
+            string externalId)
+        {
+            var fact =
+                new Fact(
+                    entity,
+                    name,
+                    true,
+                    1,
+                    policy,
+                    externalId);
+
+            Assert.True(
+                fact.ReceiveEvidence(
+                    evidence));
+
+            Assert.True(fact.IsProven);
+
+            return fact;
+        }
+
+        private static Discovery CreateAvailableDiscovery(
+            IEntity entity,
+            string name,
+            IFact fact,
+            string externalId)
+        {
+            var discovery =
+                new Discovery(
+                    entity,
+                    1,
+                    name,
+                    externalId);
+
+            Assert.True(
+                discovery.ReceiveFact(
+                    fact));
+
+            Assert.True(discovery.IsAvailable);
+
+            return discovery;
+        }
+
+        private static CompetingKnowledge BuildCompetingKnowledge(
+            WildsDiscoveries discoveries,
+            string scope,
+            string documentSlug,
+            string historyKey,
+            string firstKey,
+            IDiscoveryVectorEvaluation firstEvaluation,
+            string secondKey,
+            IDiscoveryVectorEvaluation secondEvaluation,
+            string relationshipKey)
+        {
+            var profileId =
+                Guid.NewGuid();
+
+            var firstCentroid =
+                ComponentMap(firstEvaluation.Vector);
+
+            var secondCentroid =
+                ComponentMap(secondEvaluation.Vector);
+
+            var geometryRegistration =
+                discoveries.Geometry.Register(
+                    new DiscoveryGeometryProfile(
+                        profileId,
+                        documentSlug,
+                        "1.0",
+                        scope,
+                        new List<IDiscoveryClusterMapping>
+                        {
+                            new DiscoveryClusterMapping(
+                                Guid.NewGuid(),
+                                "first",
+                                profileId,
+                                documentSlug,
+                                "1.0",
+                                firstKey,
+                                "hypersphere",
+                                firstCentroid,
+                                0.25),
+                            new DiscoveryClusterMapping(
+                                Guid.NewGuid(),
+                                "second",
+                                profileId,
+                                documentSlug,
+                                "1.0",
+                                secondKey,
+                                "hypersphere",
+                                secondCentroid,
+                                0.25)
+                        },
+                        new MinimumClusterPersistencePolicy(
+                            "one-observation",
+                            1,
+                            0.0,
+                            0.0),
+                        new BoundaryVarianceClusterStabilityMetric(),
+                        new PersistentClusterRecognitionPolicy(
+                            "recognize-knowledge")));
+
+            var first =
+                discoveries.Geometry.Observe(
+                    firstEvaluation,
+                    firstKey,
+                    historyKey);
+
+            var second =
+                discoveries.Geometry.Observe(
+                    secondEvaluation,
+                    secondKey,
+                    historyKey);
+
+            Assert.True(first.Recognition.IsRecognized);
+            Assert.True(second.Recognition.IsRecognized);
+
+            var population =
+                discoveries.Narratives.CreatePopulation(
+                    geometryRegistration.Id,
+                    new List<IDiscoveryClusterRecognitionResult>
+                    {
+                        first.Recognition,
+                        second.Recognition
+                    });
+
+            var relationship =
+                new DiscoveryNarrativeRelationshipDefinition(
+                    Guid.NewGuid(),
+                    "competing",
+                    firstKey,
+                    secondKey,
+                    relationshipKey);
+
+            var narrativeRegistration =
+                discoveries.Narratives.Register(
+                    new DiscoveryNarrativeProfile(
+                        Guid.NewGuid(),
+                        documentSlug + "-narratives",
+                        "1.0",
+                        scope,
+                        new RelationshipKeyNarrativeCompositionPolicy(
+                            "ReinforcingKnowledge"),
+                        new RecognitionCentroidDistanceNarrativeMetric(),
+                        new List<IDiscoveryNarrativeRelationshipDefinition>
+                        {
+                            relationship
+                        }));
+
+            var composition =
+                discoveries.Narratives.Compose(
+                    population,
+                    narrativeRegistration.Id);
+
+            Assert.Equal(2, composition.Groups.Count);
+            Assert.Single(composition.Decisions);
+            Assert.False(composition.Decisions[0].CanCompose);
+
+            var narratives =
+                discoveries.Outcomes.Relate(
+                    composition);
+
+            Assert.Single(narratives.GroupRelationships);
+
+            return new CompetingKnowledge(
+                narratives);
+        }
+
+        private static Dictionary<string, double> ComponentMap(
+            IDiscoveryVectorPoint point)
+        {
+            var result =
+                new Dictionary<string, double>(
+                    StringComparer.Ordinal);
+
             for (var index = 0;
-                 index < vector.Components.Count;
+                 index < point.Components.Count;
                  index++)
             {
-                if (string.Equals(
-                        vector.Components[index].Name,
-                        dimension,
-                        StringComparison.Ordinal))
-                {
-                    return vector.Components[index].Value;
-                }
+                result.Add(
+                    point.Components[index].Name,
+                    point.Components[index].Value);
             }
 
-            throw new KeyNotFoundException(
-                "Vector component was not found: " +
-                dimension);
+            return result;
+        }
+
+        private static GroupTruthContext CreateCongealedGroupTruth(
+            string scope)
+        {
+            var discoveries =
+                new WildsDiscoveries();
+
+            var groupEntity =
+                new TestEntity(
+                    "kids-1-through-4");
+
+            var chocolateEvidence =
+                CreateValidatedEvidence(
+                    groupEntity,
+                    new Dictionary<string, object?>
+                    {
+                        ["GroupSize"] = 4,
+                        ["Flavor"] = "Chocolate"
+                    },
+                    "Kids 1-4 selected chocolate",
+                    4.0,
+                    "group-chocolate-observation",
+                    "Group chocolate observation");
+
+            var alternativeEvidence =
+                CreateValidatedEvidence(
+                    groupEntity,
+                    new Dictionary<string, object?>
+                    {
+                        ["AlternativeAvailable"] = true
+                    },
+                    "Other flavors remain available",
+                    1.0,
+                    "group-alternative-observation",
+                    "Group alternative observation");
+
+            var chocolateFact =
+                CreateProvenFact(
+                    groupEntity,
+                    "ChocolateSelectedByGroup",
+                    chocolateEvidence,
+                    new TrueEvidencePolicy(),
+                    "group-fact-chocolate");
+
+            var alternativeFact =
+                CreateProvenFact(
+                    groupEntity,
+                    "AlternativeFlavorRemainsPossible",
+                    alternativeEvidence,
+                    new TrueEvidencePolicy(),
+                    "group-fact-alternative");
+
+            var chocolateDiscovery =
+                CreateAvailableDiscovery(
+                    groupEntity,
+                    "ChocolateDominatesNearbyGroup",
+                    chocolateFact,
+                    "group-discovery-chocolate");
+
+            var alternativeDiscovery =
+                CreateAvailableDiscovery(
+                    groupEntity,
+                    "AlternativeFlavorRemainsPossible",
+                    alternativeFact,
+                    "group-discovery-alternative");
+
+            var chocolateInput =
+                new DiscoveryVectorInput(
+                    chocolateDiscovery,
+                    "group chocolate knowledge");
+
+            var alternativeInput =
+                new DiscoveryVectorInput(
+                    alternativeDiscovery,
+                    "group alternative knowledge");
+
+            var now =
+                DateTimeOffset.UtcNow;
+
+            var chocolateVector =
+                CreateVector(
+                    chocolateInput,
+                    chocolateFact,
+                    now,
+                    ("group-alternative", 0.0),
+                    ("group-chocolate", 1.0));
+
+            var alternativeVector =
+                CreateVector(
+                    alternativeInput,
+                    alternativeFact,
+                    now.AddSeconds(1),
+                    ("group-alternative", 1.0),
+                    ("group-chocolate", 0.0));
+
+            var chocolateEvaluation =
+                new DiscoveryVectorEvaluation(
+                    chocolateVector,
+                    Guid.NewGuid(),
+                    now);
+
+            var alternativeEvaluation =
+                new DiscoveryVectorEvaluation(
+                    alternativeVector,
+                    Guid.NewGuid(),
+                    now.AddSeconds(1));
+
+            var series =
+                new DiscoveryVectorEvaluationSeries(
+                    scope,
+                    new List<IDiscoveryVectorInput>
+                    {
+                        chocolateInput,
+                        alternativeInput
+                    },
+                    new List<IDiscoveryVectorEvaluation>
+                    {
+                        chocolateEvaluation,
+                        alternativeEvaluation
+                    });
+
+            var knowledge =
+                BuildCompetingKnowledge(
+                    discoveries,
+                    scope,
+                    "nearby-kids-group",
+                    "kids-1-through-4",
+                    "ChocolateDominatesNearbyGroup",
+                    chocolateEvaluation,
+                    "AlternativeFlavorRemainsPossible",
+                    alternativeEvaluation,
+                    "CompetingGroupKnowledge");
+
+            var clusters =
+                new List<IDiscoveryCluster>
+                {
+                    new ReadableCluster(
+                        new List<IDiscoveryVector>
+                        {
+                            chocolateVector
+                        }),
+                    new ReadableCluster(
+                        new List<IDiscoveryVector>
+                        {
+                            alternativeVector
+                        })
+                };
+
+            var policy =
+                new TextTruthPolicy(
+                    "nearby-kids-group-truth-policy",
+                    "ChocolateIsDominantInNearbyGroup",
+                    "Chocolate is dominant among Kids 1-4.");
+
+            var registration =
+                discoveries.Outcomes.Truths.Register(
+                    new DiscoveryTruthProfile(
+                        Guid.NewGuid(),
+                        "nearby-kids-group-truth",
+                        "1.0",
+                        scope,
+                        policy));
+
+            var result =
+                discoveries.Outcomes.Truths.Congeal(
+                    knowledge.Narratives,
+                    registration.Id,
+                    series,
+                    clusters);
+
+            return new GroupTruthContext(
+                groupEntity,
+                knowledge.Narratives,
+                series,
+                clusters,
+                policy,
+                result);
+        }
+
+        private static DiscoveryVector CreateVector(
+            IDiscoveryVectorInput input,
+            IFact fact,
+            DateTimeOffset at,
+            params (string Dimension, double Value)[] values)
+        {
+            var components =
+                new List<IDiscoveryVectorComponent>();
+
+            var contributions =
+                new List<IDiscoveryVectorContribution>();
+
+            for (var index = 0;
+                 index < values.Length;
+                 index++)
+            {
+                components.Add(
+                    new DiscoveryVectorComponent(
+                        values[index].Dimension,
+                        values[index].Value));
+
+                contributions.Add(
+                    new DiscoveryVectorContribution(
+                        input,
+                        values[index].Dimension,
+                        values[index].Value,
+                        1.0,
+                        fact));
+            }
+
+            return new DiscoveryVector(
+                components,
+                contributions,
+                new List<IDiscoveryVectorMotion>(),
+                new AbsoluteMagnitudeMetric(),
+                at);
+        }
+
+        private sealed class CompetingKnowledge
+        {
+            public CompetingKnowledge(
+                IDiscoveryCompetingNarrativesResult narratives)
+            {
+                Narratives =
+                    narratives;
+            }
+
+            public IDiscoveryCompetingNarrativesResult Narratives { get; }
+        }
+
+        private sealed class GroupTruthContext
+        {
+            public GroupTruthContext(
+                IEntity groupEntity,
+                IDiscoveryCompetingNarrativesResult narratives,
+                IDiscoveryVectorSeries series,
+                IReadOnlyList<IDiscoveryCluster> clusters,
+                TextTruthPolicy policy,
+                IDiscoveryTruthCongealmentResult truthResult)
+            {
+                GroupEntity = groupEntity;
+                Narratives = narratives;
+                Series = series;
+                Clusters = clusters;
+                Policy = policy;
+                TruthResult = truthResult;
+            }
+
+            public IEntity GroupEntity { get; }
+            public IDiscoveryCompetingNarrativesResult Narratives { get; }
+            public IDiscoveryVectorSeries Series { get; }
+            public IReadOnlyList<IDiscoveryCluster> Clusters { get; }
+            public TextTruthPolicy Policy { get; }
+            public IDiscoveryTruthCongealmentResult TruthResult { get; }
+        }
+
+        private sealed class GroupTruthPeerPressurePolicy :
+            IEvidenceContributionPolicy
+        {
+            private readonly int _minimumGroupSize;
+
+            public GroupTruthPeerPressurePolicy(
+                int minimumGroupSize)
+            {
+                if (minimumGroupSize < 1)
+                    throw new ArgumentOutOfRangeException(
+                        nameof(minimumGroupSize));
+
+                _minimumGroupSize = minimumGroupSize;
+            }
+
+            public bool Contributes(
+                IDiscoveryEvidence evidence)
+            {
+                if (evidence == null)
+                    throw new ArgumentNullException(
+                        nameof(evidence));
+
+                if (!evidence.IsValidated ||
+                    !(evidence.Outcome is ITruth) ||
+                    !evidence.Conditions.TryGetValue(
+                        "ObservedGroupSize",
+                        out var sizeValue) ||
+                    !(sizeValue is int size))
+                {
+                    return false;
+                }
+
+                return size >= _minimumGroupSize;
+            }
+        }
+
+        private sealed class RejectGroupTruthPolicy :
+            IEvidenceContributionPolicy
+        {
+            public bool Contributes(
+                IDiscoveryEvidence evidence)
+            {
+                if (evidence == null)
+                    throw new ArgumentNullException(
+                        nameof(evidence));
+
+                return false;
+            }
         }
 
         private sealed class IceCreamVectorizationService :
@@ -907,59 +1084,43 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 var discovery =
                     request.Input.Discovery;
 
-                if (string.Equals(
+                var social =
+                    string.Equals(
                         discovery.Name,
                         "ChocolateIsSociallyDominant",
-                        StringComparison.Ordinal))
-                {
-                    return Task.FromResult(
-                        new DiscoveryVectorizationServiceResult(
-                            new List<IDiscoveryVectorContribution>
-                            {
-                                new DiscoveryVectorContribution(
-                                    request.Input,
-                                    "social-chocolate",
-                                    1.0,
-                                    1.0,
-                                    discovery.Facts[0]),
+                        StringComparison.Ordinal)
+                        ? 1.0
+                        : 0.0;
 
-                                new DiscoveryVectorContribution(
-                                    request.Input,
-                                    "personal-vanilla",
-                                    0.0,
-                                    1.0,
-                                    discovery.Facts[0])
-                            }));
-                }
-
-                if (string.Equals(
+                var personal =
+                    string.Equals(
                         discovery.Name,
                         "VanillaRemainsPersonallyPreferred",
-                        StringComparison.Ordinal))
-                {
-                    return Task.FromResult(
-                        new DiscoveryVectorizationServiceResult(
-                            new List<IDiscoveryVectorContribution>
-                            {
-                                new DiscoveryVectorContribution(
-                                    request.Input,
-                                    "social-chocolate",
-                                    0.0,
-                                    1.0,
-                                    discovery.Facts[0]),
+                        StringComparison.Ordinal)
+                        ? 1.0
+                        : 0.0;
 
-                                new DiscoveryVectorContribution(
-                                    request.Input,
-                                    "personal-vanilla",
-                                    1.0,
-                                    1.0,
-                                    discovery.Facts[0])
-                            }));
-                }
+                if (social == 0.0 && personal == 0.0)
+                    throw new InvalidOperationException(
+                        "Unknown ice-cream Discovery.");
 
-                throw new InvalidOperationException(
-                    "The consumer vectorization service does not " +
-                    "recognize this Discovery.");
+                return Task.FromResult(
+                    new DiscoveryVectorizationServiceResult(
+                        new List<IDiscoveryVectorContribution>
+                        {
+                            new DiscoveryVectorContribution(
+                                request.Input,
+                                "social-chocolate",
+                                social,
+                                1.0,
+                                discovery.Facts[0]),
+                            new DiscoveryVectorContribution(
+                                request.Input,
+                                "personal-vanilla",
+                                personal,
+                                1.0,
+                                discovery.Facts[0])
+                        }));
             }
         }
 
@@ -969,16 +1130,14 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             public double GetMagnitude(
                 IDiscoveryVectorPoint point)
             {
-                var total =
-                    0.0;
+                var total = 0.0;
 
                 for (var index = 0;
                      index < point.Components.Count;
                      index++)
                 {
-                    total +=
-                        Math.Abs(
-                            point.Components[index].Value);
+                    total += Math.Abs(
+                        point.Components[index].Value);
                 }
 
                 return total;
@@ -992,111 +1151,65 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 IReadOnlyList<IDiscoveryVector> members)
             {
                 if (members == null)
-                {
                     throw new ArgumentNullException(
                         nameof(members));
-                }
 
                 if (members.Count == 0)
-                {
                     throw new ArgumentException(
-                        "A readable cluster requires at least one member.",
+                        "A readable cluster requires a member.",
                         nameof(members));
-                }
 
-                Members =
-                    members;
-
-                Centroid =
-                    members[0];
-
-                Density =
-                    1.0;
-
-                Dispersion =
-                    0.0;
-
-                Coherence =
-                    1.0;
+                Members = members;
+                Centroid = members[0];
+                Density = 1.0;
+                Dispersion = 0.0;
+                Coherence = 1.0;
             }
 
-            public IReadOnlyList<IDiscoveryVector>
-                Members { get; }
-
-            public IDiscoveryVectorPoint
-                Centroid { get; }
-
+            public IReadOnlyList<IDiscoveryVector> Members { get; }
+            public IDiscoveryVectorPoint Centroid { get; }
             public double Density { get; }
-
             public double Dispersion { get; }
-
             public double Coherence { get; }
         }
 
-        private sealed class KidFiveTruthPolicy :
+        private sealed class TextTruthPolicy :
             IIdentifiedTruthCongealmentPolicy
         {
-            public KidFiveTruthPolicy()
+            private readonly string _truthName;
+            private readonly string _truthValue;
+
+            public TextTruthPolicy(
+                string slug,
+                string truthName,
+                string truthValue)
             {
-                Id =
-                    Guid.NewGuid();
+                Id = Guid.NewGuid();
+                Slug = slug;
+                _truthName = truthName;
+                _truthValue = truthValue;
             }
 
             public Guid Id { get; }
-
-            public string Slug =>
-                "kid-five-truth-policy";
-
-            public bool CanCongealCalled
-            {
-                get;
-                private set;
-            }
-
-            public bool CongealCalled
-            {
-                get;
-                private set;
-            }
-
-            public IDiscoveryCompetingNarrativesResult?
-                Narratives { get; private set; }
-
-            public IReadOnlyList<IDiscoveryCluster>?
-                Clusters { get; private set; }
-
-            public IDiscoveryVectorSeries?
-                Series { get; private set; }
+            public string Slug { get; }
+            public bool CanCongealCalled { get; private set; }
+            public bool CongealCalled { get; private set; }
+            public IDiscoveryCompetingNarrativesResult? Narratives { get; private set; }
+            public IReadOnlyList<IDiscoveryCluster>? Clusters { get; private set; }
+            public IDiscoveryVectorSeries? Series { get; private set; }
 
             public bool CanCongeal(
                 IDiscoveryCompetingNarrativesResult narratives,
                 IReadOnlyList<IDiscoveryCluster> clusters,
                 IDiscoveryVectorSeries series)
             {
-                CanCongealCalled =
-                    true;
+                CanCongealCalled = true;
+                Narratives = narratives;
+                Clusters = clusters;
+                Series = series;
 
-                Narratives =
-                    narratives;
-
-                Clusters =
-                    clusters;
-
-                Series =
-                    series;
-
-                // Consumer-owned interpretation:
-                //
-                // Truth may congeal when the two recognized knowledge
-                // structures remain separate and the outcome surface
-                // retains one cross-group competing relationship.
-                return
-                    narratives.Composition.Groups.Count == 2 &&
-                    narratives.GroupRelationships.Count == 1 &&
-                    narratives
-                        .GroupRelationships[0]
-                        .Definitions
-                        .Count == 1;
+                return narratives.Composition.Groups.Count == 2 &&
+                    narratives.GroupRelationships.Count == 1;
             }
 
             public ITruth Congeal(
@@ -1104,17 +1217,10 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                 IReadOnlyList<IDiscoveryCluster> clusters,
                 IDiscoveryVectorSeries series)
             {
-                CongealCalled =
-                    true;
-
-                Narratives =
-                    narratives;
-
-                Clusters =
-                    clusters;
-
-                Series =
-                    series;
+                CongealCalled = true;
+                Narratives = narratives;
+                Clusters = clusters;
+                Series = series;
 
                 var discoveries =
                     new List<IDiscovery>();
@@ -1127,82 +1233,47 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
                         series.Inputs[index].Discovery);
                 }
 
-                return new KidFiveTruth(
+                return new TextTruth(
+                    _truthName,
+                    _truthValue,
                     series,
                     clusters,
                     discoveries);
             }
         }
 
-        private sealed class KidFiveTruth :
+        private sealed class TextTruth :
             ITruth
         {
-            public KidFiveTruth(
+            public TextTruth(
+                string name,
+                string value,
                 IDiscoveryVectorSeries series,
                 IReadOnlyList<IDiscoveryCluster> clusters,
                 IReadOnlyList<IDiscovery> discoveries)
             {
-                Id =
-                    Guid.NewGuid();
-
-                Slug =
-                    "kid-five-social-and-personal-truth";
-
-                Name =
-                    "KidFiveUnderstandsSocialAndPersonalPreference";
-
-                Value =
-                    "Chocolate is socially dominant while " +
-                    "Kid 5 still personally prefers vanilla.";
-
-                Series =
-                    series ??
-                    throw new ArgumentNullException(
-                        nameof(series));
-
-                Clusters =
-                    clusters ??
-                    throw new ArgumentNullException(
-                        nameof(clusters));
-
-                Discoveries =
-                    discoveries ??
-                    throw new ArgumentNullException(
-                        nameof(discoveries));
-
-                Stability =
-                    1.0;
-
-                Confidence =
-                    1.0;
-
-                CongealedAt =
-                    DateTimeOffset.UtcNow;
+                Id = Guid.NewGuid();
+                Slug = name.ToLowerInvariant();
+                Name = name;
+                Value = value;
+                Series = series;
+                Clusters = clusters;
+                Discoveries = discoveries;
+                Stability = 1.0;
+                Confidence = 1.0;
+                CongealedAt = DateTimeOffset.UtcNow;
             }
 
             public Guid Id { get; }
-
             public string Slug { get; }
-
             public string Name { get; }
-
             public object? Value { get; }
-
-            public IDiscoveryVectorSeries
-                Series { get; }
-
-            public IReadOnlyList<IDiscoveryCluster>
-                Clusters { get; }
-
-            public IReadOnlyList<IDiscovery>
-                Discoveries { get; }
-
+            public IDiscoveryVectorSeries Series { get; }
+            public IReadOnlyList<IDiscoveryCluster> Clusters { get; }
+            public IReadOnlyList<IDiscovery> Discoveries { get; }
             public double Stability { get; }
-
             public double Confidence { get; }
-
-            public DateTimeOffset
-                CongealedAt { get; }
+            public DateTimeOffset CongealedAt { get; }
         }
 
         private sealed class KidFiveConsequencePolicy :
@@ -1210,37 +1281,20 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
         {
             public KidFiveConsequencePolicy()
             {
-                Id =
-                    Guid.NewGuid();
+                Id = Guid.NewGuid();
             }
 
             public Guid Id { get; }
-
-            public string Slug =>
-                "kid-five-consequence-policy";
-
-            public bool ProjectCalled
-            {
-                get;
-                private set;
-            }
+            public string Slug => "kid-five-consequence-policy";
+            public bool ProjectCalled { get; private set; }
 
             public IReadOnlyList<IConsequence> Project(
                 IReadOnlyList<ITruth> truths)
             {
-                ProjectCalled =
-                    true;
-
-                if (truths == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(truths));
-                }
+                ProjectCalled = true;
 
                 if (truths.Count == 0)
-                {
                     return new List<IConsequence>();
-                }
 
                 return new List<IConsequence>
                 {
@@ -1256,54 +1310,26 @@ namespace WildsEngine.Core.Tests.Entities.Certifications
             public KidFiveConsequence(
                 ITruth truth)
             {
-                Id =
-                    Guid.NewGuid();
-
-                Slug =
-                    "kid-five-may-choose-vanilla";
-
-                Name =
-                    "KidFiveMayChooseVanilla";
-
+                Id = Guid.NewGuid();
+                Slug = "kid-five-may-choose-vanilla";
+                Name = "KidFiveMayChooseVanilla";
                 Value =
                     "Kid 5 may choose vanilla despite surrounding " +
                     "chocolate preference.";
-
-                Truths =
-                    new List<ITruth>
-                    {
-                        truth ??
-                        throw new ArgumentNullException(
-                            nameof(truth))
-                    };
-
-                Magnitude =
-                    1.0;
-
-                Confidence =
-                    1.0;
-
-                ProjectedAt =
-                    DateTimeOffset.UtcNow;
+                Truths = new List<ITruth> { truth };
+                Magnitude = 1.0;
+                Confidence = 1.0;
+                ProjectedAt = DateTimeOffset.UtcNow;
             }
 
             public Guid Id { get; }
-
             public string Slug { get; }
-
             public string Name { get; }
-
             public object? Value { get; }
-
-            public IReadOnlyList<ITruth>
-                Truths { get; }
-
+            public IReadOnlyList<ITruth> Truths { get; }
             public double Magnitude { get; }
-
             public double Confidence { get; }
-
-            public DateTimeOffset
-                ProjectedAt { get; }
+            public DateTimeOffset ProjectedAt { get; }
         }
     }
 }
