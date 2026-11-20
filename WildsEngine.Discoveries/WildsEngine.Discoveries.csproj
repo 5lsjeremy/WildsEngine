@@ -1,17 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
 
-    <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+    <AssemblyName>WildsEngine.Discoveries</AssemblyName>
+    <RootNamespace>WildsEngine.Discoveries</RootNamespace>
 
-    <ItemGroup>
-        <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
-    </ItemGroup>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
 
-    <ItemGroup>
-      <Folder Include="Abstractions\Audits\Reports\" />
-      <Folder Include="Audits\Reports\" />
-    </ItemGroup>
+    <PackageId>WildsEngine.Discoveries</PackageId>
+    <Title>Wilds Engine Discoveries</Title>
+    <Description>Attributable knowledge and emergent-narrative infrastructure from Evidence and Facts through Discoveries, knowledge geometry, scoped Truths, and Consequence projection.</Description>
+    <Authors>TethraSolutions, LLC</Authors>
+    <Company>TethraSolutions, LLC</Company>
+    <Copyright>Copyright Â© TethraSolutions, LLC. All rights reserved.</Copyright>
 
+    <RepositoryUrl>https://github.com/5lsjeremy/WildsEngine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+
+    <Deterministic>true</Deterministic>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WildsEngine.Core\WildsEngine.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Abstractions\Audits\Reports\" />
+    <Folder Include="Audits\Reports\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md"
+          Pack="true"
+          PackagePath="" />
+  </ItemGroup>
 </Project>
+
+

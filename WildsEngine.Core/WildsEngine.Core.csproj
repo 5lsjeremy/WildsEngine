@@ -1,11 +1,44 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
+
+    <AssemblyName>WildsEngine.Core</AssemblyName>
+    <RootNamespace>WildsEngine.Core</RootNamespace>
+
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+
+    <PackageId>WildsEngine.Core</PackageId>
+    <Title>Wilds Engine Core</Title>
+    <Description>Domain-neutral simulation infrastructure for coordinated work, temporal history, topology, relationships, emissions, propagation, and consumer-owned runtime participation.</Description>
+    <Authors>TethraSolutions, LLC</Authors>
+    <Company>TethraSolutions, LLC</Company>
+    <Copyright>Copyright Â© TethraSolutions, LLC. All rights reserved.</Copyright>
+
+    <RepositoryUrl>https://github.com/5lsjeremy/WildsEngine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+
+    <Deterministic>true</Deterministic>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="Abstractions\Operators\" />
     <Folder Include="Pools\" />
     <Folder Include="Work\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md"
+          Pack="true"
+          PackagePath="" />
+  </ItemGroup>
 </Project>
+
+
