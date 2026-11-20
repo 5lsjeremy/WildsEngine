@@ -2,7 +2,7 @@
 
 The Wilds product family is a modular architecture for stateful processing, dynamic simulation, knowledge development, emergent narrative, and agent-ready systems without requiring the underlying platform to understand the consumer's domain.
 
-The product family is intentionally built around **independent stopping points**. A customer can adopt one foundation, combine multiple layers, or use the flagship integrated stack while retaining its existing planner or behavior technology.
+The family is intentionally built around useful technical stopping points. A customer can adopt the processing runtime, use simulation infrastructure with its own systems, add knowledge development, or use the flagship integrated stack while retaining its existing planner or behavior technology.
 
 Two principles remain constant:
 
@@ -10,9 +10,7 @@ Two principles remain constant:
 
 **Information existing in the world does not automatically become knowledge available to an entity.**
 
-The current product roadmap is now explicitly locked. It ends at **Consequence projection**. Planning, behavior selection, persistent agency, and action systems are downstream integrations rather than requirements for completing the flagship stack.
-
----
+The current product roadmap is explicitly locked. It ends at **Consequence projection**. Planning, behavior selection, persistent agency, and action systems are downstream integrations rather than requirements for completing the flagship stack.
 
 ## QSL — Stateful Processing
 
@@ -21,7 +19,6 @@ QSL is a standalone stateful, domain-neutral processing runtime designed to oper
 Consumer objects can be bound directly into QSL processing. Native properties become available to the runtime, while additional runtime vocabulary can be introduced through explicit state attachment.
 
 The processing boundary is straightforward:
-
 - **Native state is available.**
 - **Explicitly attached state is available.**
 - **Everything else remains unresolved.**
@@ -30,9 +27,7 @@ QSL may read, evaluate, compare, calculate against, compose, and mutate authoriz
 
 **QSL does not define the world. It provides a controlled processing environment through which consumers can expose, evaluate, and change their own world.**
 
-A customer can use QSL and stop there.
-
----
+QSL remains usable as a standalone product. It also serves as the stateful processing enhancement included with Wilds product offerings, giving the product family a common programmable processing layer without making QSL dependent on consumer-domain meaning.
 
 ## Wilds Core — Simulation Infrastructure
 
@@ -44,11 +39,9 @@ Core does not require consumer information to be stripped of domain meaning. It 
 
 **The consumer defines the world. Wilds Core provides machinery through which that world can operate.**
 
-Core is also treated as established canon during current Discoveries development. Discoveries may integrate with Core, but Core is not redesigned for Discoveries convenience without a separate architectural discussion and decision.
+Core is treated as established canon during current Discoveries development. Discoveries may integrate with Core, but Core is not redesigned for Discoveries convenience without a separate architectural discussion and decision.
 
-A customer can use Core beneath its own scripting, knowledge, and AI stack and stop there.
-
----
+A customer can use Core beneath its own knowledge and agency systems and stop there. Wilds product offerings include QSL as the common stateful processing enhancement.
 
 ## Wilds.Discoveries — Knowledge and Emergent Narrative
 
@@ -56,27 +49,29 @@ Wilds.Discoveries is a standalone knowledge-processing product for turning legit
 
 Although Core is currently a dependency, that dependency does not define the Discoveries ontology. The intrinsic knowledge model is designed to remain separable so the dependency can be reduced or broken in the future without redefining what Discoveries is.
 
-The target knowledge progression is:
+The canonical knowledge progression is:
 
 **Consumer Reality → Evidence → Proof → Facts → Discoveries → Knowledge Geometry / Momentum → Clusters → Scoped Truths → Consequences**
 
+Authorization and observation may define how Evidence is admitted. They are not additional canonical knowledge stages.
+
 ### From facts to developing knowledge
 
-Facts accumulate validated Evidence, but different entities do not have to reach the same conclusion from the same information. **Consumers define resolution policies that use legitimately available knowledge together with the entity's own native properties to bias how that information resolves.**
+Facts accumulate validated Evidence, but different entities do not have to reach the same conclusion from the same information. Consumers define resolution policies that use legitimately available knowledge together with the entity's own native properties to bias how that information resolves.
 
-Discoveries does not need to understand what traits such as caution, trust, experience, stubbornness, curiosity, or any other consumer\-defined property mean. It only needs to expose those authorized values to the policies the consumer supplied. The policy owns the interpretation.
+Discoveries does not need to understand what traits such as caution, trust, experience, stubbornness, curiosity, or any other consumer-defined property mean. It only needs to expose those authorized values to the policies the consumer supplied. The policy owns the interpretation.
 
 That means identical Evidence can legitimately develop differently for different entities. One may resolve a Discovery quickly, another may remain uncertain, and another may trend toward a competing conclusion. The Evidence and Facts remain attributable throughout that process rather than being rewritten to justify the eventual result.
 
-An unresolved Discovery can also remain useful. Consumer\-defined vector dimensions can represent how its contributing knowledge is developing over time. Successive immutable evaluations can expose direction, velocity, acceleration, convergence, divergence, reversal, and other curve\-driven behavior without falsely claiming resolution.
+An unresolved Discovery can also remain useful. Consumer-defined vector dimensions can represent how its contributing knowledge is developing over time. Successive immutable evaluations can expose direction, velocity, acceleration, convergence, divergence, reversal, and other curve-driven behavior without falsely claiming resolution.
 
 **Resolution tells us how the entity currently resolves what it knows. Geometry and momentum tell us where that knowledge is heading.**
 
 ### From geometry to competing narratives
 
-Vectors can form recognizable geometric structures. Clustering allows Discoveries to preserve tight consensus where it really exists while also retaining divergent or opposing structures where evidence supports more than one narrative.
+Vectors can form recognizable geometric structures. Clustering allows Discoveries to preserve tight consensus where it really exists while also retaining divergent or opposing structures where Evidence supports more than one narrative.
 
-The system does not need to manufacture an average simply because several entities disagree.
+The system does not manufacture an average merely because several entities disagree.
 
 ### Truth as congealed composition
 
@@ -90,17 +85,23 @@ That distinction allows true and false narratives to emerge honestly. A populati
 
 This makes Discoveries useful not only for knowledge accumulation but for emergent narrative, rumor, competing interpretation, revision, and consequence-aware agent context without requiring the runtime to understand the domain itself.
 
+### Knowledge transfer and social influence
+
+Knowledge remains local until it is explicitly transferred.
+
+A scoped Truth developed by one entity, subject, or population does not automatically overwrite another entity's knowledge. A consumer may explicitly admit that Truth as new Evidence belonging to another entity. The source Truth remains attributable, while the receiving entity's own contribution and resolution policies determine what effect, if any, that Evidence has.
+
+That means group consensus can create social influence without becoming an automatic majority rule. One entity may treat the group Truth as strong Evidence, another may reject its contribution, and both outcomes remain attributable to consumer-owned policy.
+
 ### Consequence as the stopping boundary
 
 Consequences describe what available knowledge says may happen next under consumer-provided relationships and policies.
 
-Discoveries does not secretly know that a stove burns, soup poisons, electricity hurts, or any other consumer noun implies a particular outcome. Those relationships must be supplied, observed, learned, or authorized by the consumer.
+Discoveries does not secretly know that a stove burns, soup poisons, electricity hurts, or any other consumer noun implies a particular outcome. Those relationships must be supplied, observed, learned, or otherwise authorized by the consumer.
 
 **Discoveries stops at what the entity has grounds to expect may happen. It does not decide what the entity should do.**
 
-A customer can use Discoveries with its own planner, behavior tree, utility system, LLM agent, or proprietary AI stack.
-
----
+A customer can connect Discoveries output to its own planner, behavior tree, utility system, LLM agent, or proprietary AI stack.
 
 ## Wilds + QSL — Programmable Simulation
 
@@ -112,14 +113,11 @@ Together they allow consumers to expose, process, and change their own world whi
 
 A customer can use this combination and provide its own knowledge and agency systems.
 
----
-
 ## Wilds + QSL + Discoveries — Flagship Integrated Stack
 
 This is the locked flagship product boundary.
 
 The flagship combines:
-
 - domain-neutral simulation;
 - controlled stateful processing;
 - Evidence, Proof, and Fact development;
@@ -127,11 +125,11 @@ The flagship combines:
 - knowledge geometry and momentum;
 - competing geometric narratives;
 - scoped Truth congealment;
+- explicit knowledge transfer and social influence;
 - Consequence projection;
 - exact provenance across those transitions.
 
 The flagship output can tell a downstream agent:
-
 - what state is legitimately available;
 - what knowledge has been developed;
 - what remains unresolved;
@@ -142,14 +140,11 @@ The flagship output can tell a downstream agent:
 
 **That is the completion boundary. Agency begins after it.**
 
----
-
 ## Agency and Behavior Integrations
 
 Agency is intentionally pluggable and downstream of the flagship stack.
 
 Consumers may connect Wilds outputs to:
-
 - behavior trees;
 - GOAP planners;
 - utility AI;
@@ -163,62 +158,63 @@ A Wilds-native behavior system may be explored in the future, but it is **not re
 
 This protects both product scope and customer choice. Wilds provides sophisticated simulation and knowledge context without requiring customers to discard the decision technology they already trust.
 
----
-
 ## Add-ons and Integrations — Specialization
 
-Specialized capabilities can be delivered as add-ons, adapters, tools, engine integrations, consumer-specific policies, debugging/visualization tools, or domain-aware modules.
+Specialized capabilities can be delivered as add-ons, adapters, tools, engine integrations, consumer-specific policies, debugging and visualization tools, or domain-aware modules.
 
 Add-ons are allowed to understand domains. Generic Wilds machinery is not.
 
 **Specialized systems may depend upon generic Wilds machinery. Generic Wilds machinery must not silently become dependent upon their specialized meaning.**
 
----
+## Authoring Without Semantic Loss
 
-# Locked Product Tree
+The Wilds product family should make mechanical authoring easier without hiding consumer meaning.
 
-## 1. QSL
+Generated identities, safe defaults, and deterministic helpers may remove repetitive setup where the platform can do so without ambiguity. Consumer policies, semantic keys, scopes, relationships, knowledge-history identity, and other meaning-bearing configuration remain explicit where they define interpretation or provenance.
+
+**The goal is to remove paperwork, not take semantic authority away from the consumer.**
+
+## Locked Product Tree
+
+### 1. QSL
 
 **Stateful Processing**
 
-Standalone controlled execution over consumer-owned objects and explicitly supplied runtime state.
+Standalone controlled execution over consumer-owned objects and explicitly supplied runtime state. Also included as the processing enhancement for Wilds product offerings.
 
-## 2. Wilds Core
+### 2. Wilds Core
 
 **Simulation Infrastructure**
 
-Standalone generic infrastructure for temporal processing, coordination, topology, propagation, emissions, and simulation mechanics.
+Standalone generic infrastructure for temporal processing, coordination, topology, propagation, emissions, and simulation mechanics. Wilds offerings include QSL for stateful programmable processing.
 
-## 3. Wilds.Discoveries
+### 3. Wilds.Discoveries
 
 **Knowledge and Emergent Narrative**
 
-Standalone epistemic processing from Evidence through Discoveries, knowledge geometry, competing narratives, scoped Truths, and Consequences.
+Standalone epistemic processing from Evidence through Discoveries, knowledge geometry, competing narratives, scoped Truths, and Consequences. Wilds offerings include QSL while Discoveries retains its own knowledge boundary.
 
-## 4. Wilds + QSL
+### 4. Wilds + QSL
 
 **Programmable Simulation**
 
 The simulation substrate plus stateful execution.
 
-## 5. Wilds + QSL + Discoveries
+### 5. Wilds + QSL + Discoveries
 
 **Flagship Integrated Stack**
 
 Simulation + stateful processing + evolving knowledge + emergent narrative + scoped Truth + Consequence projection.
 
-## Downstream ecosystem
+### Downstream ecosystem
 
 **Agency and specialization**
 
 Behavior systems, planners, LLM agents, engine integrations, and domain-specific add-ons consume the flagship output but are not required product layers.
 
----
-
-# Explicit Out-of-Scope Rules
+## Explicit Out-of-Scope Rules
 
 The following do **not** belong to the required completion scope of the current flagship roadmap:
-
 - building a Wilds-native behavior tree;
 - building a GOAP planner;
 - building a utility-AI framework;
@@ -240,9 +236,7 @@ Those capabilities may exist in consumer applications, optional integrations, ad
 
 **No required product layer is added beyond Consequence projection without an explicit future scope decision.**
 
----
-
-# Semantic and Epistemic Custody
+## Semantic and Epistemic Custody
 
 The architecture uses three questions to protect its boundaries:
 
@@ -252,44 +246,44 @@ The architecture uses three questions to protect its boundaries:
 
 **Does this capability belong inside the locked product scope?**
 
-The architecture is operating as intended when meaning originates from identifiable consumer state, observation, Evidence, policy, or another authorized source; entity knowledge develops through legitimate epistemic transitions; and new capabilities respect the locked stopping boundary.
+The architecture is operating as intended when meaning originates from identifiable consumer state, Evidence, policy, or another authorized source; entity knowledge develops through legitimate epistemic transitions; and new capabilities respect the locked stopping boundary.
 
 The architecture has failed when the effective answer becomes:
-
 - **“Wilds just knew.”**
 - **“The entity knew because the world knew.”**
 - **“A scoped Truth became reality because the system said so.”**
 - **“We added another required product layer because it would be interesting.”**
 
----
-
 ## Results Are Attributable, Not Opaque
 
 Wilds must not produce knowledge as an unexplained black-box conclusion.
 
-Every meaningful epistemic result must remain attributable through the authorized information, consumer-supplied state, Evidence, Proof, Facts, Discoveries, policies, geometric development, clusters, scoped Truths, and other legitimate inputs that produced it.
+Every meaningful epistemic result must remain attributable through Consumer Reality, Evidence, Proof, Facts, Discoveries, consumer policies, geometric development, clusters, scoped Truths, and other legitimate inputs that produced it.
 
 Where consumers supply typed objects, state, vocabulary, and domain-aware policies, that information remains consumer-owned and attributable through processing. Wilds may process those values without collapsing them into hidden platform semantics.
 
 Provenance is therefore not merely diagnostic history. It is part of the usable structure of developed knowledge.
 
-Consumers must be able to retain the identity and provenance necessary to understand how an available result was produced, subject to legitimate knowledge boundaries and the capabilities of the result contract. An entity may only receive information it is entitled to know, but Wilds must not hide the attributable path behind knowledge it legitimately provides.
+Consumers must be able to retain the identity and provenance necessary to understand how an available result was produced, subject to legitimate knowledge boundaries and the capabilities of the result contract.
 
-This requirement continues through knowledge geometry, clustering, scoped Truth formation, and Consequence projection. A higher-order result does not erase the attributable structures that produced it.
+This requirement continues through knowledge geometry, clustering, scoped Truth formation, explicit knowledge transfer, and Consequence projection. A higher-order result does not erase the attributable structures that produced it.
 
 **Wilds may develop an answer. Wilds must not hide where that answer came from.**
 
 ### Provenance Chain
 
-Consumer Reality → Authorized State / Observation → Evidence → Proof → Facts → Discoveries → Knowledge Geometry / Momentum → Clusters → Scoped Truths → Consequences
+**Consumer Reality → Evidence → Proof → Facts → Discoveries → Knowledge Geometry / Momentum → Clusters → Scoped Truths → Consequences**
+
+Authorization and observation describe how Evidence may be admitted; they are not additional canonical knowledge stages.
 
 At every transition: **preserve identity • preserve provenance • preserve consumer ownership • preserve legitimate knowledge boundaries**.
 
-# One Architecture, Five Product Offers
+## One Architecture, Five Product Offers
 
 - **QSL processes state.**
 - **Wilds Core processes simulation.**
 - **Wilds.Discoveries develops knowledge, narratives, scoped Truths, and Consequences.**
+- **QSL enhances Wilds product offerings while remaining independently usable.**
 - **Wilds + QSL provides programmable simulation.**
 - **Wilds + QSL + Discoveries is the flagship integrated stack.**
 - **External agency decides what to do next.**

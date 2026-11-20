@@ -1,21 +1,13 @@
-using System;
-using System.Collections.Generic;
 using WildsEngine.Core.Tests.Entities.Fixtures;
 using WildsEngine.Discoveries.Abstractions;
-using WildsEngine.Discoveries.Abstractions.Clusters;
 using WildsEngine.Discoveries.Abstractions.Consequences;
 using WildsEngine.Discoveries.Abstractions.Narratives;
 using WildsEngine.Discoveries.Consequences;
 using WildsEngine.Discoveries.Narratives;
 using WildsEngine.Discoveries.Policies;
 using WildsEngine.Discoveries.Surface;
-using WildsEngine.Discoveries.Abstractions;
-using WildsEngine.Discoveries.Abstractions.Clusters;
-using WildsEngine.Discoveries.Abstractions.Consequences;
-using WildsEngine.Discoveries.Abstractions.Narratives;
 using WildsEngine.Discoveries.Abstractions.Truths;
 using WildsEngine.Discoveries.Truths;
-using Xunit;
 
 namespace WildsEngine.Core.Tests.Entities.Certifications
 {

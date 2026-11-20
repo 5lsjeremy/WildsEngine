@@ -2,13 +2,13 @@
 
 ## Purpose
 
-Wilds is designed to provide **domain-agnostic processing of consumer-owned worlds**. The platform may process domain-specific objects, vocabulary, state, evidence, facts, discoveries, knowledge geometry, scoped Truths, Consequences, and consumer policies without itself acquiring the meaning of those things.
+Wilds is designed to provide **domain-agnostic processing of consumer-owned worlds**. The platform may process domain-specific objects, vocabulary, state, Evidence, Facts, Discoveries, knowledge geometry, scoped Truths, Consequences, and consumer policies without itself acquiring the meaning of those things.
 
 **Consumer meaning may pass through Wilds. It must never become hidden Wilds meaning.**
 
 The consumer is expected to understand its domain. QSL, Wilds Core, and Wilds.Discoveries process that domain while preserving semantic and epistemic custody.
 
-This document also locks the current product scope. The flagship roadmap ends at **Consequence projection**. Agency, behavior selection, planning, and action systems are downstream integrations rather than requirements for completion of the flagship stack.
+The current product scope is locked. The flagship roadmap ends at **Consequence projection**. Agency, behavior selection, planning, and action systems are downstream integrations rather than requirements for completion of the flagship stack.
 
 ## 1. The Consumer Owns Meaning
 
@@ -23,13 +23,14 @@ QSL is a standalone stateful, domain-neutral processing runtime over consumer-ow
 The language expresses operations. The runtime establishes the state against which those operations may legally execute. QSL may read, evaluate, compare, compose, calculate against, and mutate authorized consumer state without requiring QSL to understand the semantic meaning of that state.
 
 A property becomes available because it is:
-
 - native to a bound consumer object; or
 - explicitly introduced through runtime state attachment.
 
 A property that is neither native nor explicitly attached remains unresolved.
 
 **Availability is explicit. Availability is not semantic truth.**
+
+QSL is also the processing enhancement included with Wilds product offerings. That packaging relationship does not erase QSL's standalone product boundary: QSL remains usable as its own stateful processing runtime, while Wilds products can use it as their common programmable processing layer.
 
 ## 3. Wilds Core Is Simulation Infrastructure
 
@@ -40,7 +41,6 @@ Core does not define the consumer world. It provides machinery through which tha
 ### Core is canon
 
 Wilds Core is treated as established canon during current Discoveries development.
-
 - Discoveries does not reshape Core for convenience.
 - No Core contract or implementation is changed as part of Discoveries work without an explicit architectural discussion and decision.
 - Discoveries may integrate with Core, but current Core integration must not silently become part of the intrinsic Discoveries ontology.
@@ -57,7 +57,9 @@ None of those operations inherently teach the platform what the underlying conce
 
 Information may exist in the consumer world without being legitimately available to an entity as knowledge.
 
-Discoveries protects this boundary. World data, observations, Evidence, Proof, Facts, and Discoveries participate in an epistemic process before they can contribute to higher-order knowledge.
+Discoveries protects this boundary. Consumer Reality, Evidence, Proof, Facts, and Discoveries participate in an epistemic process before information can contribute to higher-order knowledge.
+
+Observation or authorization may describe **how Evidence is admitted**. They are not separate canonical knowledge objects in the intrinsic progression.
 
 **The world knowing something does not mean an entity knows it.**
 
@@ -69,14 +71,13 @@ The current intrinsic knowledge progression is:
 
 **Consumer Reality → Evidence → Proof → Facts → Discoveries → Knowledge Geometry / Momentum → Clusters → Scoped Truths → Consequences**
 
-This progression separates observation, validation, local discovery, geometric composition, stabilized narrative, and projected outcome.
+This progression separates admitted information, validation, local discovery, geometric composition, stabilized narrative, and projected outcome.
 
 Discoveries provides the machinery. The consumer provides the meaning.
 
 ## 7. Evidence, Proof, Facts, and Discoveries Remain Distinct
 
 The architecture preserves epistemic boundaries:
-
 - an observation is not automatically Evidence;
 - Evidence is not automatically a Fact;
 - believable Evidence is not necessarily true;
@@ -84,7 +85,7 @@ The architecture preserves epistemic boundaries:
 - a Fact is not automatically available to every entity;
 - a Discovery is not automatically resolved because it has partial support;
 - an inference does not automatically become an observation;
-- a hypothesis does not automatically become consumer reality.
+- a hypothesis does not automatically become Consumer Reality.
 
 Failure or unresolved state is preferred over invented knowledge.
 
@@ -103,7 +104,6 @@ A two-of-three contributing state may therefore have meaningful directional mome
 Facts and Discoveries may contribute to consumer-defined vector dimensions. Discoveries validates the geometric structure while leaving dimension meaning external.
 
 The model supports:
-
 - components and points;
 - contributions and weights;
 - motion separated from position;
@@ -139,7 +139,7 @@ This allows Discoveries to represent both true and false narratives without coll
 
 Consequences belong to Discoveries because an entity can learn or project what may happen without yet deciding what to do.
 
-Consequences must originate through consumer-supplied meaning, entity experience, evidence, policy, scoped Truths, learned relationships, or another authorized source.
+Consequences must originate through consumer-supplied meaning, entity experience, Evidence, policy, scoped Truths, learned relationships, or another authorized source.
 
 Discoveries must not secretly know that a particular consumer noun implies a particular outcome.
 
@@ -154,7 +154,6 @@ A Consequence describes what may result. It does not prescribe an action.
 Planning, behavior selection, persistent agency, and action are intentionally downstream of the locked flagship scope.
 
 Consumers may connect the flagship stack to:
-
 - behavior trees;
 - GOAP planners;
 - utility AI;
@@ -170,35 +169,49 @@ Behavioral output does not automatically become Evidence, Fact, Discovery, Truth
 
 ## 14. Knowledge Is Local Until Explicitly Transferred
 
-Knowledge acquired by one entity does not automatically belong to another entity.
+Knowledge acquired by one entity, subject, or population does not automatically belong to another.
 
-Sharing, reporting, sampling, aggregation, corroboration, adoption, or other knowledge transitions must remain explicit and attributable.
+Sharing, reporting, sampling, aggregation, corroboration, adoption, social influence, or other knowledge transitions must remain explicit and attributable.
+
+A scoped Truth from one knowledge context may become Evidence belonging to another entity only through an explicit transition. The source Truth remains the source Truth. Its ownership, series, clusters, Discoveries, and history are not transferred into the receiving entity. The receiving entity receives new Evidence that can preserve an exact reference to that source Truth, and its own consumer policies decide whether that Evidence contributes to later Facts or Discoveries.
+
+This permits social influence and peer pressure without making consensus an automatic overwrite rule.
 
 **Transporting information is not the same as knowing it. Aggregating information is not the same as declaring it world truth.**
 
 ## 15. Consumer Policies May Contain Domain Semantics
 
-Consumers are explicitly permitted to provide domain-aware evidence, proof, contribution, vectorization, metric, curve, congealment, and consequence-projection policies.
+Consumers are explicitly permitted to provide domain-aware Evidence, Proof, contribution, vectorization, metric, curve, congealment, and Consequence-projection policies.
 
 **The semantic authority must remain attributable to the consumer.**
 
 The platform can execute a consumer rule without adopting that rule as platform knowledge.
 
-## 16. Standalone Product Boundaries Matter
+## 16. Authoring Convenience Must Not Hide Meaning
 
-The product family contains independent stopping points:
+The platform may remove mechanical authoring work when doing so does not erase semantic or structural responsibility.
+
+Generated identifiers, safe mechanical defaults, and deterministic history-key helpers may make ordinary authoring easier. Consumer-owned policies, semantic keys, scopes, relationships, history identity, and other meaningful configuration remain explicit where they define interpretation or provenance.
+
+A convenience API must not weaken structural integrity. When identity is already part of a dependent structure, as with identity-bound geometry mappings and profiles, the invariant takes precedence over convenience.
+
+**Remove paperwork, not meaning.**
+
+## 17. Standalone Product Boundaries Matter
+
+The product family contains independent technical stopping points while sharing a common packaging strategy.
 
 ### QSL — Stateful Processing
 
-A consumer can use QSL and stop.
+A consumer can use QSL and stop. QSL also ships as the processing enhancement included with Wilds product offerings.
 
 ### Wilds Core — Simulation Infrastructure
 
-A consumer can use Core beneath its own scripting, knowledge, and agency systems and stop.
+A consumer can use Core beneath its own scripting, knowledge, and agency systems and stop. Wilds product offerings include QSL as the common stateful processing enhancement.
 
 ### Wilds.Discoveries — Knowledge and Emergent Narrative
 
-A consumer can use Discoveries as a knowledge-processing system and connect its output to any downstream agency stack.
+A consumer can use Discoveries as a knowledge-processing system and connect its output to any downstream agency stack. Wilds product offerings include QSL while Discoveries retains its own intrinsic knowledge boundary.
 
 ### Wilds + QSL — Programmable Simulation
 
@@ -210,10 +223,9 @@ The flagship combines simulation, stateful processing, epistemic development, kn
 
 Agency remains downstream.
 
-## 17. Explicit Out-of-Scope Rules
+## 18. Explicit Out-of-Scope Rules
 
 The following are **not required for completion of the current flagship roadmap**:
-
 - a Wilds-native behavior tree;
 - GOAP implementation;
 - utility-AI implementation;
@@ -234,12 +246,11 @@ These may exist as consumer integrations, add-ons, experiments, or future separa
 
 **No new required product layer is added beyond Consequence projection without a future explicit scope decision.**
 
-## 18. Gateways Prefer Explicit Failure Over Invention
+## 19. Gateways Prefer Explicit Failure Over Invention
 
 When required state, vocabulary, authority, identity, provenance, knowledge, geometry, or processing conditions are unavailable, the architecture should prefer an explicit unresolved or failed result over silently manufacturing what is missing.
 
 The standing requirements are:
-
 - explicit availability;
 - explicit ownership;
 - explicit transitions;
@@ -249,11 +260,11 @@ The standing requirements are:
 - contradiction preservation;
 - failure instead of invention.
 
-## Results Are Attributable, Not Opaque
+## 20. Results Are Attributable, Not Opaque
 
 Wilds must not produce knowledge as an unexplained black-box conclusion.
 
-Every meaningful epistemic result must remain attributable through the authorized information, consumer-supplied state, Evidence, Proof, Facts, Discoveries, policies, geometric development, clusters, scoped Truths, and other legitimate inputs that produced it.
+Every meaningful epistemic result must remain attributable through Consumer Reality, Evidence, Proof, Facts, Discoveries, consumer policies, geometric development, clusters, scoped Truths, and other legitimate inputs that produced it.
 
 Where consumers supply typed objects, state, vocabulary, and domain-aware policies, that information remains consumer-owned and attributable through processing. Wilds may process those values without collapsing them into hidden platform semantics.
 
@@ -267,7 +278,9 @@ This requirement continues through knowledge geometry, clustering, scoped Truth 
 
 ### Provenance Chain
 
-Consumer Reality → Authorized State / Observation → Evidence → Proof → Facts → Discoveries → Knowledge Geometry / Momentum → Clusters → Scoped Truths → Consequences
+**Consumer Reality → Evidence → Proof → Facts → Discoveries → Knowledge Geometry / Momentum → Clusters → Scoped Truths → Consequences**
+
+Authorization and observation describe how Evidence may be admitted; they do not introduce another canonical knowledge object into this chain.
 
 At every transition: **preserve identity • preserve provenance • preserve consumer ownership • preserve legitimate knowledge boundaries**.
 
@@ -277,7 +290,7 @@ When evaluating a feature, processor, integration, policy, or future product pro
 
 **Where did this meaning come from? Who is entitled to know it? Does it belong inside the locked product scope?**
 
-If meaning originates from identifiable consumer state, observation, Evidence, policy, knowledge, or another authorized boundary, semantic custody remains intact.
+If meaning originates from identifiable consumer state, Evidence, policy, knowledge, or another authorized boundary, semantic custody remains intact.
 
 If entity knowledge arises through legitimate epistemic processing, epistemic custody remains intact.
 
@@ -288,6 +301,7 @@ If the answer becomes **“Wilds just knew,” “the entity knew because the wo
 - **QSL processes state.**
 - **Wilds Core processes simulation.**
 - **Wilds.Discoveries develops knowledge, narratives, scoped Truths, and Consequences.**
+- **QSL enhances Wilds product offerings while remaining a standalone processing product.**
 - **Wilds + QSL provides programmable simulation.**
 - **Wilds + QSL + Discoveries is the flagship integrated stack.**
 - **External agency decides what to do next.**
