@@ -1,2 +1,38 @@
-using System;using WildsEngine.Discoveries.Abstractions.Consequences;using WildsEngine.Discoveries.Base;using WildsEngine.Discoveries.Abstractions;
-namespace WildsEngine.Discoveries.Consequences { public sealed class DiscoveryConsequenceProfile:IdentifierBase,IDiscoveryConsequenceProfile { public DiscoveryConsequenceProfile(Guid id,string slug,string version,string scope,IConsequenceProjectionPolicy policy):base(id,slug){if(string.IsNullOrWhiteSpace(version)||string.IsNullOrWhiteSpace(scope))throw new ArgumentException("Version and scope required.");Version=version.Trim();Scope=scope.Trim();ProjectionPolicy=policy??throw new ArgumentNullException(nameof(policy));}public string Version{get;}public string Scope{get;}public IConsequenceProjectionPolicy ProjectionPolicy{get;} } }
+using System;
+using WildsEngine.Discoveries.Abstractions;
+using WildsEngine.Discoveries.Abstractions.Consequences;
+using WildsEngine.Discoveries.Base;
+
+namespace WildsEngine.Discoveries.Consequences
+{
+    public sealed class DiscoveryConsequenceProfile : IdentifierBase, IDiscoveryConsequenceProfile
+    {
+        public DiscoveryConsequenceProfile(
+            string slug,
+            string scope,
+            IConsequenceProjectionPolicy policy)
+            : this(Guid.NewGuid(), slug, "1.0", scope, policy)
+        {
+        }
+
+        public DiscoveryConsequenceProfile(
+            Guid id,
+            string slug,
+            string version,
+            string scope,
+            IConsequenceProjectionPolicy policy)
+            : base(id, slug)
+        {
+            if (string.IsNullOrWhiteSpace(version) || string.IsNullOrWhiteSpace(scope))
+                throw new ArgumentException("Version and scope required.");
+
+            Version = version.Trim();
+            Scope = scope.Trim();
+            ProjectionPolicy = policy ?? throw new ArgumentNullException(nameof(policy));
+        }
+
+        public string Version { get; }
+        public string Scope { get; }
+        public IConsequenceProjectionPolicy ProjectionPolicy { get; }
+    }
+}

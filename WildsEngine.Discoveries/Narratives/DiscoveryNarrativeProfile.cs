@@ -9,6 +9,16 @@ namespace WildsEngine.Discoveries.Narratives
     public sealed class DiscoveryNarrativeProfile : IdentifierBase, IDiscoveryNarrativeProfile
     {
         public DiscoveryNarrativeProfile(
+            string slug,
+            string scope,
+            IDiscoveryNarrativeCompositionPolicy compositionPolicy,
+            IDiscoveryNarrativeMetric metric,
+            IReadOnlyList<IDiscoveryNarrativeRelationshipDefinition> relationships)
+            : this(Guid.NewGuid(), slug, "1.0", scope, compositionPolicy, metric, relationships)
+        {
+        }
+
+        public DiscoveryNarrativeProfile(
             Guid id,
             string slug,
             string version,
@@ -28,6 +38,7 @@ namespace WildsEngine.Discoveries.Narratives
             var ids = new HashSet<Guid>();
             var slugs = new HashSet<string>(StringComparer.Ordinal);
             var pairs = new HashSet<string>(StringComparer.Ordinal);
+
             for (var index = 0; index < relationships.Count; index++)
             {
                 var relationship = relationships[index] ??
@@ -54,6 +65,6 @@ namespace WildsEngine.Discoveries.Narratives
         public IReadOnlyList<IDiscoveryNarrativeRelationshipDefinition> Relationships { get; }
 
         private static string PairKey(string left, string right) =>
-            string.CompareOrdinal(left, right) <= 0 ? left + "\u001f" + right : right + "\u001f" + left;
+            string.CompareOrdinal(left, right) <= 0 ? left + "" + right : right + "" + left;
     }
 }
